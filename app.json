@@ -1,0 +1,12 @@
+{
+  "name": "bookChamp",
+  "displayName": "bookChamp",
+  "expo": {
+    "name": "bookChamp",
+    "slug": "bookChamp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
