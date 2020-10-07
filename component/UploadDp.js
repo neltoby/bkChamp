@@ -8,6 +8,8 @@ import { Badge } from 'react-native-elements'
 
 export default function UploadDp() {
     const [imgUrl, setImg] = useState({})
+    const [cloudImg, setCloudImg] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -15,14 +17,33 @@ export default function UploadDp() {
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
+            base64: true,
         });
-      
-        console.log(result);
-      
-          if (!result.cancelled) {
-            setImg(result);
-          }
+
+        if (!result.cancelled) {
+        setImg(result);
+        }
     }
+
+    const uploadPix = () => {
+        setLoading(true)
+        let base64Img = `data:image/jpg;base64,${imgUrl.base64}`;
+        let data = {
+            "file": base64Img,
+            "upload_preset": "",
+        }
+    }
+
+    useEffect(() => {
+        (async () => {
+            if (Constants.platform.ios) {
+                const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+                if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+                }
+            }
+        })();
+    }, []);
 
     return (
         <Container>
@@ -44,6 +65,12 @@ export default function UploadDp() {
                             value = {<Icon name="camera" style={{ fontSize: 25, color: "#054078" }}/>}
                             onPress= {pickImage}
                         />
+                        {loading ? 
+                            <View style={style.loading}>
+                                <Text style={style.loadingText}>Loading</Text>
+                            </View> 
+                            : null
+                        }
                     </View>
                 </View>
                 <View style={style.infoDirection}>
@@ -113,6 +140,17 @@ const style = StyleSheet.create({
         width: 140,
         height: 140,
         borderRadius: 70
+    },
+    loading: {
+        width: 80,
+        position: 'absolute',
+        top: 50,
+        right: 30,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+    },
+    loadingText: {
+        fontSize: 15,
+        color: '#fff',
     },
     button: {
         // paddingHorizontal:

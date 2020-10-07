@@ -1,12 +1,16 @@
 import React, {useState, useEffect } from 'react'
 import Constants from 'expo-constants';
+import { useFocusEffect } from '@react-navigation/native';
 import logo from '../processes/image'
 import Container from './Container'
+import ErrorBoundary from './ErrorBoundary'
+import ErrorUi from './ErrorUi'
 import FocusAwareStatusBar from './FocusAwareStatusBar'
 import { View, Text, StyleSheet, Image,  Platform } from 'react-native'
 import { Input, Button, Icon } from 'react-native-elements'
 import { Header, Content, Left, Right, Body, Title, Icon as NativeIcon, Button as NButton } from 'native-base';
 import { vNumber } from '../actions/login'
+import { signUp } from '../actions/request'
 import { useDispatch } from 'react-redux';
 
 const Username = ({ navigation, route }) => {
@@ -16,12 +20,17 @@ const Username = ({ navigation, route }) => {
     // const [phone, setPhone] = useState('')
     // const [password, setPassword] = useState('')
     const details = {}
+    details['name'] = route.params.name
+    details['email'] = route.params.email
+    details['phone_number'] = route.params.phone
+    details['password'] = route.params.password
+    console.log(details)
 
     const dispatch = useDispatch()
     
     const handleBack = () => {
         navigation.navigate('SignUp', {
-            name, email, phone, password
+            name: details.name, email: details.email, phone: details.phone_number, password: details.password
         })
     }
     const nextSlide = () => {        
@@ -30,103 +39,93 @@ const Username = ({ navigation, route }) => {
     }
     const handleSignUp = () => {
         dispatch(vNumber(23456))
+        console.log(details)
+        // dispatch(signUp({...details, username }, nextSlide))
         setUserName('')
         nextSlide()
-        // Animated.timing(iconValue, {
-        //     toValue: 35,
-        //     duration: 1000,
-        // }).start()
     }
-    useEffect(() => {
-        if(route.params?.name){
-            details['name'] = route.params.name
-        }
-        if(route.params?.email){
-            details['email'] = route.params.email
-        }
-        if(route.params?.phone){
-            details['phone'] = route.params.phone
-        }
-        if(route.params?.password){
-            details['password'] = route.params.password
-        }
-    },[route.params])
-    useEffect(() => {
-        (async () => {
-            if (Constants.platform.ios) {
-                const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
-                if (status !== 'granted') {
-                alert('Sorry, we need camera roll permissions to make this work!');
-                }
+    useFocusEffect(
+        React.useCallback(() => {
+            const backAction = () => {
+                handleBack()
+                return false                                             
             }
-        })();
-      }, []);
+
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
+        }, [])
+    )
+    
     return(
-        <Container>
-            <FocusAwareStatusBar barStyle='light-content' backgroundColor='#054078' />
-            <Header transparent >
-                <Left>
-                    <NButton transparent onPress = {handleBack}>
-                        <NativeIcon name={Platform.OS == 'ios' ? 'chevron-back' : 'arrow-back'} />
-                    </NButton>
-                </Left>
-                <Body>
-                    <Title>Book Champ</Title>
-                </Body>
-                <Right>
-                    <Image source={logo()} 
-                    style={style.img} />
-                </Right>
-            </Header>
-            <Content 
-                contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'center'}} 
-            >       
-                <View style={style.usertextContainer}>
-                    <Text style={style.usertext}>
-                        Create a username
-                    </Text> 
-                </View>
-                <View style={style.inputContainer}>
-                <Input
-                    value = {username}
-                    label = 'Username'
-                    labelStyle = {style.label}
-                    inputContainerStyle={style.inputs}
-                    inputStyle={style.input}
-                    placeholder='Username'
-                    leftIcon={
-                        <Icon
-                        type='font-awesome'
-                        name='user-circle'
-                        size={24}
-                        color='#fff'
-                        />
-                    }
-                    onChangeText={value => setUserName(value)}
-                />
-                </View>
-                <View style={{...style.viewImg, marginTop: 20}}>
-                    <Button
-                        onPress = {handleSignUp}
-                        raised
-                        buttonStyle = {{width: 150, backgroundColor: '#1258ba'}}
-                        type = 'solid'
-                        icon={
+        <ErrorBoundary ui={<ErrorUi />}>
+            <Container>
+                <FocusAwareStatusBar barStyle='light-content' backgroundColor='#054078' />
+                <Header transparent >
+                    <Left>
+                        <NButton transparent onPress = {handleBack}>
+                            <NativeIcon name={Platform.OS == 'ios' ? 'chevron-back' : 'arrow-back'} />
+                        </NButton>
+                    </Left>
+                    <Body>
+                        <Title>Book Champ</Title>
+                    </Body>
+                    <Right>
+                        <Image source={logo()} 
+                        style={style.img} />
+                    </Right>
+                </Header>
+                <Content 
+                    contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'center'}} 
+                >       
+                    <View style={style.usertextContainer}>
+                        <Text style={style.usertext}>
+                            Create a username
+                        </Text> 
+                    </View>
+                    <View style={style.inputContainer}>
+                    <Input
+                        value = {username}
+                        label = 'Username'
+                        labelStyle = {style.label}
+                        inputContainerStyle={style.inputs}
+                        inputStyle={style.input}
+                        placeholder='Username'
+                        leftIcon={
                             <Icon
                             type='font-awesome'
-                            name="angle-right"
-                            size={20}
-                            color="#fff"
+                            name='user-circle'
+                            size={24}
+                            color='#fff'
                             />
                         }
-                        iconRight 
-                        titleStyle={{marginRight: 10}}
-                        title="SIGN UP"
+                        onChangeText={value => setUserName(value)}
                     />
-                </View>
-                
-            </Content>
-        </Container>
+                    </View>
+                    <View style={{...style.viewImg, marginTop: 20}}>
+                        <Button
+                            onPress = {handleSignUp}
+                            raised
+                            buttonStyle = {{width: 150, backgroundColor: '#1258ba'}}
+                            type = 'solid'
+                            icon={
+                                <Icon
+                                type='font-awesome'
+                                name="angle-right"
+                                size={20}
+                                color="#fff"
+                                />
+                            }
+                            iconRight 
+                            titleStyle={{marginRight: 10}}
+                            title="SIGN UP"
+                        />
+                    </View>
+                    
+                </Content>
+            </Container>
+        </ErrorBoundary>
     )
 }
 export default Username

@@ -7,6 +7,8 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "description": "Most recent expo version 39 for bookchamp",
+    "githubUrl": "https://github.com/neltoby/bkChamp"
   }
 }

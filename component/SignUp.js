@@ -13,7 +13,7 @@ const SignUp = ({ navigation, route }) => {
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
     const validator = new SimpleReactValidator();
-    handleSignUp = () => {
+    const handleSignUp = () => {
         if (validator.allValid()) {
             if(name.trim().split(' ').length > 1){
                 navigation.navigate('Username', {

@@ -3,14 +3,14 @@ import {displayItems} from '../processes/displayItems'
 import {LIKE, ARCHIVE, UNARCHIVE, SETARTICLE, LOADING_ARTICLE, SET_SUBJECT,
     ARTICLE_REMOVE_ERR, LOADING_ARTICLE_STOP, ARTICLE_LOADING_FAILED, READ_ARTICLE} from '../actions/learn'
 import isJson from '../processes/isJson'
-import { imageBase64 } from '../processes/db'
+import { img } from '../processes/db'
 
 const initialState = {
     displayItems: [],
     loading_article: false,
     load_error: false,
     subject: null,
-    preview: imageBase64(),
+    preview: img,
 }
 
 export default function learnReducer (state = initialState, action) {

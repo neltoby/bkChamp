@@ -19,6 +19,7 @@ export default function VerificationBody({ navigation }) {
                 // signed up but haven't confirmed 
                 await storeKey(loginValue, val)
                 await deleteKey(confirm)
+                // verication state set to set false indicates that user is verified and confirm token removed
                 await dispatch(verification(false))
             }
             navigation.navigate('UploadDp')

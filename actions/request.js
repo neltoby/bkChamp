@@ -1,6 +1,7 @@
 import {loginStatus, login} from './login'
 import {storeKey, getKey} from '../processes/keyStore'
 import {loginValue, confirm} from '../processes/lock'
+import isJson from '../processes/isJson'
 import { onArticleSuccess, setArticle, articleErrDis, onFailedLike,
     setSubject, likeDisperse, archiveDisperse, archived, like } from './learn'
 import { registerPoint } from './quiz'
@@ -272,29 +273,31 @@ export const buyPoints = payload => {
     }
 }
 
-export const SignUp =  ({ payload, navigation })=> {
+export const signUp =  (payload, navigateFxn)=> {
     return (dispatch, getState) => {
         (async () => {
             // settin up params
             const param = {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Token ${val}`
+                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
             }
-            fetch(`${domain}signup`, param)
+            await fetch(`${domain}signup`, param)
             .then(res => res.json())
             .then(json => {
-                const obj = JSON.parse(json)
+                console.log(json)
+                const obj = isJson(json)
                 if(obj.constructor === Object && obj.token){
                     dispatch(verificationPoint(obj))
                     return obj
                 }else throw new Error(obj)               
             })
             .then(obj => storeKey(confirm, obj.token))
-            .then(response => navigation.navigate())
-            .catch(err => console.log(err))
+            .then(response => navigateFxn())
+            .catch(err => console.log(err.message, 'fro eror reporting'))
         })()
     }
 }

@@ -9,13 +9,10 @@ export default function useCheckpoint(failed, success, payload) {
     const checkPoint = async () => {
         const {isConnected, isInternetReachable} = await Network.getNetworkStateAsync()
         const airplane = await Network.isAirplaneModeEnabledAsync()
-        const unsubscribe = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
-          });
-        console.log(isConnected, 'isConnected')
-        console.log(isInternetReachable, 'isInternetReachable')
-        console.log(airplane, 'airplane')
+        // const unsubscribe = NetInfo.addEventListener(state => {
+        //     console.log("Connection type", state.type);
+        //     console.log("Is connected?", state.isConnected);
+        // });
         if(airplane){
             Toast.show(
                 { 
@@ -25,7 +22,7 @@ export default function useCheckpoint(failed, success, payload) {
                 }
             )
             return await failed(payload)
-        }else if(isConnected || isInternetReachable) {
+        }else if(!isConnected || !isInternetReachable) {
             Toast.show(
                 { 
                     text: `Request failed, Please check your internet connenction`, 

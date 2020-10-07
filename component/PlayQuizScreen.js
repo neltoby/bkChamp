@@ -38,29 +38,31 @@ const PlayQuizScreen = ({ navigation }) => {
         dispatch(setOverlay('cancel'))
         navigation.navigate('SelectHome')
     }
-    useEffect(() => {
-        const backAction = () => {
-            if(store !== 'timeOut'){
-                Alert.alert('Abort?', 'Are you sure you want to abort your current quiz session',
-                    [
-                        {
-                            text: "Cancel",
-                            onPress: () => null,
-                            style: "cancel"
-                        },
-                        { text: "YES", onPress: () => navigation.navigate('Quiz') }
-                    ]
-                )
-                return true
-            }                                              
-        }
+    useFocusEffect(
+        React.useCallback(() => {
+            const backAction = () => {
+                if(store !== 'timeOut'){
+                    Alert.alert('Abort?', 'Are you sure you want to abort your current quiz session',
+                        [
+                            {
+                                text: "Cancel",
+                                onPress: () => null,
+                                style: "cancel"
+                            },
+                            { text: "YES", onPress: () => navigation.navigate('Quiz') }
+                        ]
+                    )
+                    return true
+                }                                              
+            }
 
-        BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => {
-            BackHandler.removeEventListener('hardwareBackPress', backAction)
-        }
-    }, [])
-    console.log(store, 'store.quiz.setOverlay 127 again and again')
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
+        }, [])
+    )
+
     return (
         <>
         <Container style={{backgroundColor: "#054078"}}>
