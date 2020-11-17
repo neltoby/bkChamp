@@ -27,9 +27,11 @@ export default function learnReducer (state = initialState, action) {
                         }else{
                             item.likes = item.likes + 1
                             item.liked = true
-                        }          
-                    }
-                    return item
+                        }  
+                        return item        
+                    }else{
+                        return item
+                    }                   
                 }) 
                 draft.displayItems = isJson(newItemRes)
             })
@@ -54,8 +56,9 @@ export default function learnReducer (state = initialState, action) {
                 let newDisplay = isJson(state.displayItems.slice())
                 draft.displayItems = newDisplay.map((element, i) => {
                     element=isJson(element)
-                    if(element.id == action.payload){
+                    if(element.id == action.payload.item.id){
                         element.archived = false
+                        return element
                     }
                     return element
                 })

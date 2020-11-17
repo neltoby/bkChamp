@@ -1,16 +1,31 @@
-import React, { memo } from 'react'
-import { View, Text, StyleSheet, Image} from 'react-native'
+import React, { memo, useEffect } from 'react'
+import { ScrollView, View, Text, StyleSheet, Image} from 'react-native'
 import { Button } from 'native-base'
 import { useSelector, useDispatch } from 'react-redux'
 import isJson from '../processes/isJson'
 import {oops} from '../processes/image'
-import { active, setOverlay, playingAgain } from '../actions/quiz'
+import { endGame, callStartGame } from '../actions/request'
+import { active, setOverlay, playingAgain, loadQuiz, loadQuestion, noPoints } from '../actions/quiz'
 
 export default function QuizResult({navigation}) {
     const store = isJson(useSelector(state => state))
+    const points = store.user.user.points
+    const skipped = useSelector(state => state.quiz).skipped
+    const question = useSelector(state => state.quiz).question
+    let score = useSelector(state => state.quiz).score
     const dispatch = useDispatch()
     const playAgain = () => {
-        dispatch(playingAgain())
+        dispatch(setOverlay('cancel'))
+        dispatch(loadQuiz(true))
+        dispatch(loadQuestion({}))
+        if(points > 0){
+            dispatch(playingAgain()) 
+            dispatch(callStartGame())
+        }else{
+            dispatch(loadQuiz(false))
+            dispatch(noPoints(true))
+        }
+        
     }
 
     const cancelQuiz = () => {
@@ -23,8 +38,29 @@ export default function QuizResult({navigation}) {
         dispatch(setOverlay('cancel'))
         navigation.navigate('ReviewQuestion')
     }
+    useEffect(() => {
+        if(store.quiz.setOverlay === 'end' || 
+        store.quiz.setOverlay === 'timeOut'){           
+            let unanswered = []               
+            question.easy.forEach(element => {
+                unanswered.push(element.id)
+            });
+            question.moderate.forEach(element => {
+                unanswered.push(element.id)
+            });
+            question.difficult.forEach(element => {
+                unanswered.push(element.id)
+            });
+            let payload = {skipped, undisplayed: unanswered, score}
+            console.log(payload)
+            dispatch(endGame({payload}))
+        }
+        return () => {
+        }
+    }, [store.quiz.setOverlay])
     return (
-        <View style={style.overlay}> 
+        <View style={style.overlay}>
+        <ScrollView contentContainerStyle={{alignItems: 'center'}}> 
             {
                 store.quiz.setOverlay === 'end' ? (
                     <>
@@ -41,7 +77,7 @@ export default function QuizResult({navigation}) {
                 (
                     <>
                         <Text style={style.oops}>
-                            Ooops... You timed out!
+                            Ooops... Your time is out!
                         </Text>
                         <View style={style.oopsView}>
                             <Image source={oops()} style={style.oopsImage} />
@@ -101,7 +137,8 @@ export default function QuizResult({navigation}) {
                     <Text style={[style.buttonText, {color: '#fff'}]}>Cancel</Text>
                 </Button>
             </View>               
-        </View>  
+        </ScrollView>  
+        </View>
     )
 }
 
@@ -122,7 +159,7 @@ const style = StyleSheet.create({
     overlay: {
         backgroundColor: '#fff',
         width: '90%',
-        alignItems: 'center',
+        flex: 0.7,
         paddingHorizontal: 5,
         paddingVertical: 10,
         borderRadius: 5,
@@ -131,8 +168,8 @@ const style = StyleSheet.create({
         fontSize: 17
     },
     oopsImage: {
-        width: 150,
-        height: 150,
+        width: 100,
+        height: 100,
     },
     oops: {
         fontSize: 20,

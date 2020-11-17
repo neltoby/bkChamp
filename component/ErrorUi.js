@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, BackHandler } from 'react-native'
 import deviceSize from '../processes/deviceSize'
 import { Input } from 'react-native-elements';
 import { Button } from 'native-base';
+import { Restart } from 'fiction-expo-restart';
 
 export default function ErrorUi() {
     const deviceWidth = deviceSize().deviceWidth;
@@ -12,7 +13,8 @@ export default function ErrorUi() {
     const tval = new Value(0)
 
     const exitApp = () => {
-        BackHandler.exitApp()
+        Restart();
+        // BackHandler.exitApp()
     }
     useEffect(() => {
         block([

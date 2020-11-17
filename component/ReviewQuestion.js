@@ -1,20 +1,28 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
+import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
 import { Container, Header, Content, Footer, Left, Body, Title, Right, Button, FooterTab, Icon as NativeIcon } from 'native-base'
-import {View, Text, StyleSheet, SafeAreaView, StatusBar, Image, useWindowDimensions} from 'react-native'
+import {View, Text, StyleSheet, StatusBar, Image, useWindowDimensions} from 'react-native'
 import { useSelector, useDispatch } from 'react-redux';
+import Overlay from './Overlay';
+import Rolling from './Rolling'
+import { MemoizedPlayAgainButton } from './PlayAgainButton'
 import isJson from '../processes/isJson';
 import {noQuestion} from '../processes/image'
-import {playedCurrent, resetplayedCurrent, playingAgain, settime} from '../actions/quiz'
+import { callStartGame } from '../actions/request'
+import {playedCurrent, playedPrev, resetplayedCurrent, playingAgain, settime, loadQuestion, loadQuiz } from '../actions/quiz'
 
 const ReviewQuestion = ({ navigation }) => {
+    const [startAgain, setStartAgain] = useState(false)
+    const loading = isJson(useSelector(state => state.quiz)).loadingQuiz
     const windowHeight = useWindowDimensions().height;
     const store = isJson(useSelector(state => state))
     const dispatch = useDispatch()
     const played = store.quiz.played
     const no = store.quiz.playedCurrent
     const current = isJson(played[no])
+    const points = useSelector(state => state.user).user.points
     const avail = Object.entries(current).length 
     const col = current.answer === current.selected ? '#00ff00' : 'red' ;
     useFocusEffect(
@@ -26,14 +34,32 @@ const ReviewQuestion = ({ navigation }) => {
                 dispatch(playingAgain()) 
                 dispatch(settime(''))           
             }
-        }, [])
-        
+        }, [])        
     )
+
+    const setAgain = useCallback(
+        () => {
+            setStartAgain(true)
+        },
+        [],
+    )
+
+    const redirect = () => {
+        navigation.navigate('PlayQuiz')
+    }
+
+    const playAgain = () => {
+        dispatch(loadQuiz(true))
+        setStartAgain(false)
+        dispatch(loadQuestion({}))
+        dispatch(callStartGame(redirect))
+    }
     const nextQuestion = () => {
         dispatch(playedCurrent())
     }
+    const prevQuestion = () => dispatch(playedPrev())
     const goback = () => { 
-        navigation.navigate('PlayQuiz')
+        navigation.navigate('Quiz')
     }
     return(
         <Container style={{backgroundColor: "#054078"}}>
@@ -58,11 +84,33 @@ const ReviewQuestion = ({ navigation }) => {
             <View style={style.container}>
                 {played.length ?
                     <View style={style.review}>
-                        <Text style={style.questag}>Q{parseInt(parseInt(no) + 1)}</Text>
-                        <View style={style.textContent}>
-                            <Text style={style.question}>
-                                {current.question}
-                            </Text>
+                        <View style={style.content}>
+                            <Text style={style.questag}>Q{parseInt(parseInt(no) + 1)}</Text>
+                        </View>
+                        <View style={[style.levelContent, 
+                            {backgroundColor: current.difficulty === 'EASY' ? '#019900' : current.difficulty === 'MODERATE' ? '#0033ff' : '#ff3300'}]}>
+                            <Text style={style.levelContainer}>
+                                <Text style={style.levelText}>
+                                    Difficulty level - 
+                                </Text>
+                                <Text style={style.levelText}>
+                                    - 
+                                </Text>
+                                <Text style={style.levelText}>
+                                    {
+                                        current.difficulty === 'EASY' ?
+                                            'Easy' : 
+                                            current.difficulty === 'MODERATE' ? 'Moderate' : 'Difficult'
+                                    }
+                                </Text>
+                            </Text>      
+                        </View>
+                        <View style={style.textContent}>                          
+                            <View style={style.countContainer}>
+                                <Text style={style.question}>
+                                    {current.question}
+                                </Text>
+                            </View>                  
                             <Text style={{...style.question, color: col}}>
                                 YOUR ANSWER : {current.selected}
                             </Text>
@@ -76,24 +124,35 @@ const ReviewQuestion = ({ navigation }) => {
                         <View style={style.textContent}>
                             <Text>
                                 <Text style={style.note}>NOTE: </Text>
-                                <Text style={style.noteContent}>{current.note}</Text>
+                                <Text style={style.noteContent}>{current.notes}</Text>
                             </Text>
                         </View>
                         <View style={style.next}>
                             {no < played.length - 1 ?
                                 <Button transparent onPress={() => nextQuestion()}>
-                                    <Text>Next</Text>
+                                    <Text style={{color: '#0033ff', fontWeight: 'bold'}}>Next</Text>
                                 </Button>
                             :
-                                <Text />
+                                null
+                            }
+                            {no !== 0 ?
+                                <Button transparent onPress={() => prevQuestion()}>
+                                    <Text style={{color: '#0033ff', fontWeight: 'bold'}}>Back</Text>
+                                </Button>
+                            :
+                                null
                             }
                         </View>
+                        <MemoizedPlayAgainButton setStartAgain={setAgain} />
                     </View>
                     : 
-                    <View style={style.noreview}>
-                        <Text style={style.noQuest}>You have not answered any question!</Text>
-                        <Image source={noQuestion()} style={style.img} />
-                    </View>
+                    <>
+                        <View style={style.noreview}>
+                            <Text style={style.noQuest}>You have not answered any question!</Text>
+                            <Image source={noQuestion()} style={style.img} />                       
+                        </View>
+                        <MemoizedPlayAgainButton setStartAgain={setAgain} />
+                    </>
                 }
             </View>
             </Content>
@@ -104,6 +163,64 @@ const ReviewQuestion = ({ navigation }) => {
                     </Button>
                 </FooterTab>
             </Footer>
+            <Modal
+                useNativeDriver={true}
+                visible={startAgain}
+                swipeDirection={['up', 'down']} // can be string or an array
+                swipeThreshold={200} // default 100
+                onSwipeOut={event => setStartAgain(false)}
+                onHardwareBackPress={() => setStartAgain(false)}
+                modalTitle={<ModalTitle title='Play again?' />}
+                footer={
+                    <ModalFooter>
+                        {points > 0 ? 
+                            <>
+                                <ModalButton
+                                    text="No"
+                                    onPress={() => setStartAgain(false)}
+                                />
+                                <ModalButton
+                                    text="Yes"
+                                    onPress={() => playAgain()}
+                                /> 
+                            </>
+                            :
+                            <>
+                                <ModalButton
+                                    text="Cancel"
+                                    onPress={() => setStartAgain(false)}
+                                />
+                                <ModalButton
+                                    text="Subscribe"
+                                    onPress={() => navigation.navigate('Subscribe')}
+                                />
+                            </>
+                        }
+                    </ModalFooter>
+                  }
+            >
+                <ModalContent>                   
+                    <View style={style.showView}>                       
+                        {points > 0 ? 
+                            <Text>
+                                You are about to start a new quiz session
+                            </Text>
+                            : 
+                            <>
+                                <Text>
+                                    You do not have sufficient points to start a game session
+                                </Text>
+                                <Text>
+                                    Use the subscribe button below
+                                </Text>
+                            </>
+                        }                        
+                    </View>
+                </ModalContent>
+            </Modal>
+            <Overlay isVisible={loading} >
+                <Rolling text='Loading ...' />
+            </Overlay>
         </Container>
     )
 }
@@ -125,6 +242,11 @@ const style = StyleSheet.create({
         height: 400,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    startBut: {
+        marginTop: 30,
+        width: '100%',
+        alignItems: 'center'
     },
     review: {
         marginTop: 15,
@@ -149,6 +271,20 @@ const style = StyleSheet.create({
         color: '#777',
         marginBottom: 10,
     },
+    levelContent: {
+        alignItems: 'center',
+        paddingVertical: 7,
+        borderRadius: 40,
+    },
+    levelContainer: {
+        textAlign: 'center'
+    },
+    levelText: {
+        paddingHorizontal: 10,
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
     textContent: {
         paddingHorizontal: 10,
     },
@@ -159,7 +295,7 @@ const style = StyleSheet.create({
     },
     next: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         paddingRight: 15,
     },
     note: {

@@ -1,23 +1,36 @@
-import React, { useEffect, lazy, Suspense, useMemo } from 'react'
+import React, { lazy, Suspense, useMemo, useCallback } from 'react'
 import FocusAwareStatusBar from './FocusAwareStatusBar'
-import { Container, Content,Toast, Card, CardItem, Body, Icon as NativeIcon } from 'native-base'
-import { View, Text, StyleSheet, Image as RNImage, BackHandler } from 'react-native'
-import {lionel} from '../processes/image'
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Container, Toast, Card, CardItem, Body, Icon as NativeIcon } from 'native-base'
+import { View, ScrollView, Text, StyleSheet, BackHandler } from 'react-native'
 import isJson from '../processes/isJson'; 
 import deviceSize from '../processes/deviceSize'
 import Rolling from './Rolling'
 import { MemoizedSubjectHeader } from './SubjectHeader'
+import ReadItems from './ReadItems'
 import Image from './Image'
-import {onFailedLike, loadingArticleStop, onFailedArchive} from '../actions/learn'
-import { likeFxn, unlikeFxn, archiveFxn } from '../actions/request'
-import useCheckpoint from './useCheckpoint'
+import { TabRouter, useFocusEffect } from '@react-navigation/native'
+import {loadingArticleStop} from '../actions/learn'
+// import { likeFxn, unlikeFxn, archiveFxn } from '../actions/request'
+// import useCheckpoint from './useCheckpoint'
 import { useDispatch, useSelector } from 'react-redux';
 
 const Overlay = lazy(() => import('./Overlay'))
 const ErrorPage = lazy(() => import('./ErrorPage'))
 // const deviceHeight = deviceSize().deviceHeight
 // const deviceWidth = deviceSize().deviceWidth
+
+const uris = {
+    history: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230128/Categories/History_ndetqy.jpg',
+    health: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230123/Categories/Health_cover_z40x2g.jpg',
+    geography: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230121/Categories/Geography_oqgvbc.jpg',
+    finance: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230109/Categories/Finance_o4i2xw.jpg',
+    sport: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230107/Categories/Sports_okhqqt.jpg',
+    socials: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230086/Categories/Socials_pmz5gk.jpg',
+    science: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230081/Categories/Science_lglise.jpg',
+    politics: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230077/Categories/Politics_mmds91.jpg',
+    lifestyle: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230047/Categories/Lifestyle_cbwqqv.jpg',
+    entertainment: 'https://res.cloudinary.com/bookchmap/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1603230030/Categories/Entertainment_s0wxqp.jpg'
+}
 
 
 const Subject = ({ navigation, route }) => {
@@ -28,88 +41,49 @@ const Subject = ({ navigation, route }) => {
     const store = isJson(useSelector(state => state.learn))
     const preview = useMemo(() => { uri: store.preview }, [store.preview])
     const disItems = isJson(store.displayItems)
-    const takeTo = ({item}) => {
-        navigation.navigate('ReadPost', {subject: subject, item})
-    }
-    const likes = async (id, liked) => {
-        if(!liked){
-            const getResult = useCheckpoint(onFailureLike, onSuccessLike, id)
-            getResult().then(res => {
-                Toast.show(
-                    { 
-                        text: 'You liked post', 
-                        buttonText: 'CLOSE', 
-                        type: 'success',
-                        textStyle: { fontSize: 14 },
-                        style: {marginHorizontal: 50, borderRadius: 20, marginBottom: 20 }
-                    }
-                )
-            })
-            
-        }else{
-            const getResult = useCheckpoint(onFailureUnlike, onSuccessUnlike, id)
-            await getResult()
-        } 
-    }
-    const updateSearch = (search) => {
-        setSearch(search)
-        if(search){
-            setLoading(true)
-        }
-    }
-    const archive = (obj) => {
-        if(!obj.item.archived) {
-            const getResult = useCheckpoint(onFailureArchive, onSuccessArchive, obj)
-            getResult()
-        }
-    }
-    const onSuccessLike = (id) => {
-        dispatch(likeFxn(id))
-    }
-    const onFailureLike = (id) => {
-        dispatch(onFailedLike({id,state: 1}))
-    }
-    const onSuccessUnlike = (id) => {
-        dispatch(unlikeFxn(id))
-    }
-    const onFailureUnlike = (id) => {
-        dispatch(onFailedLike({id,state: 0}))
-    }
+    const uri = subject === 'Science and Technology' ? uris.science : uris[subject.toLowerCase()]
+    // const updateSearch = (search) => {
+    //     setSearch(search)
+    //     if(search){
+    //         setLoading(true)
+    //     }
+    // }
+    
+    
 
-    // when network is confirmed for an archive request
-    const onSuccessArchive = (obj) => {
-        dispatch(archiveFxn(obj))
-    }
-    // when there is no network for a archive request
-    const onFailureArchive = (obj) => {
-        dispatch(onFailedArchive({...obj,state: 1}))
-    }
+    
     const searchContent = () => {} 
 
-    useEffect(() => {
-        const backAction = () => {
-            if(store.loading_article){
-                dispatch(loadingArticleStop())
-                return true
-            }else{
-                return false
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                console.log(store.loading_article, 'value for loading_article' )
+                if(store.loading_article == true){
+                    dispatch(loadingArticleStop())
+                    return true
+                }else if(store.loading_article == false) {
+                    navigation.navigate('Learn')
+                    return true
+                }else{
+                    return false
+                }
             }
-        }
 
-        BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => {
-            BackHandler.removeEventListener('hardwareBackPress', backAction)
-        }
-    }, [])
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
+        }, [])
+    )
 
     return(
-        <Container style={{backgroundColor: "#fff"}}>
+        <Container style={style.container}>
             <FocusAwareStatusBar barStyle='light-content' backgroundColor='#054078' />
             <MemoizedSubjectHeader navigation={navigation} subject={subject} />
-            <Content>
+            <ScrollView style={style.content}>
                 {store.load_error ?
                     (
-                        <Suspense fallback={<View><Text>Loading...</Text></View>}>
+                        <Suspense fallback={<View style={style.loading}><Text>Loading...</Text></View>}>
                             <ErrorPage/>
                         </Suspense>
                     )
@@ -117,7 +91,7 @@ const Subject = ({ navigation, route }) => {
                     store.loading_article ?
                     (
                         <Suspense fallback={<View><Text>Loading...</Text></View>}>
-                            <Overlay isVisible={true} deviceWidth={deviceWidth} deviceHeight={deviceHeight}>
+                            <Overlay isVisible={store.loading_article} deviceWidth={deviceWidth} deviceHeight={deviceHeight}>
                                 <Rolling text={`${subject}...`} />
                             </Overlay>
                         </Suspense>
@@ -125,69 +99,33 @@ const Subject = ({ navigation, route }) => {
                     :
                     disItems.length ? 
                     (
-                        <>
-                            <View>
-                                <RNImage source={lionel()} style={style.lionel} />
+                        <View>
+                            <View style={[style.viewImage]}>
+                                <Image {...{preview, uri}} style={style.lionel} />
+                                <Text style={style.subject}> {subject} </Text>
                             </View>
                             {disItems.map((item, i) => {
-                                let uri = item.image_url           
-                            return (
-                                <Card style={style.content} key={item.id}>
-                                    <CardItem>
-                                        <Body>
-                                            <View style={style.titleContainer}>
-                                                <Text numberOfLines={1} style={style.title}>
-                                                    {item.title}
-                                                </Text> 
-                                            </View>
-                                            <View style={style.imgContainer}>
-                                                {item.image !== null ? (
-                                                <View style={style.viewImg}> 
-                                                    <TouchableWithoutFeedback onPress={() => takeTo({item})}>
-                                                        <Image style={style.league} {...{preview, uri}} />
-                                                    </TouchableWithoutFeedback>
-                                                </View>
-                                                ) : null}
-                                                <View style={{...style.imgText, width: item.image !== null ? '60%': '100%'}}>
-                                                    <TouchableWithoutFeedback onPress={() => takeTo({item})}>
-                                                        <Text numberOfLines={6}>
-                                                            {item.body}
-                                                        </Text>                        
-                                                    </TouchableWithoutFeedback>
-                                                    <View style={item.image_url !== null ? style.action : {...style.action, flexDirection: 'row-reverse'}}>
-                                                        <View style={{width: item.image_url !== null ? '100%' : '60%', flexDirection: 'row'}}>
-                                                            <View style={style.actions}>
-                                                                <NativeIcon type={item.liked ? 'Ionicons' : 'FontAwesome5'} onPress={() => likes(item.id, item.liked)} name='heart' style={{color: item.liked ? 'red' : '#777', fontSize: 25}} />
-                                                            </View>
-                                                            <View style={style.actions}>
-                                                                <NativeIcon type={item.read ? 'Ionicons' : 'FontAwesome5'} name='eye' style={{color: '#777', fontSize: 25}} />
-                                                            </View>
-                                                            <View style={style.actions}>
-                                                                <NativeIcon 
-                                                                    onPress={() => {archive({item}); Toast.show({ text: `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: {backgroundColor: 'green'} })}} 
-                                                                    type= 'Ionicons' 
-                                                                    name= 'md-archive' 
-                                                                    style={{color: item.archived ? 'green' : '#777', fontSize: 25}} 
-                                                                />
-                                                            </View>
-                                                        </View>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        </Body>
-                                    </CardItem>
-                                </Card>
-                            )})}
-                        </>
+                                return (
+                                    <ReadItems 
+                                        item={item} 
+                                        subject={subject} 
+                                        navigation={navigation} 
+                                        preview={preview} 
+                                        key={i}
+                                    />
+                                    )
+                            }
+                            )}
+                        </View>
                     )
                     :
                     (
-                        <View>
-                            <Text>THere was no article for {subject}</Text>
+                        <View style={style.loading}>
+                            <Text>There was no article for {subject}</Text>
                         </View>
                     )
                 }
-            </Content>
+            </ScrollView>
         </Container>
     )
 }
@@ -195,51 +133,41 @@ const Subject = ({ navigation, route }) => {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        // marginTop: Constants.statusBarHeight ,
+        backgroundColor: '#fff',     
     },
-    titleContainer: {
-        marginBottom: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
+    content: {
+        // flex: 1,
+        backgroundColor: "#000",
     },
-    title: {
-        fontSize: 17,
+    viewImage: {
+        // paddingTop: 0,
+        // marginTop: 0,
+        position: 'relative',
+        height: 250,
+    },
+    subject: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        color: '#fff',
+        fontSize: 20,
         fontWeight: 'bold',
-        color: '#054078',
+    },
+    loading: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     lionel: {
         width: '100%',
-        height: 180,
+        height: '100%',
     },
     content: {
         marginTop: 25,
     },
-    imgContainer: {
-        flexDirection: 'row',
-    }, 
-    viewImg: {
-        width: '40%'
-    },
-    league: {
-        width: '100%',
-        height: 130,
-        borderTopLeftRadius: 10,
-        borderBottomLeftRadius: 10,
-    },
-    imgText: {       
-        paddingLeft: 15,
-    },
     blue: {
         color: 'blue',
-    },
-    action: {
-        flexDirection: 'row',
-        paddingTop: 10,
-    },
-    actions: {
-        width: '33%',
-        alignItems: 'center',
     },
 })
 

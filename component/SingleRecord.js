@@ -41,7 +41,10 @@ SingleRecord.defaultProps = {
 SingleRecord.propTypes = {
     info: PropTypes.shape({
         name: PropTypes.string.isRequired,
-        value: PropTypes.number.isRequired,
+        value: PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.string
+        ]).isRequired,
         type: PropTypes.string
     })
     

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { View, StyleSheet, BackHandler } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native';
 import Container from './Container'
 import { MemoResend } from './Resend'
 import { MemoCNOverlay } from './CNOverlay'
@@ -17,21 +18,23 @@ const ConfirmNumber = ({ navigation }) => {
         setClose(false)
     }
 
-    useEffect(() => {
-        const backAction = () => {
-            if(!close){
-                setClose(true)
-                return true
-            } else{
-                closeApp()
-                return false
-            }          
-        }
-        BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => {
-            BackHandler.removeEventListener('hardwareBackPress', backAction)
-        }
-    })
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                if(!close){
+                    setClose(true)
+                    return true
+                } else{
+                    closeApp()
+                    return false
+                }          
+            }
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
+        }, [])
+    )
 
     return (
         <>

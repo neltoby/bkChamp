@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {timeOut, setOverlay} from '../actions/quiz'
 
 const useTime = (tenmin) => {
@@ -14,7 +14,7 @@ const useTime = (tenmin) => {
                 let dis_sec = leftsec < 10 ? `0${leftsec}`: leftsec
                 let leftTime = `${leftmin}:${dis_sec}`
                 setReturned(leftTime)
-            }else{
+            }else{              
                 dispatch(timeOut())
                 dispatch(setOverlay('timeOut'))
                 setReturned('')

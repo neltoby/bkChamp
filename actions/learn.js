@@ -1,5 +1,6 @@
 import {db} from '../processes/db'
 import {CacheManager} from "react-native-expo-image-cache";
+import { fetchArchived } from './request'
 
 export const LIKE = 'LIKE'
 export const ARCHIVE = 'ARCHIVE'
@@ -7,10 +8,16 @@ export const UNARCHIVE = 'UNARCHIVE'
 export const SETARTICLE = 'SETARTICLE'
 export const PREV_SEARCH = 'PREV_SEARCH'
 export const SET_SUBJECT = 'SET_SUBJECT'
+export const ERR_ARCHIVE = 'ERR_ARCHIVE'
+export const LOAD_ARCHIVE = 'LOAD_ARCHIVE'
+export const GET_ARCHIVED = 'GET_ARCHIVED'
 export const READ_ARTICLE = 'READ_ARTICLE'
 export const SEARCH_ARCHIVE = 'SEARCH_ARCHIVE'
+export const LOADING_ARCHIVE = 'LOADING_ARCHIVE'
 export const LOADING_ARTICLE = 'LOADING_ARTICLE'
+export const ARCHIVED_ARTICLE = 'ARCHIVED_ARTICLE'
 export const ARTICLE_REMOVE_ERR = 'ARTICLE_REMOVE_ERR'
+export const UNARCHIVED_ARTICLE = 'UNARCHIVED_ARTICLE'
 export const LOADING_ARTICLE_STOP = 'LOADING_ARTICLE_STOP'
 export const ARTICLE_LOADING_FAILED = 'ARTICLE_LOADING_FAILED'
 
@@ -31,11 +38,120 @@ export const archived = payload => {
     }
 }
 
+export const archivedArticle = payload => ({type: ARCHIVED_ARTICLE, payload})
+
+export const unarchivedArticle = payload => ({type: UNARCHIVED_ARTICLE, payload})
+
+export const loadingArchive = payload => ({type: LOADING_ARCHIVE, payload})
+
+export const errArchive = payload => ({type: ERR_ARCHIVE, payload})
+
 // action function for unarchiving an article
 export const unarchive = payload => {
     return {
         type: UNARCHIVE,
         payload
+    }
+}
+
+export const loadArchive = payload => ({type: LOAD_ARCHIVE, payload})
+
+export const resolveUnarchivedArticles = payload => {
+    return dispatch => {
+        (
+            () => {
+                const {id} = payload
+                const sql = 'DELETE FROM archive WHERE id = ?'
+                db.transaction(tx => {
+                    tx.executeSql(sql, [id], (txO, {rowsAffected}) => {
+                        if(rowsAffected > 0){
+                            dispatch(unarchivedArticle(payload))
+                            dispatch(unarchive({item: payload}))
+                        }
+                    }, err => console.log('failed delete'))
+                }, err => console.log(err, 'failed transxn line 62'),
+                () => console.log('sux transxn line 63'))
+            }
+        )()
+    }
+}
+
+export const resolveArchive = payload => {
+    return dispatch => {
+        (
+            () => {
+                dispatch(onArticleSuccess(payload))
+                const sql = 'INSERT INTO archive(id, category) VALUES(?,?)'
+                payload.forEach(item => {
+                    db.transaction(tx => {
+                        tx.executeSql(sql, [item.id, item.category], (txO, {rowsAffected}) => {
+                            console.log(rowsAffected)
+                        }, err => console.log(err, 'from insert err'))
+                    }, err => console.log('failed insert trans'),
+                    () => console.log('successful trans'))
+                })
+            }
+        )()
+    }
+}
+
+export const getArchiveCategory = payload => {
+    return dispatch => {
+        (
+            async () => {
+                dispatch(loadingArchive(true))
+                const sql = 'SELECT t.* FROM articles t INNER JOIN archive a USING(id) WHERE t.category = ?'
+                db.transaction(tx => {
+                    tx.executeSql(sql, [payload], (txO, {rows}) => {
+                        const {_array} = rows
+                        console.log(_array, 'from join query')
+                        dispatch(loadingArchive(false))
+                        dispatch(archivedArticle(_array))
+                    }, err => console.log(err, 'err from join query'))
+                }, err => console.log(err),
+                () => console.log('trans succesful'))
+            }
+        )()
+    }
+}
+
+export const getArchived = () => {
+    return dispatch => {
+        (
+            async () => {
+                dispatch(loadingArchive(true))
+                const sql = 'SELECT DISTINCT category from archive'
+                let newArr = []
+                await db.transaction(tx => {
+                    tx.executeSql(sql, null, (txO, {rows}) => {
+                        const {_array, length} = rows
+                        console.log(rows)
+                        if(length){
+                            _array.forEach(item => {
+                                let val = Object.values(item)[0]
+                                const sqli = 'SELECT id FROM archive WHERE category = ?'
+                                txO.executeSql(sqli, [val], (txOb, {rows}) => {
+                                    const {_array} = rows
+                                    let ids = []
+                                    _array.forEach(element => {
+                                        ids = [...ids, Object.values(element)[0]]
+                                    })
+                                    newArr = [...newArr, {category: val, value: ids}]
+                                    dispatch(loadArchive(newArr))  
+                                    dispatch(loadingArchive(false))                               
+                                }, err => console.log(err,'select id query failed'))
+                            })                                                   
+                        }else{
+                            dispatch(fetchArchived())
+                        }
+                    }, 
+                    err => console.log(err, 'failed select query'))
+                }, 
+                err => console.log('err in transaction'),
+                () => console.log('successful transaction'))
+                // dispatch(loadArchive(newArr))
+            }
+        )()
     }
 }
 
@@ -150,8 +266,9 @@ export const archiveDisperse = payload => {
             const { item, state } = payload
             const sql = 'UPDATE articles SET archived = ?  WHERE id = ?'
             const sqli = state === 1 ? 'INSERT OR REPLACE INTO archive( id, category ) VALUES(?,?)' : 
-                                        'DELETE archive WHERE id = ?'
+                                       'DELETE FROM archive WHERE id = ?'
             const val = state === 1 ? [item.id, item.category] : [item.id]
+            console.log(val, sqli)
             db.transaction(tx => {
                 // checking the action state
                 const archive = state === 1 ? 1 : 0              
@@ -163,9 +280,9 @@ export const archiveDisperse = payload => {
                             console.log(`${rowsAffected} rows affected`,'archive table successful update')
                             
                             console.log(payload, 'payload from line 123')
-                            // const fxn = state === 1 ? archived : unarchive ;
+                            const fxn = state === 1 ? archived : unarchive ;
                             // // dispatch the archive action constructor
-                            // dispatch(fxn(payload))
+                            dispatch(fxn(payload))
                         }, err => console.log(err, 'archive table not updated'))                        
                     }                    
                 }, err => console.log(err, 'error updating archive item'))
@@ -199,19 +316,30 @@ export const readArticle = payload => {
 export const onArticleSuccess = (payload) => {
     return function(dispatch, getState) {
         (async () => {
+            console.log(payload)
             // const { subject } = getState().learn
             const sql = 'INSERT OR REPLACE INTO articles(id, title, body, category, image_url, likes, idioms_1, idioms_2, idioms_3, new_word_1, new_word_2, new_word_3, read, archived, liked ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            const sqli = 'INSERT OR REPLACE INTO archive( id, category ) VALUES(?,?)'
+            const sqlx = 'SELECT * FROM archive WHERE id = ?'
             for(let i = 0; i < payload.length; i++){
                 // let currentObj = payload[i]
                 const path = await CacheManager.get(payload[i].image_url).getPath();
-                console.log(path)
+                console.log(payload[i].image_url)
                 const val = Object.values(payload[i])
                 db.transaction(tx => {
                     tx.executeSql(sql, val, (txObj, { insertId, rowsAffected }) => {
                         console.log(insertId, 'successful insert', `${rowsAffected} row affected`)
-                    }, (txObj, err) => {
-                        console.log(err)
-                    })
+                        if(payload[i].archived){
+                            const {id, category} = payload[i]
+                            txObj.executeSql(sqlx, [id], (txObx, {rows}) => {
+                                if(rows.length < 1){
+                                    txObx.executeSql(sqli, [id, category], (txObI, {rowsAffected}) => {
+                                        console.log('successful archive')
+                                    }, err => console.log('failed archive'))
+                                }
+                            },err => console.log('err in archiving'))
+                        }
+                    }, err => console.log(err))
                 }, (err) => console.log(err),
                 () => console.log('insert transaction successful'))
             }

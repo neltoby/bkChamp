@@ -5,23 +5,26 @@ import { LinearGradient } from 'expo-linear-gradient'
 import logo from '../processes/image'
 import Overlay from './Overlay';
 import { useFocusEffect } from '@react-navigation/native';
-// import { realDeviceHeight } from '../processes/deviceSize'
 import { Container, Content, Form, Button, Toast, Spinner } from 'native-base'
 import { Input, Icon } from 'react-native-elements';
 import {loginRequest} from '../actions/request'
+import { exitLogin } from '../actions/login'
 import Rolling from './Rolling'
-import {StatusBar, View, Text, Image, StyleSheet, Platform, TouchableOpacity, useWindowDimensions} from 'react-native'
+import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals'
+import {StatusBar, View, Text, Image, StyleSheet, Platform, TouchableOpacity, BackHandler} from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
 import isJson from '../processes/isJson';
+import deviceSize from '../processes/deviceSize';
 
 const Login = ({navigation}) => {
-    const windowHeight = useWindowDimensions().height;
-    const deviceWidth = useWindowDimensions().width;
+    const windowHeight = deviceSize().deviceHeight;
+    const deviceWidth = deviceSize().deviceWidth;
     const [username, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [notVisible, setNotVisible] = useState(true) 
     const dispatch = useDispatch()
     const store = isJson(useSelector(state => state))
+    const exit = store.login.exitLogin
     const signUp = ()=> {
         navigation.navigate('SignUp')
     }
@@ -67,6 +70,19 @@ const Login = ({navigation}) => {
             )
         }
     }
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const backAction = () => {
+                dispatch(exitLogin(true))
+                return true
+            }
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
+        }, [])
+    )
     useFocusEffect(
         React.useCallback(() => {
             if(store.login.login === 'LOGGEDIN'){
@@ -74,13 +90,14 @@ const Login = ({navigation}) => {
             }
         }, [store.login.login])
     )
+    
     let toast = store.request.status === 'failed' ? 
     Toast.show(
         { 
             text: store.request.err, 
             buttonText: 'CLOSE', 
         }
-    ) : '' 
+    ) : null 
     return(
         <Container style={style.content}>
             <LinearGradient
@@ -166,6 +183,35 @@ const Login = ({navigation}) => {
                 <Overlay isVisible={store.login.status === 'loading' ? true : false} >
                     <Rolling text='Logging In...' />
                 </Overlay>
+                <Modal
+                    useNativeDriver={true}
+                    visible={exit}
+                    swipeDirection={['up', 'down']} // can be string or an array
+                    swipeThreshold={200} // default 100
+                    onSwipeOut={event => dispatch(exitLogin(false))}
+                    onHardwareBackPress={() => dispatch(exitLogin(false))}
+                    modalTitle={<ModalTitle title='Exit?' />}
+                    footer={
+                        <ModalFooter>
+                        <ModalButton
+                            text="No"
+                            onPress={() => dispatch(exitLogin(false))}
+                        />
+                        <ModalButton
+                            text="Yes"
+                            onPress={() => BackHandler.exitApp()}
+                        />
+                        </ModalFooter>
+                    }
+                >
+                    <ModalContent>
+                        <View style={style.showView}>
+                            <Text style={style.warning}>
+                                Are you sure you want to exit?
+                            </Text>
+                        </View>
+                    </ModalContent>
+                </Modal>
             </Content>
 
         </Container>

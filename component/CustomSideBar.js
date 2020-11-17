@@ -1,26 +1,31 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import {
     DrawerContentScrollView, DrawerItem,
   } from '@react-navigation/drawer';
 // import { SafeAreaView } from 'react-native-safe-area-context';
-import { Icon, Badge } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
-import {deleteKey} from '../processes/keyStore'
-import {notLogin} from '../actions/login'
-import {loginValue} from '../processes/lock'
-import { SafeAreaView, View, Text, Image, StyleSheet,  } from 'react-native'
-import { useDispatch } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import { logoutWarning } from '../actions/login'
+import Image from './Image'
+import { SafeAreaView, View, Text, StyleSheet, Image as RNImage } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux';
+import isJson from '../processes/isJson'
 
 const CustomSideBar = (props) => {
     const {navigation} = props
     const dispatch = useDispatch()
-    const setLogout = async () => {
-        await deleteKey(loginValue)
-        dispatch(notLogin())
-        navigation.navigate('Login')
-    }
+    const points = isJson(useSelector(state => state.user.user)).points 
+    const userImg = isJson(useSelector(state => state.user)).user.image
+    const storePreview = isJson(useSelector(state => state.learn)).preview
+    const preview = useMemo(() => { uri: storePreview }, [storePreview])
+    const uri = userImg 
+    const username = isJson(useSelector(state => state.user)).user.username
     
+    const logout = () => {
+        navigation.closeDrawer()
+        dispatch(logoutWarning(true))
+    }
+
     let firstData = [
         {
             text: 'Quiz', 
@@ -65,9 +70,14 @@ const CustomSideBar = (props) => {
             onPress: () => navigation.navigate('Faq'),
         },
         {
+            text: 'About Us', 
+            icon: <Icon type='material' name='info' size={24} color='#3480eb'/>,
+            onPress: () => navigation.navigate('About'),
+        },
+        {
             text: 'Logout', 
             icon: <Icon type='material-community' name='logout' size={24} color='#3480eb'/>,
-            onPress: () => setLogout(true),
+            onPress: () => logout(),
         },
 
     ] 
@@ -80,10 +90,17 @@ const CustomSideBar = (props) => {
                     style={{...style.gradient, height: 150,}}
                 />
                     <View style={style.imgView}>
-                        <Image source={require('../img/user.jpg')} style={style.img} />
+                        {userImg === null || userImg === undefined ?
+                            <RNImage source={require('../img/anonymous.jpg')} style={style.img} />
+                        :
+                            <Image 
+                                {...{preview, uri}}
+                                style={style.img} 
+                            />                            
+                        }
                     </View>
                     <View style={style.detailView}>
-                        <Text style={style.name}>John Doew</Text>
+                        <Text numberOfLines={1} style={style.name}>@{username}</Text>
                         <View style={style.bond}>
                             <Icon 
                             type='font-awesome' 
@@ -92,7 +109,7 @@ const CustomSideBar = (props) => {
                             size={16} />
                             <Text style={{...style.mode, fontSize: 18}}> starter</Text>
                         </View>
-                        <Text style={{...style.mode, paddingLeft: 10}}>1M units</Text>
+                        <Text style={{...style.mode, paddingLeft: 10}}>{points} units</Text>
                     </View>
                 </View>
                 {firstData.map((data, i) => {

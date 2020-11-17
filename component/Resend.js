@@ -1,11 +1,15 @@
 import React, { memo, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Button, Toast } from 'native-base'
+import { vNumber } from '../actions/login'
+import { useDispatch } from 'react-redux'
 
 export default function Resend() {
     const [disabled, setDisabled] = useState(false)
+    const dispatch = useDispatch()
     const resend = () => {
         setDisabled(true)
+        dispatch(vNumber(23456))
         Toast.show({
             text: 'You will be able to send again in 10s',
             buttonText: "CLOSE",

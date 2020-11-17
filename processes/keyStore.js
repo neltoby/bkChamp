@@ -9,6 +9,7 @@ export const storeKey = async (key, value) => {
             if(Platform.Version < 23){
                 res = await _storeData(key, val)
             }else{
+                console.log(`key value is ${key}`, value, 'is value')
                 res = await SecureStore.setItemAsync(key, value)
             }
         }else{

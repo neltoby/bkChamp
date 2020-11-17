@@ -1,4 +1,5 @@
 import React from 'react'
+import { View } from 'react-native'
 import {  Left, Text, Body, Right, List, ListItem, Thumbnail } from 'native-base';
 
 const getData = (props) => props.data !== undefined ? props.data : []  
@@ -29,9 +30,10 @@ export default function LiveRanks(props) {
             </List>
         ):
         (
-            <>
+            <View>
+
                 <Text>You do not have any ranking</Text>
-            </>
+            </View>
         )
         }
         </>

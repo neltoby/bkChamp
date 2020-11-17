@@ -2,17 +2,28 @@ import React, { useMemo } from 'react'
 import { Footer, FooterTab, Button, Text as NativeText } from 'native-base'
 import { useSelector, useDispatch } from 'react-redux'
 import isJson from '../processes/isJson'
-import { next, skip } from '../actions/quiz'
+import { next, skip, settime, setOverlay } from '../actions/quiz'
 
 export default function QuizFooter() {
-    const store = isJson(useSelector(state => state))
     const dispatch = useDispatch()
-    const displayed = store.quiz.displayed.length
-    let allQuestion = useMemo(() => isJson(store.quiz.question), [])
+    const level = useSelector(state => state.quiz).level
+    const all = isJson(useSelector(state => state.quiz).question)
+    const allQuestion = useMemo(() => all, [])
+    const skipped = isJson(useSelector(state => state.quiz).skipped)
+    const question = isJson(isJson(useSelector(state => state.quiz)).currentQuestion)
 
     const skipQuestion = (id) => {
-        dispatch(skip())
-        dispatch(next())
+        dispatch(skip(id))
+        if( level === 'difficult' && allQuestion[level].length === 0 ){
+            console.log('end')
+            dispatch(settime(''))
+            dispatch(setOverlay('end'))
+        }else{
+            dispatch(next())
+        }
+        
+
+        
     }
 
     return (
@@ -28,7 +39,7 @@ export default function QuizFooter() {
                     
                 </Button>
 
-                {displayed == allQuestion.length || store.quiz.skipped.length == 5 ? 
+                {skipped.length === 3 ? 
                     <Button>
                         
                     </Button> 

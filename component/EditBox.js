@@ -8,6 +8,9 @@ import { Button, Card, Toast } from 'native-base'
 import Animated, { Easing } from 'react-native-reanimated'
 import { capitalize } from '../processes/category'
 import {config} from './CustomOverlay'
+import { getKey } from '../processes/keyStore'
+import { loginValue } from '../processes/lock'
+import { updateUserinfo } from '../actions/user'
 
 const {
     timing,
@@ -20,6 +23,7 @@ const {
 const minDate = new Date(new Date().setFullYear(new Date().getFullYear() - 150))
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 12))
 const colors = ['#992438', '#AD2425', '#9224AD', '#696969', '#AD2425', '#92AD24', '#6924AE', '#24AEAE', '#935124', '#4D4D4D']
+const domain = 'https://bookchamp.herokuapp.com/api/v1/'
 
 export default function EditBox(props) {
     const {value, label, icon} = props.item
@@ -32,22 +36,57 @@ export default function EditBox(props) {
     const randomColor = Math.floor(Math.random() * 10)
     const keyboardType = label === 'username' || label === 'fullname' ? 'default' :
     label === 'phone_number' ? 'phone-pad' : label === 'email' ? 'email-address' : 'default' ;
-    const saveInfo = () => {
+    const saveInfo = async () => {
+        // get token from securestore
+        const val = await getKey(loginValue)
+        // set headers and other params
+        let str = label === 'date_of_birth' ? {date_of_birth: val} : 
+        label === 'email' ? {email: val} : label === 'fullname' ? {fullname: val} :
+        label === 'gender' ? {gender: val} : label === 'institution' ? {institution: val} :
+        label === 'phone_number' ? {phone_number: val} : label === 'username' ? {username: val} : {}
+        const param = {
+            method: 'POST',
+            headers:{
+                'Authorization': `Token ${val}`
+            },
+            body: JSON.stringify(str)          
+        }
+        console.log(str)
         setLoading(true)
-        setTimeout(() => {
+        fetch(`${domain}user/edit`, param)
+        .then(res => res.json())
+        .then(resp => {
+            console.log(resp)
+            const val = Object.entries(str)[0]
+            dispatch(updateUserinfo({name: val[0], value: val[1]}))
             setLoading(false)
-            setSuccess(true)
+            setSuccess(true)     
             Toast.show({
                 text: `${capitalize(label)} changed`,
                 buttonText: "CLOSE",
                 duration: 3000, 
                 style: {backgroundColor: 'green'}
+            })      
+        })
+        .catch(err => {
+            console.log(err)
+            setLoading(false)
+            setEdit(false)
+            setSuccess(false)
+            Toast.show({
+                text: `${err.message}`,
+                buttonText: "CLOSE",
+                duration: 3000, 
+                style: {backgroundColor: 'red'}
             })
+        })
+        .then(res => {
+            console.log(res)            
             setTimeout(() => {
                 setEdit(false)
                 setSuccess(false)
-            },3000)          
-        }, 2000)
+            },3000) 
+        })
         
     }
 
@@ -246,7 +285,10 @@ export default function EditBox(props) {
 
 EditBox.propTypes = {
     item: PropTypes.shape({
-        value: PropTypes.string,
+        value: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number,
+        ]),
         label: PropTypes.string,
         icon: PropTypes.string,
     })

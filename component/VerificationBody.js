@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, memo } from 'react'
+import React, { useRef, memo, useCallback } from 'react'
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet } from 'react-native'
 import { deleteKey, getKey, storeKey } from '../processes/keyStore'
 import CodeInput from 'react-native-confirmation-code-input'
 import { Icon } from 'react-native-elements'
 import { confirm, loginValue } from '../processes/lock'
 import { useDispatch, useSelector } from 'react-redux';
-import { login, verification, vNumber } from '../actions/login'
+import { vNumber, verification } from '../actions/login'
 
 export default function VerificationBody({ navigation }) {
     const codes = useSelector(state => state.login).v_number
@@ -14,12 +15,13 @@ export default function VerificationBody({ navigation }) {
 
     const onFulfill = async (code) => {
         if(code == codes){
+            console.log(code)
             const val = await getKey(confirm)
             if(val !== undefined && val !== null){
                 // signed up but haven't confirmed 
                 await storeKey(loginValue, val)
                 await deleteKey(confirm)
-                // verication state set to set false indicates that user is verified and confirm token removed
+                // verication state set to false indicates that user is verified and confirm token removed
                 await dispatch(verification(false))
             }
             navigation.navigate('UploadDp')
@@ -27,16 +29,17 @@ export default function VerificationBody({ navigation }) {
             console.log(codes, 'error in the inputed code', code)
         }
     }
-    useEffect(() => {
-        console.log('i was called line 30')
-        if(codes === null){
-            dispatch(vNumber(23456))
-        }
-        return () => {
-            
-        }
-    }, [])
-    console.log('i was called line 38')
+    useFocusEffect(
+        useCallback(() => {
+            if(codes === null){
+                dispatch(vNumber(23456))
+            }
+            return () => {
+                
+            }
+        }, [codes])
+    )
+
 
     return (
         <>

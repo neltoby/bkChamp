@@ -1,6 +1,4 @@
 import React from 'react'
-import logo from '../processes/image'
-import {View, Text} from 'react-native'
 import CustomSideBar from './CustomSideBar'
 import SelectHome from './SelectHome'
 import Subscribe from './Subscribe'
@@ -9,6 +7,8 @@ import FaqScreen from './FaqScreen'
 import SettingScreen from './SettingScreen'
 import LearnScreen from './LearnScreen'
 import QuizScreen from './QuizScreen'
+import Search from './Search'
+import About from './About'
 import ArchiveScreen from './ArchiveScreen'
 import RankingScreen from './RankingScreen'
 import ReadPost from './ReadPost'
@@ -40,6 +40,8 @@ const Home = () => {
             <Drawer.Screen name="Ranking" component={RankingScreen} />
             <Drawer.Screen name="PlayQuiz" component={MemoizedPlayQuizScreen} />
             <Drawer.Screen name="Subject" component={Subject} />
+            <Drawer.Screen name="Search" component={Search} />
+            <Drawer.Screen name="About" component={About} />
             <Drawer.Screen name="ReadPost" component={ReadPost} />
             <Drawer.Screen name="TransSummary" component={TransSummary} />
             <Drawer.Screen name="SearchArchive" component={SearchArchive} />
@@ -48,5 +50,5 @@ const Home = () => {
         </Drawer.Navigator>
     )
 }
-ReadPost
+// ReadPost
 export default Home

@@ -21,18 +21,13 @@ export default function useCheckpoint(failed, success, payload) {
                     type: "danger"
                 }
             )
-            return await failed(payload)
+            return failed(payload)
         }else if(!isConnected || !isInternetReachable) {
-            Toast.show(
-                { 
-                    text: `Request failed, Please check your internet connenction`, 
-                    buttonText: 'CLOSE', 
-                    type: "danger",
-                    textStyle: { fontSize: 14 }
-                }
-            )
-            return await failed(payload)
+            console.log('no network')
+            return failed(payload)
         }else{
+            console.log(isConnected,' is the value for isConnected')
+            console.log(isInternetReachable,' is the value for isInternetReachable')
             return success(payload)
         }
     }

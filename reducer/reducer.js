@@ -6,6 +6,7 @@ import archiveReducer from './archiveReducer'
 import requestReducer from './requestReducer'
 import settingReducer from './settingReducer'
 import userReducer from './userReducer'
+import searchReducer from './searchReducer'
 
 export default combineReducers({
     login: loginReducer,
@@ -15,4 +16,5 @@ export default combineReducers({
     request: requestReducer,
     setting: settingReducer,
     user: userReducer,
+    search: searchReducer,
   })

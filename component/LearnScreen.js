@@ -3,23 +3,23 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
 import deviceSize from '../processes/deviceSize'
 import {db} from '../processes/db'
-import { Container, Header, Content, Footer, Left, Body, Title, Subtitle, Right, Button, Icon as NativeIcon } from 'native-base'
-import { View, FlatList, Text, StyleSheet, StatusBar, useWindowDimensions, TouchableHighlight } from 'react-native'
+import { Container, Header, Content, Toast, Left, Body, Title, Subtitle, Right, Button, Icon as NativeIcon } from 'native-base'
+import { View, FlatList, Text, StyleSheet, StatusBar, TouchableHighlight } from 'react-native'
 import { useDispatch } from 'react-redux';
 import { getArticles } from '../actions/request'
 import useCheckpoint from './useCheckpoint'
 import { loadingArticle, articleErrRem, setArticle, loadingArticleStop } from '../actions/learn'
 
-// const windowHeight = deviceSize().deviceHeight
 
 const subject = [
-    {text:'Finance', col: '#e85f29'}, 
+    {text: 'Politics', col: 'orange'},
     {text: 'Science and Technology', col: '#00e600'}, 
-    {text: 'Politics', col: 'orange'}, 
-    {text: 'Sport', col: '#ff1a66'}, 
+    {text: 'Finance', col: '#e85f29'},  
+    {text: 'Health', col: '#033268'}, 
     {text: 'Entertainment', col: '#9999ff'}, 
-    {text: 'Social', col: '#e6e600'}, 
+    {text: 'Sport', col: '#ff1a66'}, 
     {text: 'History', col: '#033268'}, 
+    {text: 'Socials', col: '#e6e600'}, 
     {text: 'Lifestyle', col: 'green'}, 
     {text: 'Geography', col: '#e85f29'}
 ]
@@ -36,12 +36,19 @@ const LearnScreen = ({ navigation }) => {
         }, [])       
     )
     const onSuccess = (subject) => {
-        console.log('onsuccess was called')
         // get the articles for the selected subject
         dispatch(getArticles(subject))
     }
 
     const onFailure = async (payload) => {
+        Toast.show(
+            { 
+                text: `Request failed, Please check your internet connenction`, 
+                buttonText: 'CLOSE', 
+                type: "danger",
+                textStyle: { fontSize: 14 }
+            }
+        )
         const sql = `SELECT * FROM articles WHERE category = ? `
         await db.transaction(tx => {
             tx.executeSql(sql, [payload], (txObj, {rows: { length, _array}}) => {
@@ -52,6 +59,7 @@ const LearnScreen = ({ navigation }) => {
                         arr.archived = arr.archived === 1 ? true : false
                         arr.liked = arr.liked === 1 ? true : false
                     })
+                    console.log(newArr)
                     dispatch(loadingArticleStop())
                     dispatch(setArticle(newArr)) 
                 }else{
@@ -67,6 +75,7 @@ const LearnScreen = ({ navigation }) => {
     }
 
     const selectSubject = async (subject) => {
+        console.log('i was called to select subject')
         const getResult = useCheckpoint(onFailure, onSuccess, subject)
         // unset/remove the error display page
         await dispatch(articleErrRem())
@@ -88,6 +97,7 @@ const LearnScreen = ({ navigation }) => {
         const sqli = 'CREATE TABLE IF NOT EXISTS unsent (uid INTEGER PRIMARY KEY AUTOINCREMENT, id INT UNIQUE, title TEXT)'
         const sqlii = 'CREATE TABLE IF NOT EXISTS archive (aid INTEGER PRIMARY KEY AUTOINCREMENT, id INT UNIQUE, category TEXT)'
         const sqliii = 'CREATE TABLE IF NOT EXISTS archiveunsent (aid INTEGER PRIMARY KEY AUTOINCREMENT, id INT UNIQUE, title TEXT)'
+        const sqlx = 'CREATE TABLE IF NOT EXISTS search (id INTEGER PRIMARY KEY AUTOINCREMENT, searched TEXT UNIQUE)'
         db.transaction(tx => {
             tx.executeSql(sql, null,
             (txObj, { insertId, rowsAffected }) => {
@@ -97,6 +107,9 @@ const LearnScreen = ({ navigation }) => {
                         console.log('archive table created')
                         txOb.executeSql(sqliii, null, (txObI, {row}) => {
                             console.log('created archive unsent')
+                            txObI.executeSql(sqlx, null, (txObx, {rows}) => {
+                                console.log('created searched')
+                            })
                         }, err => console.log(err, 'archiveunsent cud not be created'))
                     }, err => console.log(err, 'table archive creation failed'))
                 }, (err) => console.log(err, 'cud not drop table'))

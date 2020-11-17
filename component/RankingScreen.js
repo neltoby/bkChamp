@@ -33,6 +33,7 @@ const RankingScreen = ({navigation}) => {
             <Content>
                 <Tab.Navigator 
                     initialRouteName='Basic'
+                    backBehavior='order'
                     tabBarOptions={{
                         activeTintColor: 'yellow',
                         inactiveTintColor: '#fff',

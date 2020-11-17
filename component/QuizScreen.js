@@ -1,34 +1,90 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
-import { useFocusEffect } from '@react-navigation/native';
-import { Button } from 'react-native-elements';
-import { View, Text, Image, StyleSheet, StatusBar, useWindowDimensions } from 'react-native'
+import FocusAwareStatusBar from './FocusAwareStatusBar'
+import { useFocusEffect } from '@react-navigation/native'
+import { ScrollView, View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native'
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import isJson from '../processes/isJson';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadQuiz, createdb } from '../actions/quiz';
+import { callStartGame } from '../actions/request';
+import deviceSize from '../processes/deviceSize';
+import { Container, Content, Toast } from 'native-base'
 
-const QuizScreen = ({ navigation }) => {
-    const windowHeight = useWindowDimensions().height;
-    const data = [
-        {no: 1, text: 'Every correct answer attracts 3 marks'},
-        {no: 2, text: 'Every wrong answer attracts -0.1'},
-        {no: 3, text: 'You have the option to skip question up to 5 times'},
-        {no: 4, text: 'Winners are selected every Sunday by 6pm'},
-        {no: 5, text: 'Duration of quiz is 10 minutes'},
-    ]
-    const playQuiz = () => {       
-        navigation.navigate('PlayQuiz')
+const ContainerView = ({width, height, styleProp, children}) => {
+    if(width > height){
+        return (
+            <Content style={styleProp}>
+                {children}
+            </Content>
+        )
     }
+    return (
+        <Container style={styleProp}>
+            {children}
+        </Container>
+    )
+}
+const data = [
+    {no: 1, text: 'Every correct answer attracts 3 marks'},
+    {no: 2, text: 'Every wrong answer attracts -0.1'},
+    {no: 3, text: 'You have the option to skip question up to 3 times'},
+    {no: 4, text: 'Winners are selected everyday by 12pm'},
+    {no: 5, text: 'Quiz Duration: 10 minutes'},
+]
+const QuizScreen = ({ navigation }) => {
+    const dispatch = useDispatch()
+    const windowHeight = deviceSize().deviceHeight;
+    const windowWidth = deviceSize().deviceWidth  
+    const points = isJson(useSelector(state => state.user.user)).points 
+    const loading = isJson(useSelector(state => state.quiz)).loadingQuiz
+    const errStateGame = isJson(useSelector(state => state.quiz)).startGameErr
+
+    const redirect = () => navigation.navigate('PlayQuiz')
+
+    const playQuiz = () => {
+        dispatch(callStartGame(redirect))
+    }
+
+    const disable = () => {}
+
+    const subscribe = () => navigation.navigate('Subscribe')
+
     useFocusEffect(
         React.useCallback(() => {
-          StatusBar.setBarStyle('dark-content');
-          Platform.OS === 'android' && StatusBar.setBackgroundColor('#fff');
+            if(loading) dispatch(loadQuiz(false))
         }, [])
     )
+
+    useEffect(() => {
+        createdb()
+        return () => {}
+    }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if(errStateGame !== null){
+                Toast.show(
+                    { 
+                        text: errStateGame, 
+                        buttonText: 'CLOSE', 
+                        textStyle: { fontSize: 14 },
+                    }
+                )
+            }
+        }, [errStateGame])
+    )
     return (
-        <View style={style.container}>
-            <View style={style.fore}>
+        <ContainerView 
+            height={windowHeight} 
+            width={windowWidth} 
+            style={style.container}
+        >
+            <FocusAwareStatusBar barStyle="dark-content" backgroundColor="#fff" />
+            <View style={[style.fore, {flex: windowHeight > windowWidth ? 0.35 : 0.5}]}>
                 <Image source={require('../img/quizStar.jpg')} style={style.foreImg} />
             </View>
-            <View style={style.secContainer}>
+            <View style={[style.secContainer, {flex: windowHeight > windowWidth ? 0.65 : 0.5}]}>
                 <LinearGradient
                     colors={['transparent', '#e1efef']}
                     style={{...style.gradient, height: windowHeight,}}
@@ -38,25 +94,48 @@ const QuizScreen = ({ navigation }) => {
                 </View>
                 <View style={style.guide}> 
                     <Text style={style.head}>QUIZ GUIDELINES</Text>
-                    {data.map((item, i) => {
-                        return(
-                            <Text style={style.textContainer} key={`${item}${i}`}>
-                                <Text style={style.thick}>{item.no}.</Text>
-                                <Text style={style.info}>{item.text}</Text>
-                            </Text>
-                        )
-                    })}
-                    
-                </View>
-                <View>
-                    <TouchableHighlight onPress={playQuiz}>
+                    <ScrollView>
+                        {data.map((item, i) => {
+                            return(
+                                <Text style={style.textContainer} key={`${item}${i}`}>
+                                    <Text style={style.thick}>{item.no}.</Text>
+                                    <Text style={style.info}>{item.text}</Text>
+                                </Text>
+                            )
+                        })}
+                    </ScrollView>
+                </View>                
+                <View style={{flex: 0.3, alignItems: 'center', width: '100%'}}>
+                {points > 0 ?
+                    <TouchableHighlight onPress={loading ? disable : playQuiz}>
                         <View style={style.but}>
-                            <Text style={{color: '#3480eb', fontWeight: 'bold'}}>LET'S DO THIS</Text>
+                            {loading ? 
+                                <ActivityIndicator size='small' color='blue' />
+                            :
+                                <Text 
+                                    style={{color: '#3480eb', fontWeight: 'bold'}}
+                                >
+                                    LET'S DO THIS
+                                </Text>
+                            }
                         </View>
                     </TouchableHighlight>
+                    :
+                    <>
+                    <Text style={style.subText}>
+                        Sorry, you do not have points to proceed!
+                    </Text>
+                    <TouchableHighlight onPress={subscribe}>
+                        <View style={style.but}>
+                            <Text style={{color: '#3480eb', fontWeight: 'bold'}}>SUBSCRIBE</Text>
+                        </View>
+                    </TouchableHighlight>
+                    </>
+                }
                 </View>
+                
             </View>
-        </View>
+        </ContainerView>
     )
 }
 
@@ -71,13 +150,11 @@ const style = StyleSheet.create({
         top: 0,
     },
     secContainer: {
-        flex: 0.7,
         justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: '#054078'
     },
     fore: {
-        flex: 0.3,
         justifyContent:'center',
         alignItems: 'center',
         backgroundColor: '#fff',
@@ -97,6 +174,7 @@ const style = StyleSheet.create({
         top: -50,
     },
     guide: {
+        flex: 0.7,
         backgroundColor: '#fff',
         borderRadius: 15,
         width: '80%',
@@ -130,6 +208,11 @@ const style = StyleSheet.create({
         elevation: 3,
         borderRadius: 3
     },
+    subText: {
+        color: '#fff',
+        fontSize: 16,
+        marginBottom: 15
+    }
 })
 
 export default QuizScreen

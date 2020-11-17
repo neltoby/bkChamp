@@ -1,32 +1,30 @@
-import React, { useState } from 'react'
-import { useFocusEffect } from '@react-navigation/native';
+import React  from 'react'
 import FocusAwareStatusBar from './FocusAwareStatusBar'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { Container, Header, Content, Left, Button, Icon, Body, Title, Right } from 'native-base';
-import { View, Text, StyleSheet, StatusBar, Platform, BackHandler } from 'react-native'
+import { Container, Header, Left, Button, Icon, Body, Title, Right } from 'native-base';
+import { StyleSheet, Platform } from 'react-native'
 import Basic from './Basic'
 const Tab = createMaterialTopTabNavigator();
 const dataContent = [
-    {amt: '#50', unit: ' 1 unit'},
-    {amt: '#100', unit: ' 3 unit'},
-    {amt: '#200', unit: ' 7 unit'},
-    {amt: '#300', unit: ' 12 unit'},
-    {amt: '#400', unit: ' 17 unit'},
+    {amt: '#100', unit: '4 unit'},
+    {amt: '#200', unit: '8 unit'},
+    {amt: '#300', unit: '12 unit'},
+    {amt: '#400', unit: '16 unit'},
 ]
 const medium = [
-    {amt: '#500', unit: ' 20 unit'},
-    {amt: '#800', unit: ' 35 unit'},
-    {amt: '#1000', unit: ' 45 unit'},
-    {amt: '#1500', unit: ' 70 unit'},
-    {amt: '#2000', unit: ' 100 unit'},
+    {amt: '#500', unit: '22 unit'},
+    {amt: '#800', unit: '34 unit'},
+    {amt: '#1000', unit: '42 unit'},
+    {amt: '#1500', unit: '62 unit'},
+    {amt: '#2000', unit: '82 unit'},
 ]
 const mega = [
-    {amt: '#2500', unit: ' 135 unit'},
-    {amt: '#3000', unit: ' 175 unit'},
-    {amt: '#3500', unit: ' 220 unit'},
-    {amt: '#4000', unit: ' 270 unit'},
-    {amt: '#4500', unit: ' 325 unit'},  
-    {amt: '#5000', unit: ' 385 unit'},      
+    {amt: '#2500', unit: ' 105 unit'},
+    {amt: '#3000', unit: ' 125 unit'},
+    {amt: '#3500', unit: ' 145 unit'},
+    {amt: '#4000', unit: ' 165 unit'},
+    {amt: '#4500', unit: ' 185 unit'},  
+    {amt: '#5000', unit: ' 205 unit'},      
 ]
 const title = [
     {text: 'Basic', dataContent: dataContent },
@@ -56,6 +54,7 @@ const Subscribe = ({navigation}) => {
             </Header>
                 <Tab.Navigator 
                     initialRouteName='Basic'
+                    backBehavior='order'
                     tabBarOptions={{
                         activeTintColor: 'yellow',
                         inactiveTintColor: '#fff',

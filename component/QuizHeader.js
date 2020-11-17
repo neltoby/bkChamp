@@ -1,7 +1,7 @@
 import React , { memo } from 'react'
 import { Header,  Button, Left, Body, Right, Icon as NativeIcon, Title, } from 'native-base'
 
-export default function QuizHeader() {
+export default function QuizHeader({navigation}) {
     console.log('quizHeader memoized')
     return (
         <Header transparent>

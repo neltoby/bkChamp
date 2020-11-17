@@ -1,16 +1,26 @@
-import React, {useState} from 'react'
+import React, { useState, useRef } from 'react'
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient'
-import { View, FlatList, StyleSheet, Text, useWindowDimensions } from 'react-native'
+import PaystackWebView from 'react-native-paystack-webview';
+import { View, FlatList, StyleSheet, Text } from 'react-native'
 import {Button, Icon} from 'native-base'
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { buyPoints } from '../actions/request'
+import { useDispatch } from 'react-redux';
+import { paystack } from '../processes/lock'
+import { noPoints } from '../actions/quiz';
+import { updateUserinfo } from '../actions/user'
+import deviceSize from '../processes/deviceSize'
 
 const Basic = (props) => {
-    const windowWidth = useWindowDimensions().width;
-    const windowHeight = useWindowDimensions().height;
+    const paystackWebViewRef = useRef();
+    const dispatch = useDispatch()
+    const windowWidth = deviceSize().deviceWidth;
+    const windowHeight = deviceSize().deviceHeight;
     const {dataContent, navigation} = props
     const [selected, setSelected] = useState(false)
     const [itemSelect, setItem] = useState({})
+    const amt = itemSelect.amt === undefined ? 0 : itemSelect.amt.substr(1)
+    const points = itemSelect.unit === undefined ? null : itemSelect.unit.split(' ')[0]
     useFocusEffect(
         React.useCallback(() => {               
           return () =>
@@ -21,8 +31,12 @@ const Basic = (props) => {
         setItem({})
         setSelected(false)
     }
-    const makePayment = () => {
+    const naviTrans = () => {
         navigation.navigate('TransSummary', {amt: itemSelect.amt, unit: itemSelect.unit})
+    }
+    const makePayment = () => {
+        dispatch(buyPoints({payload: itemSelect.unit, fxn: naviTrans}))
+        
     }
     const selectedItem = (item) => {
         setItem(item)
@@ -31,22 +45,24 @@ const Basic = (props) => {
     const displayContent = ({item}) => {
         return(
             <Button 
-            style={{...style.content, width: windowWidth - 100, backgroundColor: '#054078'}}
-            onPress={() => selectedItem({amt: item.amt, unit: item.unit})}>
+                style={{...style.content, width: windowWidth - 100, backgroundColor: '#054078'}}
+                onPress={() => selectedItem({amt: item.amt, unit: item.unit})}>
                     <Text style={style.butText}>{item.amt} - {item.unit}</Text>
             </Button>
         )
     }
+
     const _keyExtractor = (item, index) => `${index}${item.unit}`
     return(
         <>
             
             {selected ? 
-                <View style={style.selectedContainer}>
-                    <LinearGradient
-                        colors={['transparent', '#e1efef']}
-                        style={{...style.gradient, height: windowHeight,}}
-                    />
+            <View style={{flex: 1, backgroundColor: '#054078',}}>
+                <LinearGradient
+                    colors={['transparent', '#e1efef']}
+                    style={{...style.gradient, height: windowHeight,}}
+                />
+                <View style={style.selectedContainer}>                  
                     <Text style={style.resTitle}>You selected</Text>
                     <Text style={style.margin}>
                         <Text style={style.unitDisplay}>Unit</Text> 
@@ -57,34 +73,57 @@ const Basic = (props) => {
                         <Text style={style.unitDisplay}>Cost</Text> 
                         <Text>  - </Text>
                         <Text style={style.costDisplay}>{itemSelect.amt}</Text>
-                    </Text>
-                    <View style={style.viewbutton}>
-                        <View style={{...style.viewBack}}>
-                            <Button full onPress={undoSelect} style={{backgroundColor: '#054078'}}>
-                                <Icon name='arrow-back' />
-                                <Text style={style.mycolor}>Back</Text>
-                            </Button>
-                        </View>
-                        <View style={{...style.viewBack}}>
-                            <Button full onPress={makePayment} style={{backgroundColor: '#054078'}}>
-                                <Text style={style.mycolor}>Make Payment</Text>
-                            </Button>
-                        </View>
+                    </Text>                   
+                </View>
+                <View style={style.viewbutton}>
+                    <View style={{width: '80%'}}>
+                        <PaystackWebView
+                            buttonText="Pay Now"
+                            showPayButton={false}
+                            paystackKey={`${paystack.key}`}
+                            amount={amt}                   
+                            billingEmail={paystack.email}
+                            billingMobile={paystack.mobile}
+                            billingName={paystack.name}
+                            ActivityIndicatorColor="green"
+                            SafeAreaViewContainer={{marginTop: 0}}
+                            SafeAreaViewContainerModal={{marginTop: 0}}
+                            handleWebViewMessage={(e) => {
+                                console.log(itemSelect.amt, 'processing')
+                            }}
+                            onCancel={(e) => {
+                                console.log(e, 'cancel response')
+                            }}
+                            onSuccess={(res) => {
+                                dispatch(noPoints(false))
+                                dispatch(updateUserinfo({name: 'points', value: points}))
+                            }}
+                            ref={paystackWebViewRef}                          
+                        />
+                        <Button full onPress={()=> paystackWebViewRef.current.StartTransaction()} style={{backgroundColor: 'green', marginBottom: 10}}>
+                            <Text style={style.mycolor}>Pay Now</Text>               
+                        </Button>
+                        <Button full  onPress={undoSelect} style={{backgroundColor: '#054078'}}>
+                            <Text style={style.mycolor}>Back</Text>
+                        </Button>
                     </View>
                 </View>
+            </View>
             :
                 <View style={style.button}>
                     <LinearGradient
                         colors={['transparent', '#e1efef']}
                         style={{...style.gradient, height: windowHeight,}}
                     />
-                    <FlatList
-                        style={style.flatlist}
-                        contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
-                        data={dataContent}
-                        renderItem={displayContent}
-                        keyExtractor={_keyExtractor}
-                    />
+                    <View style={[style.cover, {height: windowWidth < windowHeight ? '70%' : '100%'}]}>
+                        <FlatList
+                            style={style.flatlist}
+                            contentContainerStyle={{ alignItems: 'center', justifyContent: 'center'}}
+                            data={dataContent}
+                            renderItem={displayContent}
+                            keyExtractor={_keyExtractor}
+                        />
+                    </View>
                 </View>
             }
         </>
@@ -99,11 +138,17 @@ const style = StyleSheet.create({
         top: 0,
     },
     flatlist: {
-        width: '100%',
+        marginHorizontal: 20,    
+    },
+    cover: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     button: {
         flex: 1,
-        backgroundColor: '#054078'
+        backgroundColor: '#054078',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     butText: {
         fontSize: 17,
@@ -116,10 +161,9 @@ const style = StyleSheet.create({
         justifyContent: 'center',
     },
     selectedContainer: {
-        flex: 1,
+        flex: 0.6,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#054078',
     },
     resTitle: {
         fontSize: 23,
@@ -141,12 +185,9 @@ const style = StyleSheet.create({
         marginBottom: 15,
     },
     viewbutton: {
-        flexDirection: 'row',
-        marginTop: 25,
-    },
-    viewBack: {
-        width: '50%',
-        paddingHorizontal: 5,
+        flex: 0.4,
+        alignItems: 'center',
+        paddingHorizontal: '10%'
     },
     mycolor: {
         color: '#fff',

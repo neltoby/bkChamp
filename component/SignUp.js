@@ -105,6 +105,7 @@ const SignUp = ({ navigation, route }) => {
                     inputContainerStyle={style.inputs}
                     inputStyle={style.input}
                     placeholder='FullName'
+                    autoCompleteType='name'
                     leftIcon={
                         <Icon
                         type='material'
@@ -120,6 +121,7 @@ const SignUp = ({ navigation, route }) => {
                     labelStyle = {style.label}
                     placeholder="Email"
                     keyboardType="email-address"
+                    autoCompleteType='email'
                     inputContainerStyle={style.inputs}
                     inputStyle={style.input}
                     leftIcon={
@@ -136,6 +138,7 @@ const SignUp = ({ navigation, route }) => {
                     label = 'Phone Number'
                     labelStyle = {style.label}
                     placeholder="Phone Number"
+                    autoCompleteType='tel'
                     keyboardType="numeric"
                     inputContainerStyle={style.inputs}
                     inputStyle={style.input}
@@ -161,6 +164,8 @@ const SignUp = ({ navigation, route }) => {
                     label = 'Password'
                     labelStyle = {style.label}
                     placeholder="Password"
+                    keyboardType='default'
+                    autoCompleteType='password'
                     inputContainerStyle={style.inputs}
                     inputStyle={style.input}
                     leftIcon={

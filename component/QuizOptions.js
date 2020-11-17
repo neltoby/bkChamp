@@ -1,28 +1,28 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native'
+import { View, ScrollView, Text, TouchableHighlight, StyleSheet } from 'react-native'
 import {Icon } from 'react-native-elements';
 import isJson from '../processes/isJson'
+import { useFocusEffect } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
 import {next, correctAnswers, wrongAnswers, displayedQuestion, answered, active, setOverlay,
-    decreaseScore, increaseScore, skip, playingAgain, correctAns, played, settime } from '../actions/quiz'
+    decreaseScore, increaseScore, correctAns, played, settime } from '../actions/quiz'
 
 export default function QuizOptions() {
-    const store = isJson(useSelector(state => state))
+    // const store = isJson(useSelector(state => state))
     const dispatch = useDispatch()
-    let allQuestion = useMemo(() => isJson(store.quiz.question), [store.quiz.question])
     const [selVal, setSelval] = useState('')
-    const current = parseInt(store.quiz.current, 10)
-    const question = isJson(allQuestion[current])
-    const answer = store.quiz.answer
-    const correct = store.quiz.correctAns
-    const displayed = (store.quiz.displayed).length
+    const allquestion = isJson(useSelector(state => state.quiz).question)
+    const question = isJson(useSelector(state => state.quiz).currentQuestion)
+    const answer = isJson(useSelector(state => state.quiz)).answer
+    const correct = isJson(useSelector(state => state.quiz)).correctAns
+    const level = useSelector(state => state.quiz).level
 
-    useEffect(() => {
-        const quest = isJson(allQuestion[current || 0])
-        dispatch(displayedQuestion(quest.id))
-    }, [current])
-        
-
+    useFocusEffect(
+        React.useCallback(() => {
+            dispatch(displayedQuestion(question.id))
+            return () => {}
+        }, [question.id])
+    )
 
     const selected = (val) => {
         setSelval(val)
@@ -36,11 +36,11 @@ export default function QuizOptions() {
             dispatch(wrongAnswers(question.id)) 
             dispatch(decreaseScore())        
         }
-        
+
         dispatch(answered(true))
         setTimeout(() => {
-            if(question.id == allQuestion[allQuestion.length - 1].id ){
-                settime('')
+            if(level === 'difficult' && allquestion[level].length === 0){
+                dispatch(settime(''))
                 dispatch(setOverlay('end'))
             }else{
                 dispatch(answered(false))
@@ -52,7 +52,7 @@ export default function QuizOptions() {
     }
 
     return (
-        <View style={style.optionContainer}>
+        <ScrollView contentContainerStyle={{justifyContent: 'center',alignItems: 'center'}} style={style.optionContainer}>
             {
                 !answer ? question.options.map((option, i) => {
                     return (
@@ -166,15 +166,13 @@ export default function QuizOptions() {
                 })
             }
             
-        </View>
+        </ScrollView>
     )
 }
 
  const style = StyleSheet.create({
     optionContainer: {
         marginTop: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     optionView: {
         borderRadius: 4,

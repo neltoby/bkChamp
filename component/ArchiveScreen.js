@@ -1,15 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
 import {Container, Header, Content, Left, Body, Right, Button, Title, Icon as NativeIcon} from 'native-base'
-import { StyleSheet, View, Text, StatusBar, Platform, TouchableWithoutFeedback, useWindowDimensions } from 'react-native'
+import { ScrollView, StyleSheet, View, Text, StatusBar, Platform, TouchableWithoutFeedback, ActivityIndicator } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import deviceSize from '../processes/deviceSize'
+import { getArchived } from '../actions/learn'
 import isJson from '../processes/isJson';
 
 const ArchiveScreen = ({ navigation }) => {
-    const windowHeight = useWindowDimensions().height;
-    const store = isJson(useSelector(state => state.archive))
+    const windowHeight = deviceSize().deviceHeight;
+    const dispatch = useDispatch()
+    const archive = isJson(useSelector(state => state.archive)).archive
+    const loading = isJson(useSelector(state => state.archive)).loading
+    
     useFocusEffect(
         React.useCallback(() => {
             StatusBar.setBarStyle('light-content');
@@ -18,26 +23,45 @@ const ArchiveScreen = ({ navigation }) => {
             }
         }, [])       
     )
+
+    useEffect(() => {
+        dispatch(getArchived())
+        return () => {}
+    }, [])
+
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         dispatch(getArchived())
+    //         return () => {
+    //         }
+    //     }, [])       
+    // )
+    
     const goto = (loc) => {
         navigation.navigate('ViewArchive', {subject: loc})
     }
     const renderView = ({item}) => {
+        const col = item.category === 'Science and Technology' ? '#00e600' :
+            item.category === 'Finance' ? '#e85f29' : item.category === 'Politics' ? 
+            'orange' : item.category === 'Sports' ? '#ff1a66' : item.category === 'Socials' ?
+            '#e6e600' : item.category === 'Entertainment' ? '#9999ff' : 
+            item.category === 'History' ? '#033268' : item.category === 'Lifestyle' ? 'green' : 'e85f29'
         return (
-            <TouchableWithoutFeedback onPress={() => goto(item.text)}>
-                <View style={{...style.cover, backgroundColor: item.col, borderColor: item.col}}>
+            <TouchableWithoutFeedback onPress={() => goto(item.category)}>
+                <View style={{...style.cover, backgroundColor: col, borderColor: col}}>
                     <View style={style.item}>
-                        <Text style={{...style.text, color: '#fff' }}>{item.text}</Text>
+                        <Text style={{...style.text, color: '#fff' }}>{item.category}</Text>
                     </View>
                     <View style={style.num}>
-                        <Text style={style.numText}>{item.num}</Text>
+                        <Text style={style.numText}>{item.value.length}</Text>
                     </View>
                 </View>
             </TouchableWithoutFeedback>
         )
     }
-    const _keyExtractor = (item, index) => `${item.text}${index}`
+    const _keyExtractor = (item, index) => `${item.category}${index}`
     return(
-        <View style={{backgroundColor: "#054078", flex: 1,}}>
+        <Container style={{backgroundColor: "#054078"}}>
             <LinearGradient
                 colors={['transparent', '#e1efef']}
                 style={{...style.gradient, height: windowHeight,}}
@@ -57,16 +81,27 @@ const ArchiveScreen = ({ navigation }) => {
                 <NativeIcon type= 'Ionicons' name= 'md-archive' style={{color: '#fff', fontSize: 24}} />
                 </Right>
             </Header>
-            <View style={style.content}>
-                <FlatList 
-                    style={style.flatList}
-                    contentContainerStyle = {{flex: 1, justifyContent:'center', alignItems: 'center'}}
-                    data={store.category}
-                    renderItem={renderView}
-                    keyExtractor={_keyExtractor}
-                />
-            </View>
-        </View>
+            {loading ? 
+                <View style={style.content}>
+                    <ActivityIndicator size='small' color='blue' />
+                </View>
+                :
+                archive.length ? 
+                    <FlatList 
+                        style={style.flatList}
+                        contentContainerStyle = {{justifyContent:'center', alignItems: 'center'}}
+                        data={archive}
+                        renderItem={renderView}
+                        keyExtractor={_keyExtractor}
+                    />
+                    : 
+                    <View style={style.content}>
+                        <Text>
+                            No archived article
+                        </Text>
+                    </View>
+            }
+        </Container>
     )
 }
 
@@ -95,9 +130,10 @@ const style = StyleSheet.create({
         paddingVertical: 7,
         borderRadius: 50,
     },
-    flatList: {        
+    flatList: {     
+        flex: 1,
         marginTop: 20,
-        width: '100%',
+        // width: '100%',
     },
     item: {
         width: '85%',

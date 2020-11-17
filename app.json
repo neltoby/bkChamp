@@ -9,6 +9,11 @@
       "**/*"
     ],
     "description": "Most recent expo version 39 for bookchamp",
-    "githubUrl": "https://github.com/neltoby/bkChamp"
+    "githubUrl": "https://github.com/neltoby/bkChamp",
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#ffffff",
+      "resizeMode": "contain"
+    }
   }
 }

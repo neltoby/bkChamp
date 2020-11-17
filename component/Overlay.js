@@ -1,10 +1,10 @@
 import React from 'react'
-import {useWindowDimensions} from 'react-native'
+import deviceSize from '../processes/deviceSize'
 import Modal from 'react-native-modal';
 
 export default function Overlay(props) {
-    const windowHeight = props.deviceHeight || useWindowDimensions().height;
-    const deviceWidth = props.deviceWidth || useWindowDimensions().width;
+    const windowHeight = props.deviceHeight || deviceSize().deviceHeight;
+    const deviceWidth = props.deviceWidth || deviceSize().deviceWidth;
     return (
         <Modal
             isVisible={props.isVisible}

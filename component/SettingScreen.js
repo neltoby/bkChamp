@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
+import Constants from 'expo-constants';
 import deviceSize from '../processes/deviceSize'
 import FocusAwareStatusBar from './FocusAwareStatusBar'
 import { LinearGradient } from 'expo-linear-gradient'
+import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect } from '@react-navigation/native'
 import ListSeparator from './ListSeparator'
 import Animated, { Easing } from 'react-native-reanimated';
-import { View, Text, Image, StyleSheet, ImageBackground, Keyboard, FlatList, TouchableWithoutFeedback } from 'react-native'
-import { Container,  Button,  DatePicker } from 'native-base'
+import { View, Text, Image as RNImage, StyleSheet, Alert, ImageBackground, Keyboard, FlatList, TouchableWithoutFeedback } from 'react-native'
+// import { Badge } from 'react-native-elements'
+import { Container,  Button, Badge, Toast, Icon as NBIcon } from 'native-base'
+import Image from './Image'
 import { Icon} from 'react-native-elements';
 import isJson from '../processes/isJson';
 import SetPassword from './SetPassword'
 import EditBox from './EditBox'
-import { useSelector } from 'react-redux';
+import { updateUserinfo } from '../actions/user'
+import { useDispatch, useSelector } from 'react-redux';
 import CustomOverlay from './CustomOverlay'
 import { ScrollView , PanGestureHandler, State } from 'react-native-gesture-handler';
 const { 
@@ -30,16 +35,28 @@ const {
     color 
 } = Animated;
 
-
+const AnimatedIcon = Animated.createAnimatedComponent(NBIcon)
+const AnimatedBadge = Animated.createAnimatedComponent(Badge)
+const AnimatedImage = Animated.createAnimatedComponent(Image)
 const AnimatedImageBg = Animated.createAnimatedComponent(ImageBackground)
 const AnimatedContent = Animated.createAnimatedComponent(ScrollView)
-const AnimatedContents = Animated.createAnimatedComponent(FlatList)
+// const AnimatedContents = Animated.createAnimatedComponent(FlatList)
+const api = 'https://api.cloudinary.com/v1_1/bookchmap/image/upload'
 
 const SettingScreen = () => {
+    const dispatch = useDispatch()
     const windowHeight = deviceSize().deviceHeight;
+    const deviceWidth = deviceSize().deviceWidth
+    const [imgUrl, setImg] = useState({})
+    const [empty, setEmpty] = useState(false)
+    const [cloudImg, setCloudImg] = useState(null)
+    const [loading, setLoading] = useState(false)
     const store = isJson(useSelector(state => state))
     const user = [] 
-    Object.entries(isJson(store.user)).forEach(item => {
+    const storePreview = isJson(useSelector(state => state.learn)).preview
+    const preview = useMemo(() => { uri: storePreview }, [storePreview])
+    const uri = store.user.user.image
+    Object.entries(isJson(store.user.user)).forEach(item => {
         let label = item[0]
         let icon = label === 'username' || label === 'fullname' ? 'person' :
             label === 'email' ? 'email' : label === 'phone_number' ? 'call' : 
@@ -56,12 +73,12 @@ const SettingScreen = () => {
         }
     })
     const details = [
-        {fullname: isJson(store.user).fullname, icon: 'person'},
-        {username: isJson(store.user).username, icon: 'person'},
-        {email: isJson(store.user).email, icon: 'email'},
-        {mobile: isJson(store.user).phone_number, icon: 'call'}
+        {fullname: isJson(store.user.user).fullname, icon: 'person'},
+        {username: isJson(store.user.user).username, icon: 'person'},
+        {email: isJson(store.user.user).email, icon: 'email'},
+        {mobile: isJson(store.user.user).phone_number, icon: 'call'}
     ]
-    user.push({value: 'testuser', label: 'password', icon: 'https'})
+    user.push({value: '', label: 'password', icon: 'https'})
     const [verify, setVerify] = useState(false)
     const [edit, setEdit] = useState(false)
     const nameVal = new Value(deviceSize().deviceWidth)
@@ -90,6 +107,11 @@ const SettingScreen = () => {
     const translateY = interpolate(clampedVal, {
         inputRange: [0, HEIGHT],
         outputRange: [0, HEIGHT],
+        extrapolate: 'clamp'
+    })
+    const translateX = interpolate(clampedVal, {
+        inputRange: [0, HEIGHT],
+        outputRange: [(0.8 * deviceWidth), deviceWidth + 20],
         extrapolate: 'clamp'
     })
     const borderRadius = interpolate(translateY, {
@@ -159,6 +181,72 @@ const SettingScreen = () => {
         1
     )
 
+    const pickImage = async () => {
+        console.log('pickImage has been called')
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+            base64: true,
+        });
+
+        if (!result.cancelled) {
+            setImg(result);
+            uploadPix(result)
+        }
+    }
+    const uploadPix = (result) => {
+        if(result.base64){
+            setLoading(true)
+            let base64Img = `data:image/jpg;base64,${result.base64}`;
+            let data = {
+                "file": base64Img,
+                "upload_preset": "bookchampUsers",
+            }
+            fetch(api, {
+                body: JSON.stringify(data),
+                headers: {
+                    'content-type': 'application/json'
+                },
+                method: 'POST',
+            })
+            .then(async res => {
+                let data = await res.json()
+                console.log(data)               
+                return data.secure_url
+            })
+            .then(url => {
+                setLoading(false)
+                setCloudImg(url)
+                dispatch(updateUserinfo({name: 'image', value: url}))
+                Toast.show({
+                    text: url,
+                    buttonText: "CLOSE",
+                    duration: 10000
+                })
+            })
+            .catch(err => {
+                setLoading(false)
+                setEmpty(true)
+                Toast.show({
+                    text: 'error uploading profile',
+                    buttonText: "CLOSE",
+                    duration: 3000
+                })
+                setTimeout(() => {
+                    setEmpty(false)
+                }, 2000);
+            })
+        }else{
+            console('empty value for upload')
+            setEmpty(true)
+            setTimeout(() => {
+                setEmpty(false)
+            }, 2000);
+        }       
+    }
+
     useFocusEffect(
         React.useCallback(() => {
             if(verify){
@@ -204,6 +292,16 @@ const SettingScreen = () => {
             Keyboard.removeListener('keyboardDidHide', _keyboardDidHide)
         }
     }, [])
+    useEffect(() => {
+        (async () => {
+            if (Constants.platform.ios) {
+                const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+                if (status !== 'granted') {
+                    alert('Sorry, we need camera roll permissions to make this work!');
+                }
+            }
+        })();
+    }, []);
     const _keyboardDidShow = e => {
         timing(animatedMargin, {
             duration: e.duration,
@@ -235,7 +333,7 @@ const SettingScreen = () => {
     //         console.log(borderRadius, 'borderRadius')
     //     })
     // }, [borderRadius])
-
+    console.log(store.user.user, '\from settings')
     return(
         <>
         <Container style={{backgroundColor: "#054078"}}>
@@ -244,10 +342,17 @@ const SettingScreen = () => {
             <AnimatedContent style={[style.profileview, {transform: [{translate: springVal}]}]}>
                     
                     <View style={style.profile}>
-                        <Image
-                            source={require('../img/user.jpg')}
-                            style={{width: '100%', height: 300}}                                   
-                        />
+                        {uri === null ? 
+                            <RNImage
+                                source={require('../img/anonymous.jpg')}
+                                style={{width: '100%', height: 300}}                                   
+                            />
+                        :
+                            <Image
+                                {...{preview, uri}}
+                                style={{width: '100%', height: 300}} 
+                            />
+                        }
                         <Animated.View style={{...style.nameText, transform: [{translateX: nameVal}]}}>
                             <Text style={style.name} numberOfLines={1}>
                                 {details[0].fullname}
@@ -267,10 +372,18 @@ const SettingScreen = () => {
                                 <Text style={{color: 'yellow', fontWeight: 'bold'}}>Details</Text>
                             </Button>
                             <Button 
+                                iconLeft
                                 onPress={editSpring}
                                 bordered
                                 style={{paddingHorizontal: 20, paddingVertical: 2, borderColor: '#fff'}}
                             >
+                                <Icon
+                                    type='material'
+                                    name='folder-shared'
+                                    size={24}
+                                    color='#f1f1f1'
+                                    containerStyle={{marginRight: 15}}
+                                />
                                 <Text style={{color: '#fff', fontWeight: 'bold'}}>Edit</Text>
                             </Button>
                         </View>
@@ -283,24 +396,7 @@ const SettingScreen = () => {
                                 }
                             })}
                         </View>
-                        <View style={style.buttonContainer}>
-                            <Button 
-                                iconLeft
-                                bordered
-                                style={style.button}
-                            >
-                                <Icon
-                                    type='material'
-                                    name='folder-shared'
-                                    size={24}
-                                    color='#f1f1f1'
-                                    containerStyle={{marginRight: 15}}
-                                />
-                                <Text style={style.all}>
-                                    All Profile
-                                </Text>
-                            </Button>                    
-                        </View> 
+
                     </View>                               
             </AnimatedContent>
             )
@@ -343,9 +439,24 @@ const SettingScreen = () => {
                                     
                                 </Animated.View>
                                 <Animated.View style={[{height: animatedHeight}]}>
-                                    <AnimatedImageBg source={require('../img/user.jpg')} style={[{flex: 1, justifyContent: 'flex-end', paddingLeft: 15, paddingBottom: 15},{opacity: iconOpacity}]} >
-                                        <Text style={style.name}>{details[0].fullname}</Text>
-                                    </AnimatedImageBg>
+                                    {uri === null ?
+                                        <AnimatedImageBg source={require('../img/anonymous.jpg')} style={[{flex: 1, justifyContent: 'flex-end', paddingLeft: 15, paddingBottom: 15},{opacity: iconOpacity}]} >
+                                            <Text style={style.name}>{details[0].fullname}</Text>
+                                        </AnimatedImageBg>
+                                    :
+                                    <AnimatedImage
+                                        {...{preview, uri}}
+                                        style={[style.imgUrl, {opacity: iconOpacity}]} 
+                                    />
+                                    }
+                                    {/* <AnimatedBadge containerStyle={[style.badge]}
+                                        value = {<Icon name="camera" style={{ fontSize: 25, color: "#054078" }}/>}
+                                        onPress= {pickImage}
+                                    /> */}
+                                    <AnimatedBadge style={[style.badge, {left: translateX}]}                                        
+                                    >
+                                        <AnimatedIcon name="camera" onPress= {pickImage} style={{ fontSize: 25, color: "#054078" }}/>
+                                    </AnimatedBadge>
                                 </Animated.View>
                             </View>
                             <AnimatedContent
@@ -356,7 +467,7 @@ const SettingScreen = () => {
                                 style={[{paddingTop: 15, paddingBottom: 25}]} 
                             >                          
                                     {user.map((item,i) => (
-                                        <TouchableWithoutFeedback style={[style.editBox]}>
+                                        <TouchableWithoutFeedback style={[style.editBox]} key={i}>
                                             <EditBox item={item} />
                                         </TouchableWithoutFeedback>
                                     ))}   
@@ -375,6 +486,7 @@ const SettingScreen = () => {
 
 const style = StyleSheet.create({
     profileview: {
+        flex: 1,
         padding: 0,
         width: '100%',
     },
@@ -433,6 +545,10 @@ const style = StyleSheet.create({
         backgroundColor: '#fff',
         paddingVertical: 0
     }, 
+    imgUrl: {
+        height: '100%',
+        width: '100%',
+    },
     editBox: {
         // flexDirection: 'row',
         // justifyContent: 'center',
@@ -447,6 +563,16 @@ const style = StyleSheet.create({
     editText: {
         fontSize: 18
     },
+    badge: {
+        position: 'absolute',
+        bottom: 20,
+        borderRadius: 20,
+        width: 40, 
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#eee'
+    }
 })
 
 

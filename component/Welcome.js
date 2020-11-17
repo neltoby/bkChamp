@@ -4,9 +4,13 @@ import logo from '../processes/image'
 import { Button, Icon } from 'react-native-elements';
 import { Container, Content, H1 } from 'native-base';
 import { View, Text, StyleSheet, Image } from "react-native";
+import { welcome } from '../actions/login'
+import { useDispatch } from 'react-redux';
 
 const Welcome = ({ navigation }) => {
+    const dispatch = useDispatch()
     const nextSlide = () => {
+        dispatch(welcome('Home'))
         navigation.navigate('Home')
     }
     return(
@@ -27,10 +31,15 @@ const Welcome = ({ navigation }) => {
                         <View style={style.empty}></View>
                     </View>
                     <View style={style.note}>
-                        <Text style={style.welcomeNote}>node_modules\react-native\Libraries\BatchedBridge\MessageQueue.js:436:47 in __callFunction
-- node_modules\react-native\Libraries\BatchedBridge\MessageQueue.js:111:26 in __guard$argument_0
-- node_modules\react-native\Libraries\BatchedBridge\MessageQueue.js:384:10 in __guard
-- node_modules\react-native\Libraries\BatchedBridge\MessageQueue.js:110:17 in __guard$argument_0</Text>
+                        <Text>
+                            <Text style={style.welcomeNote}>
+                                "Knowledge is like a precious Ornament, 
+                                you decide how much it adorns you"
+                            </Text>
+                            <Text>
+                                – Joshua Akpovino (CEO – Book Champ)
+                            </Text>
+                        </Text>
                     </View>
                     <Button
                         onPress = {nextSlide}
@@ -101,10 +110,12 @@ const style = StyleSheet.create({
         alignSelf: 'center',
         width: '70%',
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#aaa',
         padding: 4,
         justifyContent: "center",
+    },
+    welcomeNote: {
+        fontWeight: 'bold',
+        fontSize: 19
     },
     continue: {
         width: '70%',

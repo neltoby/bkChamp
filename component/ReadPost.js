@@ -1,7 +1,8 @@
 import React, { useMemo, useEffect, useState } from 'react'
+import { SlideAnimation, BottomModal, ModalTitle, ModalFooter, ModalButton, ModalContent } from 'react-native-modals';
 import { Badge } from 'react-native-elements'
-import { View, Platform, StyleSheet, Text } from 'react-native'
-import { Container, Header, Content, Left, Button, Body, Subtitle, Toast, Right, Icon as NativeIcon } from 'native-base'
+import { View, Platform, StyleSheet, Text, BackHandler } from 'react-native'
+import { Container, Header, Left, Button, Body, Subtitle, Toast, Right, Icon as NativeIcon } from 'native-base'
 import isJson from '../processes/isJson'
 import deviceSize from '../processes/deviceSize'
 import { useSelector, useDispatch } from 'react-redux'
@@ -12,21 +13,51 @@ import Image from './Image'
 import CustomOverlay from './CustomOverlay'
 import useCheckpoint from './useCheckpoint'
 import { useFocusEffect } from '@react-navigation/native'
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 
+const reactStringReplace = require('react-string-replace')
 
 const ReadPost = ({ navigation, route}) => {
-    const {item, subject} = route.params
+    const { subject } = route.params
+    const items = route.params.item
+    const item = route.params.type !== undefined ? route.params.item : isJson(useSelector(state => state.learn)).displayItems.find(element => element.id === items.id)
     const windowHeight = deviceSize().deviceHeight
     const dispatch = useDispatch()
     const [imageOverlay, setImageOverlay] = useState(false)
+    const [word, setWord] = useState({})
     const store = isJson(useSelector(state => state.learn))
     const preview = useMemo(() => { uri: store.preview }, [store.preview])
-    // const item = isJson(store.displayItems).filter(element => {
-    //     if(element.id == index) return element
-    // })[0]
+    let replaceText
+    replaceText = item.new_word_1 !== '' && item.new_word_1 !== null ? reactStringReplace(item.body , item.new_word_1.split(':')[0],(match, i) => (
+        <Text key={match + i} style={style.color} onPress={() => newWord(match, item.new_word_1.split(':')[1], 1)}>{match}</Text>
+    )) : item.body
+    replaceText = item.new_word_2 !== '' && item.new_word_2 !== null ? reactStringReplace(replaceText , item.new_word_2.split(':')[0],(match, i) => (
+        <Text key={match + i} style={style.color} onPress={() => newWord(match, item.new_word_2.split(':')[1], 1)}>{match}</Text>
+    )) : replaceText
+    replaceText = item.new_word_3 !== '' && item.new_word_3 !== null ? reactStringReplace(replaceText , item.new_word_3.split(':')[0],(match, i) => (
+        <Text key={match + i} style={style.color} onPress={() => newWord(match, item.new_word_3.split(':')[1], 1)}>{match}</Text>
+    )) : replaceText
+    replaceText = item.idioms_1 !== '' && item.idioms_1 !== null ? reactStringReplace(replaceText , item.idioms_1.split(':')[0],(match, i) => (
+        <Text key={match + i} style={style.color} onPress={() => newWord(match, item.idioms_1.split(':')[1], 0)}>{match}</Text>
+    )) : replaceText
+    replaceText = item.idioms_2 !== '' && item.idioms_2 !== null ? reactStringReplace(replaceText , item.idioms_2.split(':')[0],(match, i) => (
+        <Text key={match + i} style={style.color} onPress={() => newWord(match, item.idioms_2.split(':')[1], 0)}>{match}</Text>
+    )) : replaceText
+    replaceText = item.idioms_3 !== '' && item.idioms_3 !== null ? reactStringReplace(replaceText , item.idioms_3.split(':')[0],(match, i) => (
+        <Text key={match + i} style={style.color} onPress={() => newWord(match, item.idioms_3.split(':')[1], 0)}>{match}</Text>
+    )) : replaceText
+
+    const newWord = (word, meaning, num) => {
+        const obj = {word, meaning, type: num === 1 ? 'New word' : 'Idiom'}
+        setWord(obj)
+    }
+
+    const closeWord = () => {
+        setWord({})
+    }
+
     const likes = async (id) => {
-        if(!item.liked){
+        if(item.liked === false){
             const getResult = useCheckpoint(onFailureLike, onSuccessLike, id)
             getResult().then(res => {
                 Toast.show(
@@ -44,16 +75,15 @@ const ReadPost = ({ navigation, route}) => {
             await getResult()
         }       
     }
+
     const archive = (obj) => {
         if(!obj.item.archived) {
             const getResult = useCheckpoint(onFailureArchive, onSuccessArchive, obj)
             getResult()
+        }else{
+            const getResult = useCheckpoint(onFailureUnarchive, onSuccessUnarchive, obj)
+            getResult()
         }
-        // else{
-        //     console.log('unarchive post ?')
-        //     // const getResult = useCheckpoint(onFailureUnarchive, onSuccessUnarchive, obj)
-        //     // getResult()
-        // }
     }
     // when network is confirmed for a like request
     const onSuccessLike = (id) => {
@@ -96,7 +126,21 @@ const ReadPost = ({ navigation, route}) => {
             if(!item.read){
                 dispatch(updateSeenArticle(item.id))
             }
-            
+            return () => {
+            }
+        }, [item.id])
+    )
+    useFocusEffect(
+        React.useCallback(() => {
+            const backAction = () => {
+                navigation.navigate(route.params.type !== undefined ? 'ViewArchive' : 'Subject')
+                return true
+            }
+
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
         }, [item.id])
     )
 
@@ -105,7 +149,7 @@ const ReadPost = ({ navigation, route}) => {
         <Container style={{backgroundColor: "#fff"}}>
             <Header style={style.header}>
                 <Left>
-                    <Button transparent onPress={() => navigation.navigate('Subject')}>
+                    <Button transparent onPress={() => navigation.navigate(route.params.type ? 'ViewArchive' : 'Subject')}>
                         <NativeIcon  name={Platform.OS == 'ios' ? 'chevron-back-outline' : 'arrow-back'} />
                     </Button>
                 </Left>
@@ -120,171 +164,112 @@ const ReadPost = ({ navigation, route}) => {
                     </Button>
                 </Right>
             </Header>
-            <Content>
-                <TouchableWithoutFeedback onPress={displayImage} style={style.imgView}>
-                    <Image {...{preview, uri:item.image_url}} style={style.img} />
-                </TouchableWithoutFeedback>
-                <View style={style.titleContainer}>
-                    <Text style={style.title}>
-                        {item.title}
-                    </Text>
-                </View>
-                <Hyperlink
-                    linkDefault={ true }
-                    
-                    linkStyle={ { color: '#2980b9' } }
-                >
-                    <View style={style.textView}>        
-                        <Text>{item.body}</Text>               
-                    </View>
-                </Hyperlink>
-                <View style={style.actions}>
-                    <View style={style.action}>
-                        <NativeIcon 
-                            type={item.liked ? 'Ionicons' : 'FontAwesome5'} 
-                            onPress={() => likes(item.id)} 
-                            name='heart' 
-                            style={{color: item.liked ? 'red' : '#777', fontSize: 28}} />
-                            <Badge 
-                                badgeStyle={{ width: 25, height: 25, borderRadius: 25/2, backgroundColor: 'transparent' }}
-                                value={<Text style={style.badgeText}>{item.likes}</Text>}
-                                containerStyle={{ position: 'absolute', top: -4, right: 20 }}
-                            />
-                    </View>
-                    <View style={style.action}>
-                        <NativeIcon 
-                            type={item.read ? 'Ionicons' : 'FontAwesome5'} 
-                            name='eye' 
-                            style={{color: '#777', fontSize: 28}} />
-                    </View>
-                    <View style={style.action}>
-                        <NativeIcon 
-                            onPress={() => {archive({item}); Toast.show({ text: `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: {backgroundColor: 'green'} })}}
-                            type='Ionicons'
-                            name='md-archive'
-                            style={{color: item.archived ? 'green' : '#777', fontSize: 28}} 
-                        />
+            <View style={style.container}>
+                <View style={style.imageContaniner}>
+                    <TouchableWithoutFeedback onPress={displayImage} style={style.imgView}>
+                        <Image {...{preview, uri:item.image_url}} style={style.img} />
+                    </TouchableWithoutFeedback>
+                    <View style={style.titleContainer}>
+                        <Text numberOfLines={1} style={style.title}>
+                            {item.title}
+                        </Text>
                     </View>
                 </View>
-                <View style={style.wordsContainer}>
-                    <View style={style.newWordsContainer}>
-                        {
-                            (item.new_word_1 !== '' && item.new_word_1 !== null) || (item.new_word_2 !== '' && item.new_word_2 !== null) || (item.new_word_3 !== '' && item.new_word_3 !== null) ?
-                            <View style={style.newWordTitle}>
-                                <Text style={style.newTitle}> {item.new_word_2 !== '' || item.new_word_3 !== '' ? 'Meaning of these words' : 'Meaning of this word'} </Text>
-                            </View> 
-                            : null
-                        }
-                        {item.new_word_1 !== '' && item.new_word_1 !== null ? 
-                            <View style={style.newWordContent}>
-                                <Text style={style.newWord}>
-                                    <Text style={style.heading}>
-                                        {item.new_word_1.split(':')[0]} :
-                                    </Text>
-                                    <Text style={style.explain}>
-                                        {item.new_word_1.split(':')[1]}
-                                    </Text>
-                                </Text>
-                            </View>
-                        : null}
-                        {item.new_word_2 !== '' && item.new_word_2 !== null ? 
-                            <View style={style.newWordContent}>
-                                <Text style={style.newWord}>
-                                    <Text style={style.heading}>
-                                        {item.new_word_2.split(':')[0]} :
-                                    </Text>
-                                    <Text style={style.explain}>
-                                        {item.new_word_2.split(':')[1]}
-                                    </Text>
-                                </Text>
-                            </View>
-                        : null}
-                        {item.new_word_3 !== '' && item.new_word_3 !== null ? 
-                            <View style={style.newWordContent}>
-                                <Text style={style.newWord}>
-                                    <Text style={style.heading}>
-                                        {item.new_word_3.split(':')[0]} :
-                                    </Text>
-                                    <Text style={style.explain}>
-                                        {item.new_word_3.split(':')[1]}
-                                    </Text>
-                                </Text>
-                            </View>
-                        : null}
-                    </View>
-                    <View style={style.newWordsContainer}>
-                        {
-                            (item.idioms_1 !== '' && item.idioms_1 !== null) || (item.idioms_2 !== '' && item.idioms_2 !== null) || (item.idioms_3 !== '' && item.idioms_3 !== null) ?
-                            <View style={style.newWordTitle}>
-                                <Text style={style.newTitle}> {(item.idioms_2 !== '' && item.idioms_2 !== null) || (item.idioms_3 !== '' && item.idioms_3 !== null) ? 'Idioms meaning ' : 'Idiom meaning'} </Text>
-                            </View> 
-                            : null
-                        }
-                        {item.idioms_1 !== '' && item.idioms_1 !== null ? 
-                            <View style={style.newWordContent}>
-                                <Text style={style.newWord}>
-                                    <Text style={style.heading}>
-                                        {item.idioms_1.split(':')[0]} :
-                                    </Text>
-                                    <Text style={style.explain}>
-                                        {item.idioms_1.split(':')[1]}
-                                    </Text>
-                                </Text>
-                            </View>
-                        : null}
-                        {item.idioms_2 !== '' && item.idioms_2 !== null ? 
-                            <View style={style.newWordContent}>
-                                <Text style={style.newWord}>
-                                    <Text style={style.heading}>
-                                        {item.idioms_2.split(':')[0]} :
-                                    </Text>
-                                    <Text style={style.explain}>
-                                        {item.idioms_2.split(':')[1]}
-                                    </Text>
-                                </Text>
-                            </View>
-                        : null}
-                        {item.idioms_3 !== '' && item.idioms_3 !== null ? 
-                            <View style={style.newWordContent}>
-                                <Text style={style.newWord}>
-                                <Text style={style.heading}>
-                                        {item.idioms_3.split(':')[0]} :
-                                    </Text>
-                                    <Text style={style.explain}>
-                                        {item.idioms_3.split(':')[1]}
-                                    </Text>
-                                </Text>
-                            </View>
-                        : null}
-                    </View>
-
-                </View>
-            </Content>
-        </Container>
-        {imageOverlay ? 
-            (
-                <CustomOverlay
-                    isVisible={imageOverlay}
-                    backgroundColor = 'rgba(0,0,0,1)'
-                    animation='slide'
-                >
-                    <View style={{...style.imageContainer, height: windowHeight}}>
-                        <View style={style.cover}>
-                        <NativeIcon 
-                            type='FontAwesome'
-                            onPress={displayImage} 
-                            name='times' 
-                            style={{color: '#ddd', fontSize: 28, position: 'absolute', right: 20, top: 50}} />
+                <View style={style.emptyContent}/>
+                <ScrollView style={style.content}>
+                    <Hyperlink
+                        linkDefault={ true }
+                        
+                        linkStyle={ { color: '#2980b9' } }
+                    >
+                        <View style={style.textView}>        
+                            <Text>{replaceText}</Text>               
                         </View>
-                            <View style={style.imageWrapper}>
-                                <Image {...{preview, uri:item.image_url}} style={style.bigimg} />
+                    </Hyperlink>
+                    {route.params.type === undefined ? 
+                        <View style={style.actions}>
+                            <View style={style.action}>
+                                <NativeIcon 
+                                    type={item.liked ? 'Ionicons' : 'FontAwesome5'} 
+                                    onPress={() => likes(item.id)} 
+                                    name='heart' 
+                                    style={{color: item.liked ? 'red' : '#777', fontSize: 28}} />
+                                    <Badge 
+                                        badgeStyle={{ width: 25, height: 25, borderRadius: 25/2, backgroundColor: 'transparent' }}
+                                        value={<Text style={style.badgeText}>{item.likes}</Text>}
+                                        containerStyle={{ position: 'absolute', top: -4, right: 20 }}
+                                    />
                             </View>
-                        <View style={style.cover} />
+                            <View style={style.action}>
+                                <NativeIcon 
+                                    type={item.read ? 'Ionicons' : 'FontAwesome5'} 
+                                    name='eye' 
+                                    style={{color: '#777', fontSize: 28}} />
+                            </View>
+                            <View style={style.action}>
+                                <NativeIcon 
+                                    onPress={() => {archive({item}); Toast.show({ text: item.archived ? `Removed from archive` : `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: {backgroundColor: item.archived ? 'red' : 'green'} })}}
+                                    type='Ionicons'
+                                    name='md-archive'
+                                    style={{color: item.archived ? 'green' : '#777', fontSize: 28}} 
+                                />
+                            </View>
+                        </View>
+                        : null
+                    }
+                </ScrollView>
+            </View>
+        </Container>
+        <CustomOverlay
+            isVisible={imageOverlay}
+            backgroundColor = 'rgba(0,0,0,1)'
+            animation='slide'
+        >
+            <View style={{...style.imageContainer, height: windowHeight}}>
+                <View style={style.cover}>
+                <NativeIcon 
+                    type='FontAwesome'
+                    onPress={displayImage} 
+                    name='times' 
+                    style={{color: '#ddd', fontSize: 28, position: 'absolute', right: 20, top: 50}} />
+                </View>
+                    <View style={style.imageWrapper}>
+                        <Image {...{preview, uri:item.image_url}} style={style.bigimg} />
                     </View>
-                </CustomOverlay>
-            ) :
-            null
-        }
+                <View style={style.cover} />
+            </View>
+        </CustomOverlay>
+        <BottomModal 
+            modalAnimation={new SlideAnimation({
+                initialValue: 0,
+                slideFrom: 'bottom',
+                useNativeDriver: true,
+            })}
+            onDismiss={() => setWord({})}
+            modalTitle={<ModalTitle title={word.type} />}
+            onHardwareBackPress={() =>{ setWord({}); return true}}
+            onSwipeOut={ event => setWord({})}
+            visible={Object.entries(word).length ? true : false}
+            footer={
+                <ModalFooter>
+                    <ModalButton
+                    text="OK"
+                    onPress={() => setWord({})}
+                    />
+                </ModalFooter>
+                }
+        >
+            <ModalContent>
+                <View style={{...style.wordContainer}}>
+                    <View style={style.wordtitle}>
+                        <Text style={style.titleText}>{word.word}</Text>
+                    </View>
+                    <View style={style.wordtitle}>
+                        <Text>{word.meaning}</Text>
+                    </View>
+                </View>
+            </ModalContent>
+        </BottomModal>
         </>
     )
 }
@@ -294,12 +279,25 @@ const style = StyleSheet.create({
         marginTop: 20,
         backgroundColor: '#054078',
     },
+    container: {
+        flex: 1
+    },
+    imageContaniner: {
+        flex: 0.5,
+    },
+    emptyContent: {
+        flex: 0.05,
+    },
+    content: {
+        flex: 0.45,
+        paddingTop: 10,
+    },
     imgView: {
-        marginBottom: 15,
+        
     },
     img: {
         width: '100%',
-        height: 200,
+        height: '95%',
     },
     textView: {
         paddingHorizontal: 15,
@@ -309,7 +307,7 @@ const style = StyleSheet.create({
     actions: {
         flex: 1,
         flexDirection: 'row',
-        marginTop: 20,
+        marginVertical: 20
     },
     action: {
         flex: 0.33,
@@ -319,31 +317,43 @@ const style = StyleSheet.create({
         fontWeight: 'bold',
         color: '#054078'
     },
-    wordsContainer: {
-        padding: 10,
-    },
-    newWordsContainer: {
-        marginBottom: 20
-    }, 
-    newWordTitle: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 5,
-    },
-    newTitle: {
+    // wordsContainer: {
+    //     padding: 10,
+    // },
+    color: {
+        color: '#2980b9',
         fontWeight: 'bold',
-        fontSize: 17,
-        color: '#444'
     },
-    newWordContent: {
-        marginBottom: 10,
-    }, 
+    wordtitle: {
+        paddingHorizontal: 10,
+    },
+    titleText: {
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    // newWordsContainer: {
+    //     marginBottom: 20
+    // }, 
+    // newWordTitle: {
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     paddingVertical: 5,
+    // },
+    // newTitle: {
+    //     fontWeight: 'bold',
+    //     fontSize: 17,
+    //     color: '#444'
+    // },
+    // newWordContent: {
+    //     marginBottom: 10,
+    // }, 
     badgeText: {
         color: '#fff',
         fontSize: 15,
         fontWeight: 'bold'
     },
     titleContainer: {
+        height: '5%',
         paddingHorizontal: 20,
         alignItems: 'center',
     },
@@ -354,7 +364,6 @@ const style = StyleSheet.create({
     }, 
     imageContainer: {
         height: '100%',
-        // flex: 1
     },
     imageWrapper: {
         flex: 0.6
@@ -369,3 +378,24 @@ const style = StyleSheet.create({
 })
 
 export default ReadPost
+
+{/* <CustomOverlay
+                isVisible={true}
+                backgroundColor = 'rgba(0,0,0,0.5)'
+                animation='slide'
+            >
+                <View style={{...style.wordContainer}}>
+                    <View style={style.wordtitle}>
+                        <Text>{word.type}</Text>
+                        <Text>{word.word}</Text>
+                    </View>
+                    <View style={style.wordContent}>
+                        <Text>{word.meaning}</Text>
+                    </View>
+                    <View style={style.wordClose} >
+                        <Button onPress={closeWord}>
+                            <Text>CLOSE</Text>
+                        </Button>
+                    </View>
+                </View>
+            </CustomOverlay> */}

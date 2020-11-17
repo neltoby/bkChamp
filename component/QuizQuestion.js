@@ -4,13 +4,19 @@ import { useSelector } from 'react-redux'
 import isJson from '../processes/isJson'
 
 export default function QuizQuestion() {
-    const store = isJson(useSelector(state => state))
-    let allQuestion = useMemo(() => isJson(store.quiz.question), [store.quiz.question])
-    const current = store.quiz.current
-    const question = isJson(allQuestion[current])
+    // const store = isJson(useSelector(state => state))
+    // let allQuestion = useMemo(() => isJson(store.quiz.question), [store.quiz.question])
+    // const current = store.quiz.current
+    const level = useSelector(state => state.quiz).level
+    const question = isJson(useSelector(state => state.quiz)).currentQuestion
     return (
         <ScrollView  style={style.scrollContainer}>                        
             <View>
+                <Text style={[style.questionText, {fontSize: 16, marginBottom: 10, color: level === 'easy' ? '#019900' : level === 'moderate' ? '#0033ff' : '#ff3300'}]}>
+                    {level}
+                </Text>
+            </View>
+            <View>               
                 <Text style={style.questionText}>
                     {question.question}
                 </Text>
@@ -30,7 +36,7 @@ export default function QuizQuestion() {
         paddingTop: 30,
     },
     questionText: {
-        fontSize: 20,
+        fontSize: 17,
         fontWeight: 'bold',
     },
  })

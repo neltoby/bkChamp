@@ -1,40 +1,45 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useFocusEffect } from '@react-navigation/native';
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import {Header, Left, Button, Icon as NativeIcon, Body, Title, Right, Card, CardItem} from 'native-base'
-import { View, Text, StyleSheet, FlatList, StatusBar, Platform, Image } from 'react-native'
+import { View, Text, StyleSheet, FlatList, StatusBar, Platform, ActivityIndicator } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import isJson from '../processes/isJson'
-import {unarchive} from '../actions/learn'
+import Image from './Image'
+import { unarchivedFromServer } from '../actions/request'
+import { getArchiveCategory } from '../actions/learn'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const ViewArchive = ({ navigation , route}) => {
     const {subject} = route.params
     const { showActionSheetWithOptions } = useActionSheet();
     const dispatch = useDispatch()
-    const store = isJson(useSelector(state => state.archive))
-    let archived = isJson(store.archive).filter((element) => {
-        if(element.subject === subject) return element
-    })
+    const prev = isJson(useSelector(state => state.learn)).preview
+    const preview = useMemo(() => { uri: prev }, [prev])
+    const archived = isJson(useSelector(state => state.archive)).archivedArticle
+    const loading = isJson(useSelector(state => state.archive)).loading
+    // let archived = isJson(store.archive).filter((element) => {
+    //     if(element.subject === subject) return element
+    // })
     useFocusEffect(
         React.useCallback(() => {
             StatusBar.setBarStyle('light-content');
             Platform.OS === 'android' && StatusBar.setBackgroundColor('#054078');           
             return () => {
-                archived = []
+                // archived = []
             }
         }, [subject])       
     )
-    const options = [
-        'Cancel', 
-        'Apple', 
-        <Text style={{color: 'yellow'}}>Banana</Text>,
-        'Watermelon', 
-        <Text style={{color: 'red'}}>Durian</Text>
-    ]
-    const showActionSheet = (id) => {
+    useFocusEffect(
+        React.useCallback(() => {
+            dispatch(getArchiveCategory(subject)) 
+            return () => {
+            }
+        }, [subject])       
+    )
+
+    const showActionSheet = (item) => {
         const options = ['Yes', 'No'];
-        // const destructiveButtonIndex = 3;
         const cancelButtonIndex = 1;
         const title = 'Unarchive?'
         const message = 'You are about to unarchive a post, are you sure you want to do this?'
@@ -47,28 +52,30 @@ const ViewArchive = ({ navigation , route}) => {
             },
             buttonIndex => {
                 if(buttonIndex == 0){
-                    dispatch(unarchive(id))
+                    dispatch(unarchivedFromServer(item))
                 }
             },
           );
     }
     const _keyExtractor = (item, index) => `item${index}`
     const renderView = ({item}) => {
+        let uri = item.image_url 
+        console.log(uri, 'from uri in view Archive')
         return(
             <Card style={style.content}>
                 <CardItem>
                     <View style={style.itemContainer}>
-                        <TouchableWithoutFeedback style={style.imgView} onPress={() => navigation.navigate('ReadPost', {subject: subject, index: item.item.id})}>
-                            <View>
-                                <Image source={item.item.img} style={style.img} />                       
-                            </View>
-                        </TouchableWithoutFeedback>
+                        <View style={style.imgView}>
+                            <TouchableWithoutFeedback  onPress={() => navigation.navigate('ReadPost', {subject, item, type: 'archive'})}>
+                                <Image style={style.img} {...{preview, uri}} />                       
+                            </TouchableWithoutFeedback>
+                        </View>   
                         <View style={style.textView}>
-                            <Text onPress={() => navigation.navigate('ReadPost', {subject: subject, index: item.item.id})} numberOfLines={6} style={style.title}>{item.item.text}</Text>
+                            <Text onPress={() => navigation.navigate('ReadPost', {subject, item, type: 'archive'})} numberOfLines={6} style={style.title}>{item.body}</Text>
                         </View>
                         <View style={style.deleteView}>
-                            <NativeIcon onPress={() => showActionSheet(item.item.id)} name='ios-trash' />
-                        </View>
+                            <NativeIcon onPress={() => showActionSheet(item)} name='ios-trash' />
+                        </View>                                               
                     </View>
                 </CardItem>
             </Card>
@@ -92,17 +99,23 @@ const ViewArchive = ({ navigation , route}) => {
             </Right>
         </Header>
         <View style={style.content}>
-            {archived.length ? 
-                <FlatList 
-                    style={style.flat}
-                    data={archived} 
-                    renderItem={renderView}
-                    keyExtractor={_keyExtractor}
-                />
-                : 
-                <View style={style.noArchive}>
-                    <Text style={style.noArchiveText}>Your {subject} archive is empty</Text>
-                </View>
+            {
+                loading ? 
+                    <View style={style.noArchive}>
+                        <ActivityIndicator color='blue' size='small' />
+                    </View>
+                    :
+                archived.length ? 
+                    <FlatList 
+                        style={style.flat}
+                        data={archived} 
+                        renderItem={renderView}
+                        keyExtractor={_keyExtractor}
+                    />
+                    : 
+                    <View style={style.noArchive}>
+                        <Text style={style.noArchiveText}>Your {subject} archive is empty</Text>
+                    </View>
             }
             
         </View>
@@ -127,6 +140,7 @@ const style = StyleSheet.create({
         marginTop: 20,
         backgroundColor: '#054078',
     },
+
     noArchive: {
         height: '100%',
         justifyContent: 'center',
@@ -134,12 +148,14 @@ const style = StyleSheet.create({
     },
     itemContainer: {
         flexDirection: 'row',
+        width: '100%',
     },
     imgView: {
         width: '37%',
+        height: 120,
     },
     textView: {
-        width: '55%',
+        width: '50%',
         paddingHorizontal: 15,
     },
     deleteView: {
