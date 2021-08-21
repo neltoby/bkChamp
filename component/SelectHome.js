@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useFocusEffect } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
-import { Container, Header, Button, Icon, Right } from 'native-base'
+import { Container, Header, Button, Icon, Left, Body, Right } from 'native-base'
 import { LinearGradient } from 'expo-linear-gradient'
 import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals'
 import { useIsDrawerOpen } from '@react-navigation/drawer'
@@ -42,18 +42,17 @@ const SelectHome  = ({ navigation }) => {
                             tx.executeSql(sqlix, null, (txO, {rows}) => {
                                 txO.executeSql(sqlxi, null, (txO, {rows}) => {
                                     txO.executeSql(sqlxii, null, (txOb, {rows}) => {
-                                        console.log('successfully dropped table')
                                         dispatch(notLogin())
                                         navigation.navigate('Login')
-                                    }, err => console.log(err, 'failed dropped endpoints'))                                   
-                                }, err => console.log('failed search dropped'))
-                            }, err => console.log('failed unsent drooped'))
-                        }, err => console.log('failed archiveunsent dropped'))
-                    }, err => console.log('failed dropped user'))
-                }, err => console.log('failed dropped archive'))
-            }, err => console.log(err, 'failed err dropping table'))
-        }, err => console.log(err, 'failed transxn'), 
-        () => console.log('failed successful transxn'))        
+                                    }, err => {})                                   
+                                }, err => {})
+                            }, err => {})
+                        }, err => {})
+                    }, err => {})
+                }, err => {})
+            }, err => {})
+        }, err => {}, 
+        () => {})        
     }
 
     useFocusEffect(
@@ -94,12 +93,14 @@ const SelectHome  = ({ navigation }) => {
                     colors={['transparent', '#e1efef']}
                     style={{...style.gradient, height: windowHeight,}}
                 />
-                <Header noShadow noLeft style={style.header}>
-                    <Right>
+                <Header noShadow style={style.header}>
+                    <Left>
                         <Button transparent onPress={() => navigation.toggleDrawer()}>
                             <Icon name="menu" />
                         </Button>
-                    </Right>
+                    </Left>
+                    <Body />
+                    <Right />
                 </Header>
                 <ScrollView style={style.content}>
                     <View style={[style.quiz, {height: (50/100) * windowHeight}]}>

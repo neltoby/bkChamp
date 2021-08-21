@@ -1,33 +1,30 @@
 import React, {useState, useEffect } from 'react'
 import { useFocusEffect } from '@react-navigation/native';
-import logo from '../processes/image'
-import Container from './Container'
-// import ErrorBoundary from './ErrorBoundary'
-import ErrorUi from './ErrorUi'
-import Overlay from './Overlay'
-import FocusAwareStatusBar from './FocusAwareStatusBar'
-import { View, Text, StyleSheet, Image,  Platform, BackHandler, ActivityIndicator } from 'react-native'
-import { Input, Button, Icon } from 'react-native-elements'
+import logo from '../processes/image';
+import Container from './Container';
+import Overlay from './Overlay';
+import FocusAwareStatusBar from './FocusAwareStatusBar';
+import { View, Text, StyleSheet, Image,  Platform, BackHandler, ActivityIndicator } from 'react-native';
+import { Input, Button, Icon } from 'react-native-elements';
 import { Header, Content, Left, Right, Body, Title, Icon as NativeIcon, Button as NButton, Toast } from 'native-base';
-import { createUserLoading } from '../actions/login'
-import { signUp } from '../actions/request'
-import deviceSize from '../processes/deviceSize'
+import { createUserLoading } from '../actions/login';
+import { signUp } from '../actions/request';
+import deviceSize from '../processes/deviceSize';
 import { useDispatch, useSelector } from 'react-redux';
 
 const Username = ({ navigation, route }) => {
-    const [username, setUserName] = useState('')
-    const deviceWidth = deviceSize().deviceWidth
-    const deviceHeight = deviceSize().deviceHeight
+    const [username, setUserName] = useState('');
+    const deviceWidth = deviceSize().deviceWidth;
+    const deviceHeight = deviceSize().deviceHeight;
     const details = {}
-    details['fullname'] = route.params !== undefined ? route.params.name : ''
-    details['email'] = route.params !== undefined ? route.params.email : ''
-    details['phone_number'] = route.params !== undefined ? route.params.phone : ''
-    details['password'] = route.params !== undefined ? route.params.password : ''
-    const loading = useSelector(state => state.login).createUser
-    const errSignUp = useSelector(state => state.login).signUpErr
-    console.log(loading, 'value for loading')
+    details['fullname'] = route.params !== undefined ? route.params.name : '' ;
+    details['email'] = route.params !== undefined ? route.params.email : '' ;
+    details['phone_number'] = route.params !== undefined ? route.params.phone : '' ;
+    details['password'] = route.params !== undefined ? route.params.password : '' ;
+    const loading = useSelector(state => state.login).createUser;
+    const errSignUp = useSelector(state => state.login).signUpErr;
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     
     const handleBack = () => {
         navigation.navigate('SignUp', {
@@ -36,13 +33,11 @@ const Username = ({ navigation, route }) => {
     }
     const nextSlide = () => {        
         navigation.navigate('ConfirmNumber')
-        // setVisible(false)
     }
     const handleSignUp = () => {
         if(username.trim().length > 1){
             const detail = JSON.parse(JSON.stringify(details))
             detail.phone_number = detail.phone_number.length === 10 ? `0${detail.phone_number}`: detail.phone_number
-            console.log(detail)
             dispatch(createUserLoading())
             dispatch(signUp({...detail, username }, nextSlide))
             setUserName('')
@@ -105,23 +100,24 @@ const Username = ({ navigation, route }) => {
                 >       
                     <View style={style.usertextContainer}>
                         <Text style={style.usertext}>
-                            Create a username
+                            Create a nickname
                         </Text> 
                     </View>
                     <View style={style.inputContainer}>
                     <Input
                         value = {username}
-                        label = 'Username'
+                        label = 'Nickname'
                         labelStyle = {style.label}
                         inputContainerStyle={style.inputs}
                         inputStyle={style.input}
-                        placeholder='Username'
+                        placeholder='Nickname'
+                        errorMessage='Nickname is case sensitive.'
                         leftIcon={
                             <Icon
-                            type='font-awesome'
-                            name='user-circle'
-                            size={24}
-                            color='#fff'
+                                type='font-awesome'
+                                name='user-circle'
+                                size={24}
+                                color='#fff'
                             />
                         }
                         onChangeText={value => setUserName(value)}

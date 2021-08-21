@@ -6,25 +6,25 @@ import { StyleSheet, Platform } from 'react-native'
 import Basic from './Basic'
 const Tab = createMaterialTopTabNavigator();
 const dataContent = [
-    {amt: '#100', unit: '4 unit'},
-    {amt: '#200', unit: '8 unit'},
-    {amt: '#300', unit: '12 unit'},
-    {amt: '#400', unit: '16 unit'},
+    {amt: '#100', unit: '4 units'},
+    {amt: '#200', unit: '8 units'},
+    {amt: '#300', unit: '12 units'},
+    {amt: '#400', unit: '16 units'},
 ]
 const medium = [
-    {amt: '#500', unit: '22 unit'},
-    {amt: '#800', unit: '34 unit'},
-    {amt: '#1000', unit: '42 unit'},
-    {amt: '#1500', unit: '62 unit'},
-    {amt: '#2000', unit: '82 unit'},
+    {amt: '#500', unit: '22 units'},
+    {amt: '#800', unit: '34 units'},
+    {amt: '#1000', unit: '42 units'},
+    {amt: '#1500', unit: '62 units'},
+    {amt: '#2000', unit: '82 units'},
 ]
 const mega = [
-    {amt: '#2500', unit: ' 105 unit'},
-    {amt: '#3000', unit: ' 125 unit'},
-    {amt: '#3500', unit: ' 145 unit'},
-    {amt: '#4000', unit: ' 165 unit'},
-    {amt: '#4500', unit: ' 185 unit'},  
-    {amt: '#5000', unit: ' 205 unit'},      
+    {amt: '#2500', unit: ' 105 units'},
+    {amt: '#3000', unit: ' 125 units'},
+    {amt: '#3500', unit: ' 145 units'},
+    {amt: '#4000', unit: ' 165 units'},
+    {amt: '#4500', unit: ' 185 units'},  
+    {amt: '#5000', unit: ' 205 units'},      
 ]
 const title = [
     {text: 'Basic', dataContent: dataContent },

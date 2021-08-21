@@ -70,7 +70,7 @@ const FaqScreen = ({ navigation }) => {
     }
     return (
         <Container style={style.container}>
-            <FaqAbt navigation={navigation} text='Frequently Asked Qusetion'/>
+            <FaqAbt navigation={navigation} text='Frequently Asked Question'/>
             <FlatList 
                 style={style.content}
                 data={DATA}

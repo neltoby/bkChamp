@@ -15,6 +15,7 @@
     "@react-navigation/material-top-tabs": "^5.2.16",
     "@react-navigation/native": "^5.7.5",
     "@react-navigation/stack": "^5.3.3",
+    "check-password-strength": "^2.0.3",
     "expo": "~39.0.2",
     "expo-blur": "~8.2.0",
     "expo-constants": "~9.2.0",
@@ -23,6 +24,7 @@
     "expo-image-picker": "~9.1.0",
     "expo-linear-gradient": "~8.3.0",
     "expo-network": "~2.3.0",
+    "expo-screen-orientation": "~2.0.0",
     "expo-secure-store": "~9.2.0",
     "expo-splash-screen": "~0.6.2",
     "expo-sqlite": "~8.4.0",
@@ -55,8 +57,7 @@
     "react-string-replace": "^0.4.4",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "simple-react-validator": "^1.4.6",
-    "expo-screen-orientation": "~2.0.0"
+    "simple-react-validator": "^1.4.6"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

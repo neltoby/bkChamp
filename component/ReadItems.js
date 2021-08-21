@@ -136,7 +136,7 @@ const style = StyleSheet.create({
         width: '100%',
     },
     title: {
-        fontSize: 17,
+        fontSize: 13,
         fontWeight: 'bold',
         color: '#054078',
     },

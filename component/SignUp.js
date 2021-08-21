@@ -5,20 +5,48 @@ import Container from './Container'
 import { Content, Toast, Button as NButton } from 'native-base';
 import {View, Text, StyleSheet, StatusBar, Image } from 'react-native'
 import { Input, Icon } from 'react-native-elements';
+import { passwordStrength } from 'check-password-strength';
+
+const checkPasswordStrength = (value) => {
+    if(value){
+        console.log(passwordStrength(value));
+        return passwordStrength(value);
+    }
+    return '';
+}
 
 const SignUp = ({ navigation, route }) => {
     const [notVisible, setNotVisible] = useState(true) 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [phone, setPhone] = useState('')
-    const [password, setPassword] = useState('')
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
+    const [ passwordStrengthContent,setPasswordStrengthContent ] = useState({})
+    const [passwordStr, setPasswordStr] = useState('');
     const validator = new SimpleReactValidator();
     const handleSignUp = () => {
         if (validator.allValid()) {
             if(name.trim().split(' ').length > 1){
-                navigation.navigate('Username', {
-                    name, email, phone, password
-                })
+                if(passwordStr && passwordStr !== 'Too weak'){
+                    navigation.navigate('Username', {
+                        name, email, phone, password
+                    })
+                }else{
+                    if(!passwordStr) {
+                        Toast.show({
+                            text: "Password is missing!",
+                            buttonText: "CLOSE",
+                            duration: 3000
+                        })
+                    }
+                    if(passwordStr === 'Too weak') {
+                        Toast.show({
+                            text: "Password is too weak!",
+                            buttonText: "CLOSE",
+                            duration: 3000
+                        })
+                    }
+                }
             }else{
                 Toast.show({
                     text: "Other name is missing!",
@@ -58,6 +86,18 @@ const SignUp = ({ navigation, route }) => {
     const login = () => {
         navigation.navigate('Login')
     }
+    const checkPassword = (value) => {
+        setPassword(value);
+        const val = checkPasswordStrength(value)
+        if(val){
+            setPasswordStr(checkPasswordStrength(value).value);
+            setPasswordStrengthContent(val)
+        }else{
+            setPasswordStr(val);
+            setPasswordStrengthContent({});
+        }
+        
+    }
     useEffect(() => {
         if(route.params?.name){
             setName(route.params.name)
@@ -96,7 +136,6 @@ const SignUp = ({ navigation, route }) => {
                     {validator.message('Fullname', name, 'required|alpha_num_dash_space|min:4|max:30')}
                     {validator.message('Email', email, 'required|email')}
                     {validator.message('Phone', phone, 'required|phone')}
-                    {validator.message('Password', password, 'required|alpha_num_dash_space')}
                 </View>
                 <View style={style.const}>
                 <Input
@@ -126,10 +165,10 @@ const SignUp = ({ navigation, route }) => {
                     inputStyle={style.input}
                     leftIcon={
                         <Icon
-                        type='material'
-                        name='email'
-                        size={24}
-                        color='#fff'
+                            type='material'
+                            name='email'
+                            size={24}
+                            color='#fff'
                         />
                     }
                     onChangeText={value => setEmail(value)}
@@ -159,34 +198,61 @@ const SignUp = ({ navigation, route }) => {
                     }
                     onChangeText={value => setPhone(value)}
                 />
-                <Input
-                    secureTextEntry={notVisible}
-                    label = 'Password'
-                    labelStyle = {style.label}
-                    placeholder="Password"
-                    keyboardType='default'
-                    autoCompleteType='password'
-                    inputContainerStyle={style.inputs}
-                    inputStyle={style.input}
-                    leftIcon={
-                        <Icon
-                            type='material'
-                            name='https'
-                            size={24}
-                            color='#fff'
-                        />
+                <View style={style.passwordContainer}>
+                    <Input
+                        secureTextEntry={notVisible}
+                        label = 'Password'
+                        labelStyle = {style.label}
+                        placeholder="Password"
+                        keyboardType='default'
+                        autoCompleteType='password'
+                        inputContainerStyle={style.inputs}
+                        inputStyle={style.input}
+                        leftIcon={
+                            <Icon
+                                type='material'
+                                name='https'
+                                size={24}
+                                color='#fff'
+                            />
+                        }
+                        rightIcon={
+                            <Icon
+                                type='font-awesome'
+                                name={notVisible ? 'eye' : 'eye-slash'}
+                                size={24}
+                                color='#fff'
+                                onPress={() => setNotVisible(!notVisible)}
+                            />
+                        }
+                        onChangeText={value => checkPassword(value)}
+                    />
+                    {
+                        passwordStr ? (
+                            <View style={style.passwordStrContainer}>
+                                <View 
+                                    style={{ 
+                                        ...style.passwordStrength, 
+                                        backgroundColor: passwordStr === 'Too weak' ? 'red' : 
+                                        passwordStr === 'Weak' ? 'orange' : 
+                                        passwordStr === 'Medium' ? 'yellow' : 'green'
+                                    }} 
+                                />
+                                <View style={style.passwordStrText}>
+                                    <Text 
+                                        style={{
+                                            ...style.passwordText,
+                                            color: passwordStr === 'Too weak' ? 'red' : 
+                                            passwordStr === 'Weak' ? 'orange' : 
+                                            passwordStr === 'Medium' ? 'yellow' : 'green'
+                                            }}> 
+                                        {passwordStr}
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : null
                     }
-                    rightIcon={
-                        <Icon
-                            type='font-awesome'
-                            name={notVisible ? 'eye' : 'eye-slash'}
-                            size={24}
-                            color='#fff'
-                            onPress={() => setNotVisible(!notVisible)}
-                        />
-                    }
-                    onChangeText={value => setPassword(value)}
-                />
+                </View>
                 
             <View style={{...style.viewImg, marginTop: 20, width: '100%', paddingHorizontal: 7}}>
                 <NButton 
@@ -220,7 +286,6 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        // alignItems: 'center',
     },
     imageView: {
         marginVertical: 20,
@@ -262,13 +327,39 @@ const style = StyleSheet.create({
     inputs: {
         borderColor: '#fff',
     },
+    passwordContainer: {
+        width: '100%',
+    },
+    passwordStrContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent:'space-around'
+    },
+    passwordStrength: {
+        flex: 0.1,
+        height: 9,
+        borderRadius: 2
+    },
+    passwordStrText: {
+        position: 'relative',
+        flex: 0.9,
+        paddingLeft: 5,
+        justifyContent: 'flex-start',
+        paddingTop: 0,
+    },
+    passwordText: {
+        position: 'absolute',
+        top: -7,
+        left: 5,
+        paddingTop: 0,
+        marginTop: 0,
+    },
     img: {
-        width: 120,
-        height: 120,
+        width: 80,
+        height: 80,
         borderRadius: 4,
     },
     viewImg: {
-        // height: 100,
         margin: 10,
         alignItems: 'center',
     },

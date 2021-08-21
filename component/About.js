@@ -19,7 +19,7 @@ export default function About({navigation}) {
                     </View>
                     <View style={style.faq}>
                         <Text style={style.faqText}>
-                            About Bookchamp
+                            About Book Champ
                         </Text>
                     </View>
                     <View style={style.viewImage}>

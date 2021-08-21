@@ -158,11 +158,7 @@ const ReadPost = ({ navigation, route}) => {
                         {item.title}
                     </Subtitle>
                 </Body>
-                <Right>
-                    <Button transparent >
-                        <NativeIcon type='FontAwesome5' name='ellipsis-v' style={{fontSize: 18, color: '#fff'}} />
-                    </Button>
-                </Right>
+                <Right/>
             </Header>
             <View style={style.container}>
                 <View style={style.imageContaniner}>
