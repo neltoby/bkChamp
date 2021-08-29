@@ -68,11 +68,11 @@ export const loginDetails = payload => {
                     txObj.executeSql(sqli, null, (txO, {rowsAffected}) => {
                         txO.executeSql(sqlii, Object.values(payload), (txOI, {rowsAffected}) => {
                             dispatch(userProfile(payload))
-                        }, err => console.log(err, 'sqlii query failed loginDetails'))
-                    }, err => console.log(err, 'sqli query failed loginDetails'))
-                }, err => console.log(err, 'sql query failed loginDetails'))
-            }, err => console.log(err, 'form transacto'),
-            () => console.log('user trnsaction success loginDetails'))
+                        }, err => {})
+                    }, err => {})
+                }, err => {})
+            }, err => {},
+            () => {})
         })()
     }
 }
@@ -88,11 +88,11 @@ export const verificationPoint = payload => {
                     txObj.executeSql(sqli, null, (txO, {rowsAffected}) => {
                         txO.executeSql(sqlii, Object.values(payload), (txOI, {rowsAffected}) => {
                             dispatch(userProfile(payload))
-                        }, err => console.log(err, 'sqlii query failed'))
-                    }, err => console.log(err, 'sqli query failed'))
-                }, err => console.log(err, 'sql query failed'))
-            }, err => console.log(err),
-            () => console.log('user trnsaction success'))
+                        }, err => {})
+                    }, err => {})
+                }, err => {})
+            }, err => {},
+            () => {})
         })()
     }
 } 
@@ -103,18 +103,17 @@ export const loginWithUser = (payload) => {
             const sql = 'SELECT * FROM user'
             db.transaction(tx => {
                 tx.executeSql(sql, null, (txObj, {rows}) => {
-                    const {_array} = rows
-                    console.log(_array[0])
+                    const {_array} = rows;
                     dispatch(userProfile(_array[0]))
                     if(payload === true){
                         dispatch(login())
                     }else{
                         dispatch(verification())
                     }                    
-                }, err => console.log(err, 'failed getting details'))
+                }, err => {})
             }, 
-            err => console.log(err, 'err from login transaction'),
-            () => console.log('login transaction successful')
+            err => {},
+            () => {}
             )
         })()
     }

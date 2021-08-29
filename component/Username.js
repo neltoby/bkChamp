@@ -17,18 +17,25 @@ const Username = ({ navigation, route }) => {
     const deviceWidth = deviceSize().deviceWidth;
     const deviceHeight = deviceSize().deviceHeight;
     const details = {}
-    details['fullname'] = route.params !== undefined ? route.params.name : '' ;
-    details['email'] = route.params !== undefined ? route.params.email : '' ;
-    details['phone_number'] = route.params !== undefined ? route.params.phone : '' ;
-    details['password'] = route.params !== undefined ? route.params.password : '' ;
+    details['fullname'] = route.params?.name || '';
+    details['email'] = route.params?.email || '';
+    details['phone_number'] = route.params?.phone || '';
+    details['referral'] = route.params?.referral || '';
+    details['password'] = route.params?.password || '';
     const loading = useSelector(state => state.login).createUser;
     const errSignUp = useSelector(state => state.login).signUpErr;
 
     const dispatch = useDispatch();
     
     const handleBack = () => {
-        navigation.navigate('SignUp', {
-            name: details.fullname, email: details.email, phone: details.phone_number, password: details.password
+        navigation.navigate(
+            'SignUp', 
+            {
+                name: details.fullname, 
+                email: details.email, 
+                phone: details.phone_number, 
+                referral: details.referral,
+                password: details.password
         })
     }
     const nextSlide = () => {        
@@ -43,7 +50,7 @@ const Username = ({ navigation, route }) => {
             setUserName('')
         }else{
             Toast.show({
-                text: "Fill a username!",
+                text: "Fill a nickname.",
                 buttonText: "CLOSE",
                 duration: 3000
             })
@@ -96,11 +103,11 @@ const Username = ({ navigation, route }) => {
                     </Right>
                 </Header>
                 <Content 
-                    contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'center'}} 
+                    contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'flex-start'}} 
                 >       
                     <View style={style.usertextContainer}>
                         <Text style={style.usertext}>
-                            Create a nickname
+                            Fill your nickname
                         </Text> 
                     </View>
                     <View style={style.inputContainer}>
@@ -112,6 +119,7 @@ const Username = ({ navigation, route }) => {
                         inputStyle={style.input}
                         placeholder='Nickname'
                         errorMessage='Nickname is case sensitive.'
+                        errorStyle={{color: '#ddd'}}
                         leftIcon={
                             <Icon
                                 type='font-awesome'
@@ -157,7 +165,7 @@ const Username = ({ navigation, route }) => {
                         </View>
                         <View style={style.cUserContainer}>
                             <Text numberOfLines={1} style={style.cUserText}>
-                                signing you up ...
+                                Creating your profile ...
                             </Text>
                         </View>
                     </View>
@@ -171,7 +179,7 @@ export default Username
 
 const style = StyleSheet.create({
     label: {
-        color: '#fff'
+        color: '#ddd'
     },
     img: {
         height: 40,
@@ -183,10 +191,13 @@ const style = StyleSheet.create({
     },
     usertextContainer: {
         alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 20,
     },
     usertext: {
-        fontSize: 22,
-        color: '#fff'
+        fontSize: 18,
+        color: '#ddd',
+        fontWeight: 'bold'
     },
     inputContainer: {
         width: '80%'

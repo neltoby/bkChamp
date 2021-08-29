@@ -21,6 +21,7 @@ const SignUp = ({ navigation, route }) => {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [referral, setReferral] = useState('');
     const [ passwordStrengthContent,setPasswordStrengthContent ] = useState({})
     const [passwordStr, setPasswordStr] = useState('');
     const validator = new SimpleReactValidator();
@@ -28,9 +29,15 @@ const SignUp = ({ navigation, route }) => {
         if (validator.allValid()) {
             if(name.trim().split(' ').length > 1){
                 if(passwordStr && passwordStr !== 'Too weak'){
-                    navigation.navigate('Username', {
-                        name, email, phone, password
-                    })
+                    navigation.navigate(
+                        'Username', 
+                        {
+                            name, 
+                            email, 
+                            phone, 
+                            referral
+                        }
+                    )
                 }else{
                     if(!passwordStr) {
                         Toast.show({
@@ -126,9 +133,6 @@ const SignUp = ({ navigation, route }) => {
                         <View style={style.textContainer}>
                             <Text style={style.signUp}>SIGN UP </Text>
                         </View>
-                        <View style={style.demContainer}>
-                            <Text style={style.demacation}>  /  </Text>
-                        </View>
                         <View style={style.loginConatiner}>
                             <Text onPress = {login} style={style.login}> LOGIN</Text>
                         </View>
@@ -136,6 +140,7 @@ const SignUp = ({ navigation, route }) => {
                     {validator.message('Fullname', name, 'required|alpha_num_dash_space|min:4|max:30')}
                     {validator.message('Email', email, 'required|email')}
                     {validator.message('Phone', phone, 'required|phone')}
+                    {validator.message('Referral', referral, 'alpha_num_dash_space')}
                 </View>
                 <View style={style.const}>
                 <Input
@@ -196,6 +201,23 @@ const SignUp = ({ navigation, route }) => {
                             color='#fff'
                         />
                     }
+                    onChangeText={value => setPhone(value)}
+                />
+                <Input
+                    label = 'Referral code (if any)'
+                    labelStyle = {style.label}
+                    placeholder="Referral code"
+                    inputContainerStyle={style.inputs}
+                    inputStyle={style.input}
+                    leftIcon={
+                        <Icon
+                            type='material'
+                            name='link'
+                            size={24}
+                            color='#fff'
+                        />
+                    }
+                    
                     onChangeText={value => setPhone(value)}
                 />
                 <View style={style.passwordContainer}>
@@ -293,6 +315,7 @@ const style = StyleSheet.create({
     },
     signUpContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     textContainer: {
         width: '45%',
@@ -304,9 +327,6 @@ const style = StyleSheet.create({
         width: '45%',
         flexDirection: 'row',
         paddingLeft: 20,
-    },
-    demConatiner: {
-        width: '10%',
     },
     login: {
         color: '#eee',
@@ -366,10 +386,10 @@ const style = StyleSheet.create({
     signUp: {
         fontSize: 25,
         fontWeight: 'bold',
-        color: '#fff',
+        color: '#ddd',
     },
     label: {
-        color: '#fff'
+        color: '#ddd',
     }
 })
 export default SignUp

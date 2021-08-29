@@ -23,8 +23,10 @@ export default function Resend() {
         <View style={style.resendContainer}>
             <Text style={style.resendText}>
                 if you didn't get the verification 
-                number sent to your phone please
-                click the resend button below 
+                code sent to your mail, kindly refresh 
+                your inbox or check your spam. if you 
+                still can't find the code, please
+                hit the Resend button
             </Text>
             <View style={style.buttonContainer}>
                 <Button style={style.buttons} disabled={disabled} small onPress={resend}>

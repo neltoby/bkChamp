@@ -15,7 +15,6 @@ export default function QuizFooter() {
     const skipQuestion = (id) => {
         dispatch(skip(id))
         if( level === 'difficult' && allQuestion[level].length === 0 ){
-            console.log('end')
             dispatch(settime(''))
             dispatch(setOverlay('end'))
         }else{
@@ -29,20 +28,12 @@ export default function QuizFooter() {
     return (
         <Footer>
             <FooterTab>
-                <Button>
-                    
-                </Button>
-                <Button>
-                    
-                </Button>
-                <Button active>
-                    
-                </Button>
+                <Button />
+                <Button />
+                <Button active />
 
                 {skipped.length === 3 ? 
-                    <Button>
-                        
-                    </Button> 
+                    <Button />
                 :
                     <Button onPress={() => skipQuestion(question.id)}>
                         <NativeText style={{color: '#fff', fontWeight: 'bold'}}>Skip</NativeText>

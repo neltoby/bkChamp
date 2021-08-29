@@ -29,7 +29,7 @@ const data = [
     {no: 1, text: 'Every correct answer attracts 3 marks'},
     {no: 2, text: 'Every wrong answer attracts -0.1'},
     {no: 3, text: 'You have the option to skip question up to 3 times'},
-    {no: 4, text: 'Winners are selected everyday by 12pm'},
+    {no: 4, text: 'Winners are selected every Sunday by 6pm (GMT+1)'},
     {no: 5, text: 'Quiz Duration: 10 minutes'},
 ]
 const QuizScreen = ({ navigation }) => {
@@ -123,7 +123,7 @@ const QuizScreen = ({ navigation }) => {
                     :
                     <>
                     <Text style={style.subText}>
-                        Sorry, you do not have points to proceed!
+                        Sorry, you do not have units to proceed!
                     </Text>
                     <TouchableHighlight onPress={subscribe}>
                         <View style={style.but}>
