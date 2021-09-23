@@ -3,9 +3,9 @@ import { LinearGradient } from 'expo-linear-gradient'
 import {
     DrawerContentScrollView, DrawerItem,
   } from '@react-navigation/drawer';
-// import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from 'react-native-elements';
 import { logoutWarning } from '../actions/login'
+import { deleteAccountWarning } from '../actions/login';
 import Image from './Image'
 import { SafeAreaView, View, Text, StyleSheet, Image as RNImage } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,6 +24,10 @@ const CustomSideBar = (props) => {
     const logout = () => {
         navigation.closeDrawer()
         dispatch(logoutWarning(true))
+    }
+    const deleteUser = () => {
+        navigation.closeDrawer();
+        dispatch(deleteAccountWarning(true))
     }
 
     let firstData = [
@@ -73,6 +77,11 @@ const CustomSideBar = (props) => {
             text: 'About Us', 
             icon: <Icon type='material' name='info' size={24} color='#3480eb'/>,
             onPress: () => navigation.navigate('About'),
+        },
+        {
+            text: 'Delete account', 
+            icon: <Icon type='material' name='delete' size={24} color='#3480eb'/>,
+            onPress: () => deleteUser(),
         },
         {
             text: 'Logout', 

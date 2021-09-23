@@ -1,5 +1,5 @@
 import producer, { produce } from 'immer'
-import { USER_PROFILE, UPDATE_USER } from '../actions/user'
+import { USER_PROFILE, UPDATE_USER, DELETE_ACCOUNT } from '../actions/user'
 
 const initialState = {
     user: {
@@ -13,7 +13,8 @@ const initialState = {
         gender: null,
         image: null,
         points: null
-    },    
+    },   
+    deleteUserModal: false 
 }
 
 export default function(state = initialState, action){
@@ -27,6 +28,11 @@ export default function(state = initialState, action){
             return produce( state, draft => {
                 draft['user'][action.payload.name] = action.payload.value
             }) 
+        }
+        case DELETE_ACCOUNT: {
+            return produce( state, draft => {
+                draft.deleteUserModal = action.payload
+            })
         }
         default:
             return state

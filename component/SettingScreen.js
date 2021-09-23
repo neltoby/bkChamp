@@ -7,8 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect } from '@react-navigation/native'
 import ListSeparator from './ListSeparator'
 import Animated, { Easing } from 'react-native-reanimated';
-import { View, Text, Image as RNImage, StyleSheet, Alert, ImageBackground, Keyboard, FlatList, TouchableWithoutFeedback } from 'react-native'
-// import { Badge } from 'react-native-elements'
+import { View, Text, Image as RNImage, StyleSheet, Alert, ImageBackground, Keyboard, FlatList, TouchableWithoutFeedback } from 'react-native';
 import { Container,  Button, Badge, Toast, Icon as NBIcon } from 'native-base'
 import Image from './Image'
 import { Icon} from 'react-native-elements';
@@ -40,7 +39,6 @@ const AnimatedBadge = Animated.createAnimatedComponent(Badge)
 const AnimatedImage = Animated.createAnimatedComponent(Image)
 const AnimatedImageBg = Animated.createAnimatedComponent(ImageBackground)
 const AnimatedContent = Animated.createAnimatedComponent(ScrollView)
-// const AnimatedContents = Animated.createAnimatedComponent(FlatList)
 const api = 'https://api.cloudinary.com/v1_1/bookchmap/image/upload'
 
 const SettingScreen = () => {
@@ -333,7 +331,6 @@ const SettingScreen = () => {
     //         console.log(borderRadius, 'borderRadius')
     //     })
     // }, [borderRadius])
-    console.log(store.user.user, '\from settings')
     return(
         <>
         <Container style={{backgroundColor: "#054078"}}>
@@ -550,8 +547,6 @@ const style = StyleSheet.create({
         width: '100%',
     },
     editBox: {
-        // flexDirection: 'row',
-        // justifyContent: 'center',
         borderBottomColor: '#777',
         borderBottomWidth: 1,
         paddingVertical: 5,

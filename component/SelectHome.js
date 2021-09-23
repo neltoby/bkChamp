@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useFocusEffect } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
-import { Container, Header, Button, Icon, Left, Body, Right } from 'native-base'
-import { LinearGradient } from 'expo-linear-gradient'
-import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals'
-import { useIsDrawerOpen } from '@react-navigation/drawer'
-import FocusAwareStatusBar from './FocusAwareStatusBar'
-import { ScrollView, View, Text, StyleSheet, ImageBackground, TouchableOpacity, BackHandler } from 'react-native'
-import deviceSize from '../processes/deviceSize'
+import { Container, Header, Button, Icon, Left, Body, Right } from 'native-base';
+import { LinearGradient } from 'expo-linear-gradient';
+import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
+import { useIsDrawerOpen } from '@react-navigation/drawer';
+import FocusAwareStatusBar from './FocusAwareStatusBar';
+import { ScrollView, View, Text, StyleSheet, ImageBackground, TouchableOpacity, BackHandler } from 'react-native';
+import ConfirmDeleteAccount from './ConfirmDeleteAccount'
+import deviceSize from '../processes/deviceSize';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteKey } from '../processes/keyStore'
-import { notLogin, logoutWarning } from '../actions/login'
+import { notLogin, logoutWarning } from '../actions/login';
+import { deleteAccountWarning } from '../actions/user';
 import { loginValue } from '../processes/lock'
 import {db} from '../processes/db'
 
@@ -30,6 +32,7 @@ const SelectHome  = ({ navigation }) => {
     const [back, setBack] = useState(false)
     const dispatch = useDispatch()
     const warning = useSelector(state => state.login).logoutWarning
+    const deleteUserModal = useSelector(state => state.user).deleteUserModal
 
     const setLogout = async () => {
         dispatch(logoutWarning(false))
@@ -174,6 +177,35 @@ const SelectHome  = ({ navigation }) => {
                             Are you sure you want to exit?
                         </Text>
                     </View>
+                </ModalContent>
+            </Modal>
+            <Modal
+                useNativeDriver={true}
+                visible={deleteUserModal}
+                swipeDirection={['up', 'down']} // can be string or an array
+                swipeThreshold={200} // default 100
+                onSwipeOut={event => dispatch(deleteAccountWarning(false))}
+                onHardwareBackPress={() => dispatch(deleteAccountWarning(false))}
+                // modalTitle={<ModalTitle title='Exit?' />}
+                // footer={
+                //     <ModalFooter>
+                //       <ModalButton
+                //         text="No"
+                //         onPress={() => dispatch(deleteAccountWarning(false))}
+                //       />
+                //       <ModalButton
+                //         text="Yes"
+                //         onPress={() => ()}
+                //       />
+                //     </ModalFooter>
+                //   }
+            >
+                <ModalContent>
+                    {/* <View style={style.showView}>
+                        <Text style={style.warning}>
+                            Are you sure you want to exit?
+                        </Text>
+                    </View> */}
                 </ModalContent>
             </Modal>
         </>

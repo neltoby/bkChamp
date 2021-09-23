@@ -1,7 +1,8 @@
 import {db} from '../processes/db'
 
-export const USER_PROFILE = 'USER_PROFILE'
-export const UPDATE_USER = 'UPDATE_USER'
+export const USER_PROFILE = 'USER_PROFILE';
+export const UPDATE_USER = 'UPDATE_USER';
+export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
 
 export const userProfile = payload => {
     return {
@@ -13,6 +14,13 @@ export const userProfile = payload => {
 export const updateUser= payload => {
     return {
         type: UPDATE_USER,
+        payload
+    }
+}
+
+export const deleteAccountWarning = payload => {
+    return {
+        type: DELETE_ACCOUNT,
         payload
     }
 }
