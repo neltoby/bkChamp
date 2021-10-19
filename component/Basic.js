@@ -90,19 +90,20 @@ const Basic = (props) => {
                   billingEmail={paystack.email}
                   billingMobile={paystack.mobile}
                   billingName={paystack.name}
+                  refNumber={`${+Date.now() + Math.floor(Math.random() * 1000000000)}`}
                   ActivityIndicatorColor="green"
                   SafeAreaViewContainer={{ marginTop: 0 }}
                   SafeAreaViewContainerModal={{ marginTop: 0 }}
                   handleWebViewMessage={(e) => {
-                      console.log(itemSelect.amt, 'processing');
-                    }}
+                    console.log(itemSelect.amt, 'processing');
+                  }}
                   onCancel={(e) => {
-                      console.log(e, 'cancel response');
-                    }}
+                    console.log(e, 'cancel response');
+                  }}
                   onSuccess={(res) => {
-                      dispatch(noPoints(false));
-                      dispatch(updateUserinfo({ name: 'points', value: points }));
-                    }}
+                    dispatch(noPoints(false));
+                    dispatch(updateUserinfo({ name: 'points', value: points }));
+                  }}
                   ref={paystackWebViewRef}
                 />
                 <Button full onPress={() => paystackWebViewRef.current.StartTransaction()} style={{ backgroundColor: 'green', marginBottom: 10 }}>
