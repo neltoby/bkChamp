@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react'
-import { SlideAnimation, BottomModal, ModalTitle, ModalFooter, ModalButton, ModalContent } from 'react-native-modals';
+// import { SlideAnimation, BottomModal, ModalTitle, ModalFooter, ModalButton, ModalContent } from 'react-native-modals';
 import { Badge } from 'react-native-elements'
 import { View, Platform, StyleSheet, Text, BackHandler } from 'react-native'
 import { Container, Header, Left, Button, Body, Subtitle, Toast, Right, Icon as NativeIcon } from 'native-base'
@@ -239,7 +239,7 @@ const ReadPost = ({ navigation, route}) => {
                 <View style={style.cover} />
             </View>
         </CustomOverlay>
-        <BottomModal 
+       {/*} <BottomModal 
             modalAnimation={new SlideAnimation({
                 initialValue: 0,
                 slideFrom: 'bottom',
@@ -269,7 +269,7 @@ const ReadPost = ({ navigation, route}) => {
                     </View>
                 </View>
             </ModalContent>
-        </BottomModal>
+        </BottomModal> */}
         </>
     )
 }

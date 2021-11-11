@@ -31,5 +31,4 @@ export default function useCheckpoint(failed, success, payload) {
             return success(payload)
         }
     }
-    return checkPoint
 }

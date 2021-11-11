@@ -14,14 +14,12 @@ export default function (state = initialState, action) {
                 draft.status = 'awaiting',
                 draft.err = ''
             })
-            break;
         }
             
         case SUCCESSFUL_REQUEST:{
             return produce(state, draft => {
                 draft.status = 'success'
             })
-            break;
         } 
         
         case FAILED_REQUEST:{
@@ -29,11 +27,9 @@ export default function (state = initialState, action) {
                 draft.status = 'failed',
                 draft.err = action.payload
             })
-            break;
         }
     
         default:
             return state
-            break;
     }
 }

@@ -7,6 +7,7 @@ import requestReducer from './requestReducer'
 import settingReducer from './settingReducer'
 import userReducer from './userReducer'
 import searchReducer from './searchReducer'
+import winnersReducer from './winnersReducer'
 
 export default combineReducers({
     login: loginReducer,
@@ -17,4 +18,5 @@ export default combineReducers({
     setting: settingReducer,
     user: userReducer,
     search: searchReducer,
+    winners: winnersReducer
   })

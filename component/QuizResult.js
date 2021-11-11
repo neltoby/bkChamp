@@ -14,13 +14,16 @@ export default function QuizResult({navigation}) {
     const question = useSelector(state => state.quiz).question
     let score = useSelector(state => state.quiz).score
     const dispatch = useDispatch()
+
+  const redirect = () => navigation.navigate('PlayQuiz');
+
     const playAgain = () => {
         dispatch(setOverlay('cancel'))
         dispatch(loadQuiz(true))
         dispatch(loadQuestion({}))
-        if(points > 0){
+        if(points > 0){ 
             dispatch(playingAgain()) 
-            dispatch(callStartGame())
+            dispatch(callStartGame(redirect))
         }else{
             dispatch(loadQuiz(false))
             dispatch(noPoints(true))
