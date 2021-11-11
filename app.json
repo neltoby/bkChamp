@@ -1,8 +1,8 @@
 {
-  "name": "bookChamp",
-  "displayName": "bookChamp",
+  "name": "BookChamp",
+  "displayName": "Book Champ",
   "expo": {
-    "name": "bookChamp",
+    "name": "Book Champ",
     "slug": "bookChamp",
     "version": "1.0.0",
     "assetBundlePatterns": [
@@ -15,5 +15,9 @@
       "backgroundColor": "#ffffff",
       "resizeMode": "contain"
     }
+  },
+  "android": {
+    "package": "com.bookChamp.BookChamp",
+    "versionCode": "1"
   }
 }
