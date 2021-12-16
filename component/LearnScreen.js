@@ -1,27 +1,27 @@
-import React, { useEffect } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
-import deviceSize from '../processes/deviceSize'
-import {db} from '../processes/db'
-import { Container, Header, Content, Toast, Left, Body, Title, Subtitle, Right, Button, Icon as NativeIcon } from 'native-base'
-import { View, FlatList, Text, StyleSheet, StatusBar, TouchableHighlight } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient';
+import { Body, Button, Container, Header, Icon as NativeIcon, Left, Right, Subtitle, Title, Toast } from 'native-base';
+import React, { useEffect } from 'react';
+import { FlatList, Platform, StatusBar, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { getArticles } from '../actions/request'
-import useCheckpoint from './useCheckpoint'
-import { loadingArticle, articleErrRem, setArticle, loadingArticleStop } from '../actions/learn'
+import { articleErrRem, loadingArticle, loadingArticleStop, setArticle } from '../actions/learn';
+import { getArticles } from '../actions/request';
+import { db } from '../processes/db';
+import deviceSize from '../processes/deviceSize';
+import useCheckpoint from './useCheckpoint';
 
 
 const subject = [
-    {text: 'Politics', col: 'orange'},
-    {text: 'Science and Technology', col: '#00e600'}, 
-    {text: 'Finance', col: '#e85f29'},  
-    {text: 'Health', col: '#033268'}, 
-    {text: 'Entertainment', col: '#9999ff'}, 
-    {text: 'Sport', col: '#ff1a66'}, 
-    {text: 'History', col: '#033268'}, 
-    {text: 'Socials', col: '#e6e600'}, 
-    {text: 'Lifestyle', col: 'green'}, 
-    {text: 'Geography', col: '#e85f29'}
+    { text: 'Politics', col: 'orange' },
+    { text: 'Science and Technology', col: '#00e600' },
+    { text: 'Finance', col: '#e85f29' },
+    { text: 'Health', col: '#033268' },
+    { text: 'Entertainment', col: '#9999ff' },
+    { text: 'Sport', col: '#ff1a66' },
+    { text: 'History', col: '#033268' },
+    { text: 'Socials', col: '#e6e600' },
+    { text: 'Lifestyle', col: 'green' },
+    { text: 'Geography', col: '#e85f29' }
 ]
 
 const LearnScreen = ({ navigation }) => {
@@ -33,7 +33,7 @@ const LearnScreen = ({ navigation }) => {
             Platform.OS === 'android' && StatusBar.setBackgroundColor('#054078');
             return () => {
             }
-        }, [])       
+        }, [])
     )
     const onSuccess = (subject) => {
         // get the articles for the selected subject
@@ -42,17 +42,17 @@ const LearnScreen = ({ navigation }) => {
 
     const onFailure = async (payload) => {
         Toast.show(
-            { 
-                text: `Request failed, Please check your internet connenction`, 
-                buttonText: 'CLOSE', 
+            {
+                text: `Request failed, Please check your internet connenction`,
+                buttonText: 'CLOSE',
                 type: "danger",
                 textStyle: { fontSize: 14 }
             }
         )
         const sql = `SELECT * FROM articles WHERE category = ? `
         await db.transaction(tx => {
-            tx.executeSql(sql, [payload], (txObj, {rows: { length, _array}}) => {
-                if(length > 0){
+            tx.executeSql(sql, [payload], (txObj, { rows: { length, _array } }) => {
+                if (length > 0) {
                     let newArr = [..._array]
                     newArr.forEach(arr => {
                         arr.read = arr.read === 1 ? true : false
@@ -61,10 +61,10 @@ const LearnScreen = ({ navigation }) => {
                     })
                     console.log(newArr)
                     dispatch(loadingArticleStop())
-                    dispatch(setArticle(newArr)) 
-                }else{
+                    dispatch(setArticle(newArr))
+                } else {
                     dispatch(loadingArticleStop())
-                    dispatch(setArticle([])) 
+                    dispatch(setArticle([]))
                 }
             }, (txObj, err) => {
                 console.log(err)
@@ -81,15 +81,15 @@ const LearnScreen = ({ navigation }) => {
         await dispatch(articleErrRem())
 
         // set the activityindicator rolling
-        await dispatch(loadingArticle())       
-        
+        await dispatch(loadingArticle())
+
         // set article array to empty
         await dispatch(setArticle([]))
 
         await getResult()
 
         // navigate to the selected page
-        navigation.navigate('Subject', {subject: subject})
+        navigation.navigate('Subject', { subject: subject })
     }
 
     useEffect(() => {
@@ -100,32 +100,32 @@ const LearnScreen = ({ navigation }) => {
         const sqlx = 'CREATE TABLE IF NOT EXISTS search (id INTEGER PRIMARY KEY AUTOINCREMENT, searched TEXT UNIQUE)'
         db.transaction(tx => {
             tx.executeSql(sql, null,
-            (txObj, { insertId, rowsAffected }) => {
-                txObj.executeSql(sqli, null, (txO, { rows }) => {
-                    console.log('table unsent created successfully')
-                    txO.executeSql(sqlii, null, (txOb, {rows}) => {
-                        console.log('archive table created')
-                        txOb.executeSql(sqliii, null, (txObI, {row}) => {
-                            console.log('created archive unsent')
-                            txObI.executeSql(sqlx, null, (txObx, {rows}) => {
-                                console.log('created searched')
-                            })
-                        }, err => console.log(err, 'archiveunsent cud not be created'))
-                    }, err => console.log(err, 'table archive creation failed'))
-                }, (err) => console.log(err, 'cud not drop table'))
-            }, (err) => console.log(err, ' table creation failed '))
+                (txObj, { insertId, rowsAffected }) => {
+                    txObj.executeSql(sqli, null, (txO, { rows }) => {
+                        console.log('table unsent created successfully')
+                        txO.executeSql(sqlii, null, (txOb, { rows }) => {
+                            console.log('archive table created')
+                            txOb.executeSql(sqliii, null, (txObI, { row }) => {
+                                console.log('created archive unsent')
+                                txObI.executeSql(sqlx, null, (txObx, { rows }) => {
+                                    console.log('created searched')
+                                })
+                            }, err => console.log(err, 'archiveunsent cud not be created'))
+                        }, err => console.log(err, 'table archive creation failed'))
+                    }, (err) => console.log(err, 'cud not drop table'))
+                }, (err) => console.log(err, ' table creation failed '))
         }, (err) => console.log(err, 'from learnscreen'),
-        () => console.log('table articles created'))
-        return () => {}
+            () => console.log('table articles created'))
+        return () => { }
     }, [])
 
     const _keyExtractor = (item, index) => `${item.text}${index}`
 
-    return(
-        <Container style={{backgroundColor: "#054078"}}>
+    return (
+        <Container style={{ backgroundColor: "#054078" }}>
             <LinearGradient
                 colors={['transparent', '#e1efef']}
-                style={{...style.gradient, height: windowHeight,}}
+                style={{ ...style.gradient, height: windowHeight, }}
             />
             <Header transparent>
                 <Left>
@@ -135,29 +135,29 @@ const LearnScreen = ({ navigation }) => {
                 </Left>
                 <Body>
                     <Title>
-                        Juicy Content 
+                        Juicy Content
                     </Title>
                     <Subtitle>Everyday</Subtitle>
                 </Body>
                 <Right />
             </Header>
 
-                <View style={style.container}>
-                    <FlatList 
-                        style={style.flatList}
-                        // contentContainerStyle={{alignItems: 'center'}}
-                        data={subject} 
-                        keyExtractor={_keyExtractor}
-                        renderItem = {({item}) => 
-                            <TouchableHighlight  style={{...style.subject, borderColor: item.col, backgroundColor: item.col}} onPress={() => selectSubject(item.text)}>
-                                <View>
-                                    <Text style={style.subText}>{item.text}</Text>
-                                </View>
-                            </TouchableHighlight>
-                        } 
-                    />
-                    
-                </View>
+            <View style={style.container}>
+                <FlatList
+                    style={style.flatList}
+                    // contentContainerStyle={{alignItems: 'center'}}
+                    data={subject}
+                    keyExtractor={_keyExtractor}
+                    renderItem={({ item }) =>
+                        <TouchableHighlight style={{ ...style.subject, borderColor: item.col, backgroundColor: item.col }} onPress={() => selectSubject(item.text)}>
+                            <View>
+                                <Text style={style.subText}>{item.text}</Text>
+                            </View>
+                        </TouchableHighlight>
+                    }
+                />
+
+            </View>
 
         </Container>
     )

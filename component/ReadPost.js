@@ -1,23 +1,23 @@
-import React, { useMemo, useEffect, useState } from 'react'
-import { SlideAnimation, BottomModal, ModalTitle, ModalFooter, ModalButton, ModalContent } from 'react-native-modals';
-import { Badge } from 'react-native-elements'
-import { View, Platform, StyleSheet, Text, BackHandler } from 'react-native'
-import { Container, Header, Left, Button, Body, Subtitle, Toast, Right, Icon as NativeIcon } from 'native-base'
-import isJson from '../processes/isJson'
-import deviceSize from '../processes/deviceSize'
-import { useSelector, useDispatch } from 'react-redux'
-import {onFailedLike, onFailedArchive, updateSeenArticle} from '../actions/learn'
-import { likeFxn, unlikeFxn, archiveFxn, unarchiveFxn } from '../actions/request'
-import Hyperlink from 'react-native-hyperlink';
-import Image from './Image'
-import CustomOverlay from './CustomOverlay'
-import useCheckpoint from './useCheckpoint'
 import { useFocusEffect } from '@react-navigation/native'
+import { Body, Button, Container, Header, Icon as NativeIcon, Left, Right, Subtitle, Toast } from 'native-base'
+import React, { useMemo, useState } from 'react'
+import { BackHandler, Platform, StyleSheet, Text, View } from 'react-native'
+// import { SlideAnimation, BottomModal, ModalTitle, ModalFooter, ModalButton, ModalContent } from 'react-native-modals';
+import { Badge } from 'react-native-elements'
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import Hyperlink from 'react-native-hyperlink'
+import { useDispatch, useSelector } from 'react-redux'
+import { onFailedArchive, onFailedLike, updateSeenArticle } from '../actions/learn'
+import { archiveFxn, likeFxn, unarchiveFxn, unlikeFxn } from '../actions/request'
+import deviceSize from '../processes/deviceSize'
+import isJson from '../processes/isJson'
+import CustomOverlay from './CustomOverlay'
+import Image from './Image'
+import useCheckpoint from './useCheckpoint'
 
 const reactStringReplace = require('react-string-replace')
 
-const ReadPost = ({ navigation, route}) => {
+const ReadPost = ({ navigation, route }) => {
     const { subject } = route.params
     const items = route.params.item
     const item = route.params.type !== undefined ? route.params.item : isJson(useSelector(state => state.learn)).displayItems.find(element => element.id === items.id)
@@ -28,27 +28,27 @@ const ReadPost = ({ navigation, route}) => {
     const store = isJson(useSelector(state => state.learn))
     const preview = useMemo(() => { uri: store.preview }, [store.preview])
     let replaceText
-    replaceText = item.new_word_1 !== '' && item.new_word_1 !== null ? reactStringReplace(item.body , item.new_word_1.split(':')[0],(match, i) => (
+    replaceText = item.new_word_1 !== '' && item.new_word_1 !== null ? reactStringReplace(item.body, item.new_word_1.split(':')[0], (match, i) => (
         <Text key={match + i} style={style.color} onPress={() => newWord(match, item.new_word_1.split(':')[1], 1)}>{match}</Text>
     )) : item.body
-    replaceText = item.new_word_2 !== '' && item.new_word_2 !== null ? reactStringReplace(replaceText , item.new_word_2.split(':')[0],(match, i) => (
+    replaceText = item.new_word_2 !== '' && item.new_word_2 !== null ? reactStringReplace(replaceText, item.new_word_2.split(':')[0], (match, i) => (
         <Text key={match + i} style={style.color} onPress={() => newWord(match, item.new_word_2.split(':')[1], 1)}>{match}</Text>
     )) : replaceText
-    replaceText = item.new_word_3 !== '' && item.new_word_3 !== null ? reactStringReplace(replaceText , item.new_word_3.split(':')[0],(match, i) => (
+    replaceText = item.new_word_3 !== '' && item.new_word_3 !== null ? reactStringReplace(replaceText, item.new_word_3.split(':')[0], (match, i) => (
         <Text key={match + i} style={style.color} onPress={() => newWord(match, item.new_word_3.split(':')[1], 1)}>{match}</Text>
     )) : replaceText
-    replaceText = item.idioms_1 !== '' && item.idioms_1 !== null ? reactStringReplace(replaceText , item.idioms_1.split(':')[0],(match, i) => (
+    replaceText = item.idioms_1 !== '' && item.idioms_1 !== null ? reactStringReplace(replaceText, item.idioms_1.split(':')[0], (match, i) => (
         <Text key={match + i} style={style.color} onPress={() => newWord(match, item.idioms_1.split(':')[1], 0)}>{match}</Text>
     )) : replaceText
-    replaceText = item.idioms_2 !== '' && item.idioms_2 !== null ? reactStringReplace(replaceText , item.idioms_2.split(':')[0],(match, i) => (
+    replaceText = item.idioms_2 !== '' && item.idioms_2 !== null ? reactStringReplace(replaceText, item.idioms_2.split(':')[0], (match, i) => (
         <Text key={match + i} style={style.color} onPress={() => newWord(match, item.idioms_2.split(':')[1], 0)}>{match}</Text>
     )) : replaceText
-    replaceText = item.idioms_3 !== '' && item.idioms_3 !== null ? reactStringReplace(replaceText , item.idioms_3.split(':')[0],(match, i) => (
+    replaceText = item.idioms_3 !== '' && item.idioms_3 !== null ? reactStringReplace(replaceText, item.idioms_3.split(':')[0], (match, i) => (
         <Text key={match + i} style={style.color} onPress={() => newWord(match, item.idioms_3.split(':')[1], 0)}>{match}</Text>
     )) : replaceText
 
     const newWord = (word, meaning, num) => {
-        const obj = {word, meaning, type: num === 1 ? 'New word' : 'Idiom'}
+        const obj = { word, meaning, type: num === 1 ? 'New word' : 'Idiom' }
         setWord(obj)
     }
 
@@ -57,30 +57,30 @@ const ReadPost = ({ navigation, route}) => {
     }
 
     const likes = async (id) => {
-        if(item.liked === false){
+        if (item.liked === false) {
             const getResult = useCheckpoint(onFailureLike, onSuccessLike, id)
             getResult().then(res => {
                 Toast.show(
-                    { 
-                        text: 'You liked post', 
-                        buttonText: 'CLOSE', 
+                    {
+                        text: 'You liked post',
+                        buttonText: 'CLOSE',
                         type: 'success',
                         textStyle: { fontSize: 14 },
-                        style: {marginHorizontal: 50, borderRadius: 20, marginBottom: 20 }
+                        style: { marginHorizontal: 50, borderRadius: 20, marginBottom: 20 }
                     }
                 )
-            })           
-        }else{
+            })
+        } else {
             const getResult = useCheckpoint(onFailureUnlike, onSuccessUnlike, id)
             await getResult()
-        }       
+        }
     }
 
     const archive = (obj) => {
-        if(!obj.item.archived) {
+        if (!obj.item.archived) {
             const getResult = useCheckpoint(onFailureArchive, onSuccessArchive, obj)
             getResult()
-        }else{
+        } else {
             const getResult = useCheckpoint(onFailureUnarchive, onSuccessUnarchive, obj)
             getResult()
         }
@@ -91,7 +91,7 @@ const ReadPost = ({ navigation, route}) => {
     }
     // when there is no network for a like request
     const onFailureLike = (id) => {
-        dispatch(onFailedLike({id,state: 1}))
+        dispatch(onFailedLike({ id, state: 1 }))
     }
     // when network is confirmed for an unlike request
     const onSuccessUnlike = (id) => {
@@ -99,7 +99,7 @@ const ReadPost = ({ navigation, route}) => {
     }
     // when there is no network for an unlike request
     const onFailureUnlike = (id) => {
-        dispatch(onFailedLike({id,state: 0}))
+        dispatch(onFailedLike({ id, state: 0 }))
     }
     // when network is confirmed for an archive request
     const onSuccessArchive = (obj) => {
@@ -107,7 +107,7 @@ const ReadPost = ({ navigation, route}) => {
     }
     // when there is no network for a archive request
     const onFailureArchive = (obj) => {
-        dispatch(onFailedArchive({...obj,state: 1}))
+        dispatch(onFailedArchive({ ...obj, state: 1 }))
     }
     // when network is confirmed for an unarchive request
     const onSuccessUnarchive = (obj) => {
@@ -115,7 +115,7 @@ const ReadPost = ({ navigation, route}) => {
     }
     // when there is no network for an unarchive request
     const onFailureUnarchive = (obj) => {
-        dispatch(onFailedArchive({...obj,state: 0}))
+        dispatch(onFailedArchive({ ...obj, state: 0 }))
     }
 
     const displayImage = () => {
@@ -123,7 +123,7 @@ const ReadPost = ({ navigation, route}) => {
     }
     useFocusEffect(
         React.useCallback(() => {
-            if(!item.read){
+            if (!item.read) {
                 dispatch(updateSeenArticle(item.id))
             }
             return () => {
@@ -144,102 +144,102 @@ const ReadPost = ({ navigation, route}) => {
         }, [item.id])
     )
 
-    return(
+    return (
         <>
-        <Container style={{backgroundColor: "#fff"}}>
-            <Header style={style.header}>
-                <Left>
-                    <Button transparent onPress={() => navigation.navigate(route.params.type ? 'ViewArchive' : 'Subject')}>
-                        <NativeIcon  name={Platform.OS == 'ios' ? 'chevron-back-outline' : 'arrow-back'} />
-                    </Button>
-                </Left>
-                <Body>
-                    <Subtitle>
-                        {item.title}
-                    </Subtitle>
-                </Body>
-                <Right>
-                    <Button transparent >
-                        <NativeIcon type='FontAwesome5' name='ellipsis-v' style={{fontSize: 18, color: '#fff'}} />
-                    </Button>
-                </Right>
-            </Header>
-            <View style={style.container}>
-                <View style={style.imageContaniner}>
-                    <TouchableWithoutFeedback onPress={displayImage} style={style.imgView}>
-                        <Image {...{preview, uri:item.image_url}} style={style.img} />
-                    </TouchableWithoutFeedback>
-                    <View style={style.titleContainer}>
-                        <Text numberOfLines={1} style={style.title}>
+            <Container style={{ backgroundColor: "#fff" }}>
+                <Header style={style.header}>
+                    <Left>
+                        <Button transparent onPress={() => navigation.navigate(route.params.type ? 'ViewArchive' : 'Subject')}>
+                            <NativeIcon name={Platform.OS == 'ios' ? 'chevron-back-outline' : 'arrow-back'} />
+                        </Button>
+                    </Left>
+                    <Body>
+                        <Subtitle>
                             {item.title}
-                        </Text>
-                    </View>
-                </View>
-                <View style={style.emptyContent}/>
-                <ScrollView style={style.content}>
-                    <Hyperlink
-                        linkDefault={ true }
-                        
-                        linkStyle={ { color: '#2980b9' } }
-                    >
-                        <View style={style.textView}>        
-                            <Text>{replaceText}</Text>               
+                        </Subtitle>
+                    </Body>
+                    <Right>
+                        <Button transparent >
+                            <NativeIcon type='FontAwesome5' name='ellipsis-v' style={{ fontSize: 18, color: '#fff' }} />
+                        </Button>
+                    </Right>
+                </Header>
+                <View style={style.container}>
+                    <View style={style.imageContaniner}>
+                        <TouchableWithoutFeedback onPress={displayImage} style={style.imgView}>
+                            <Image {...{ preview, uri: item.image_url }} style={style.img} />
+                        </TouchableWithoutFeedback>
+                        <View style={style.titleContainer}>
+                            <Text numberOfLines={1} style={style.title}>
+                                {item.title}
+                            </Text>
                         </View>
-                    </Hyperlink>
-                    {route.params.type === undefined ? 
-                        <View style={style.actions}>
-                            <View style={style.action}>
-                                <NativeIcon 
-                                    type={item.liked ? 'Ionicons' : 'FontAwesome5'} 
-                                    onPress={() => likes(item.id)} 
-                                    name='heart' 
-                                    style={{color: item.liked ? 'red' : '#777', fontSize: 28}} />
-                                    <Badge 
-                                        badgeStyle={{ width: 25, height: 25, borderRadius: 25/2, backgroundColor: 'transparent' }}
+                    </View>
+                    <View style={style.emptyContent} />
+                    <ScrollView style={style.content}>
+                        <Hyperlink
+                            linkDefault={true}
+
+                            linkStyle={{ color: '#2980b9' }}
+                        >
+                            <View style={style.textView}>
+                                <Text>{replaceText}</Text>
+                            </View>
+                        </Hyperlink>
+                        {route.params.type === undefined ?
+                            <View style={style.actions}>
+                                <View style={style.action}>
+                                    <NativeIcon
+                                        type={item.liked ? 'Ionicons' : 'FontAwesome5'}
+                                        onPress={() => likes(item.id)}
+                                        name='heart'
+                                        style={{ color: item.liked ? 'red' : '#777', fontSize: 28 }} />
+                                    <Badge
+                                        badgeStyle={{ width: 25, height: 25, borderRadius: 25 / 2, backgroundColor: 'transparent' }}
                                         value={<Text style={style.badgeText}>{item.likes}</Text>}
                                         containerStyle={{ position: 'absolute', top: -4, right: 20 }}
                                     />
+                                </View>
+                                <View style={style.action}>
+                                    <NativeIcon
+                                        type={item.read ? 'Ionicons' : 'FontAwesome5'}
+                                        name='eye'
+                                        style={{ color: '#777', fontSize: 28 }} />
+                                </View>
+                                <View style={style.action}>
+                                    <NativeIcon
+                                        onPress={() => { archive({ item }); Toast.show({ text: item.archived ? `Removed from archive` : `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: { backgroundColor: item.archived ? 'red' : 'green' } }) }}
+                                        type='Ionicons'
+                                        name='md-archive'
+                                        style={{ color: item.archived ? 'green' : '#777', fontSize: 28 }}
+                                    />
+                                </View>
                             </View>
-                            <View style={style.action}>
-                                <NativeIcon 
-                                    type={item.read ? 'Ionicons' : 'FontAwesome5'} 
-                                    name='eye' 
-                                    style={{color: '#777', fontSize: 28}} />
-                            </View>
-                            <View style={style.action}>
-                                <NativeIcon 
-                                    onPress={() => {archive({item}); Toast.show({ text: item.archived ? `Removed from archive` : `Saved to your ${subject} archive`, buttonText: 'CLOSE', style: {backgroundColor: item.archived ? 'red' : 'green'} })}}
-                                    type='Ionicons'
-                                    name='md-archive'
-                                    style={{color: item.archived ? 'green' : '#777', fontSize: 28}} 
-                                />
-                            </View>
-                        </View>
-                        : null
-                    }
-                </ScrollView>
-            </View>
-        </Container>
-        <CustomOverlay
-            isVisible={imageOverlay}
-            backgroundColor = 'rgba(0,0,0,1)'
-            animation='slide'
-        >
-            <View style={{...style.imageContainer, height: windowHeight}}>
-                <View style={style.cover}>
-                <NativeIcon 
-                    type='FontAwesome'
-                    onPress={displayImage} 
-                    name='times' 
-                    style={{color: '#ddd', fontSize: 28, position: 'absolute', right: 20, top: 50}} />
+                            : null
+                        }
+                    </ScrollView>
                 </View>
-                    <View style={style.imageWrapper}>
-                        <Image {...{preview, uri:item.image_url}} style={style.bigimg} />
+            </Container>
+            <CustomOverlay
+                isVisible={imageOverlay}
+                backgroundColor='rgba(0,0,0,1)'
+                animation='slide'
+            >
+                <View style={{ ...style.imageContainer, height: windowHeight }}>
+                    <View style={style.cover}>
+                        <NativeIcon
+                            type='FontAwesome'
+                            onPress={displayImage}
+                            name='times'
+                            style={{ color: '#ddd', fontSize: 28, position: 'absolute', right: 20, top: 50 }} />
                     </View>
-                <View style={style.cover} />
-            </View>
-        </CustomOverlay>
-        <BottomModal 
+                    <View style={style.imageWrapper}>
+                        <Image {...{ preview, uri: item.image_url }} style={style.bigimg} />
+                    </View>
+                    <View style={style.cover} />
+                </View>
+            </CustomOverlay>
+            {/*} <BottomModal 
             modalAnimation={new SlideAnimation({
                 initialValue: 0,
                 slideFrom: 'bottom',
@@ -269,7 +269,7 @@ const ReadPost = ({ navigation, route}) => {
                     </View>
                 </View>
             </ModalContent>
-        </BottomModal>
+        </BottomModal> */}
         </>
     )
 }
@@ -293,7 +293,7 @@ const style = StyleSheet.create({
         paddingTop: 10,
     },
     imgView: {
-        
+
     },
     img: {
         width: '100%',
@@ -361,16 +361,16 @@ const style = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#054078',
-    }, 
+    },
     imageContainer: {
         height: '100%',
     },
     imageWrapper: {
         flex: 0.6
-    }, 
+    },
     cover: {
         flex: 0.2
-    }, 
+    },
     bigimg: {
         width: '100%',
         height: '100%',

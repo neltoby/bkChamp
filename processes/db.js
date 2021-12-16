@@ -5,22 +5,22 @@ import { Toast } from 'native-base'
 export const db = SQLite.openDatabase('db.bookchamp')
 
 export const imageBase64 = (fileUri = '../img/previewImage.jpg') => {
-    try{
-        const base64 = FileSystem.readAsStringAsync(fileUri, {encoding: FileSystem.EncodingType.Base64})
+    try {
+        const base64 = FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.Base64 })
         return `data:image/png;base64,${base64}`
-    }catch(err){
+    } catch (err) {
         console.log(err.message)
     }
 }
 
 const showTaoster = payload => {
     return Toast.show(
-        { 
-            text: payload.text, 
-            buttonText: 'CLOSE', 
+        {
+            text: payload.text,
+            buttonText: 'CLOSE',
             type: payload.type || 'success',
             textStyle: { fontSize: payload.textStyle || 14 },
-            style: payload.style || {backgroundColor: 'green'}
+            style: payload.style || { backgroundColor: 'green' }
         }
     )
 }

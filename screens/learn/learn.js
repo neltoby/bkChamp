@@ -233,7 +233,7 @@ const Learn = (props) => {
           <ActivityIndicator size="small" color="blue" />
         ) : store.displayItems.length > 0 ? (
           <FlatList
-            data={store.displayItems}
+            data={store.displayItems.slice(0, 10)}
             keyExtractor={(content) => content.id.toString()}
             renderItem={({ item, index }) => renderContent(item, index)}
             ListHeaderComponent={learnCarousel()}

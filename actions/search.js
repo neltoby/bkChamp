@@ -1,4 +1,4 @@
-import {db} from '../processes/db'
+import { db } from '../processes/db'
 // import { getKey } from '../processes/keyStore'
 // import { loginValue } from '../processes/lock'
 

@@ -1,8 +1,8 @@
-import React, { memo, useCallback } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import Overlay from './Overlay'
 import { Button as NButton } from 'native-base';
-import deviceSize from '../processes/deviceSize'
+import React, { memo, useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import deviceSize from '../processes/deviceSize';
+import Overlay from './Overlay';
 
 export default function CNOverlay(props) {
     const { close, closeApp, cancel } = props
@@ -11,7 +11,7 @@ export default function CNOverlay(props) {
     const localClose = useCallback(
         () => {
             closeApp()
-        }, 
+        },
         [close]
     )
 
@@ -28,7 +28,7 @@ export default function CNOverlay(props) {
             deviceWidth={deviceWidth}
             deviceHeight={windowHeight}
         >
-            <View style={[style.containerOverlay, {width: '80%'}]}>
+            <View style={[style.containerOverlay, { width: '80%' }]}>
                 <View style={style.header}>
                     <Text style={style.headerText}>
                         Exit?
@@ -36,7 +36,7 @@ export default function CNOverlay(props) {
                 </View>
                 <View style={style.body}>
                     <Text style={style.bodyText}>
-                        Are you sure you want 
+                        Are you sure you want
                     </Text>
                     <Text style={style.bodyText}>
                         to exit this app?
@@ -73,7 +73,7 @@ const style = StyleSheet.create({
     header: {
         flex: 0.3,
         justifyContent: 'flex-end'
-    }, 
+    },
     headerText: {
         color: '#777',
         fontSize: 20
@@ -81,7 +81,7 @@ const style = StyleSheet.create({
     body: {
         flex: 0.4,
         paddingTop: 5,
-        justifyContent:'flex-start',
+        justifyContent: 'flex-start',
     },
     bodyText: {
         fontSize: 17,
@@ -90,12 +90,12 @@ const style = StyleSheet.create({
     buttonOptions: {
         flex: 0.3,
         flexDirection: 'row',
-        justifyContent:'space-between'
-    }, 
+        justifyContent: 'space-between'
+    },
     buttons: {
         backgroundColor: '#1258ba',
         paddingHorizontal: 10,
-    }, 
+    },
     buttonsText: {
         color: '#fff'
     }

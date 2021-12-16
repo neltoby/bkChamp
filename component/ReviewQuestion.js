@@ -1,17 +1,19 @@
-import React, { useCallback, useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
-import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
-import { Container, Header, Content, Footer, Left, Body, Title, Right, Button, FooterTab, Icon as NativeIcon } from 'native-base'
-import {View, Text, StyleSheet, StatusBar, Image, useWindowDimensions} from 'react-native'
-import { useSelector, useDispatch } from 'react-redux';
-import Overlay from './Overlay';
-import Rolling from './Rolling'
-import { MemoizedPlayAgainButton } from './PlayAgainButton'
+import { LinearGradient } from 'expo-linear-gradient';
+// import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
+import { Body, Button, Container, Content, Footer, FooterTab, Header, Icon as NativeIcon, Left, Right, Title } from 'native-base';
+import React, { useCallback, useState } from 'react';
+import { Image, Platform, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Icon } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadQuestion, loadQuiz, playedCurrent, playedPrev, playingAgain, resetplayedCurrent, settime } from '../actions/quiz';
+import { callStartGame } from '../actions/request';
+import { noQuestion } from '../processes/image';
 import isJson from '../processes/isJson';
-import {noQuestion} from '../processes/image'
-import { callStartGame } from '../actions/request'
-import {playedCurrent, playedPrev, resetplayedCurrent, playingAgain, settime, loadQuestion, loadQuiz } from '../actions/quiz'
+import CustomModal from './CustomModal';
+import Overlay from './Overlay';
+import { MemoizedPlayAgainButton } from './PlayAgainButton';
+import Rolling from './Rolling';
 
 const ReviewQuestion = ({ navigation }) => {
     const [startAgain, setStartAgain] = useState(false)
@@ -23,18 +25,18 @@ const ReviewQuestion = ({ navigation }) => {
     const no = store.quiz.playedCurrent
     const current = isJson(played[no])
     const points = useSelector(state => state.user).user.points
-    const avail = Object.entries(current).length 
-    const col = current.answer === current.selected ? '#00ff00' : 'red' ;
+    const avail = Object.entries(current).length
+    const col = current.answer === current.selected ? '#00ff00' : 'red';
     useFocusEffect(
         React.useCallback(() => {
             StatusBar.setBarStyle('light-content');
             Platform.OS === 'android' && StatusBar.setBackgroundColor('#054078');
-            return () => {                
+            return () => {
                 dispatch(resetplayedCurrent(0))
-                dispatch(playingAgain()) 
-                dispatch(settime(''))           
+                dispatch(playingAgain())
+                dispatch(settime(''))
             }
-        }, [])        
+        }, [])
     )
 
     const setAgain = useCallback(
@@ -58,14 +60,14 @@ const ReviewQuestion = ({ navigation }) => {
         dispatch(playedCurrent())
     }
     const prevQuestion = () => dispatch(playedPrev())
-    const goback = () => { 
-        navigation.navigate('Quiz')
+    const goback = () => {
+        navigation.navigate('SelectHome')
     }
-    return(
-        <Container style={{backgroundColor: "#054078"}}>
+    return (
+        <Container style={{ backgroundColor: "#054078" }}>
             <LinearGradient
                 colors={['transparent', '#e1efef']}
-                style={{...style.gradient, height: windowHeight,}}
+                style={{ ...style.gradient, height: windowHeight, }}
             />
             <Header transparent>
                 <Left>
@@ -81,89 +83,93 @@ const ReviewQuestion = ({ navigation }) => {
                 <Right />
             </Header>
             <Content>
-            <View style={style.container}>
-                {played.length ?
-                    <View style={style.review}>
-                        <View style={style.content}>
-                            <Text style={style.questag}>Q{parseInt(parseInt(no) + 1)}</Text>
-                        </View>
-                        <View style={[style.levelContent, 
-                            {backgroundColor: current.difficulty === 'EASY' ? '#019900' : current.difficulty === 'MODERATE' ? '#0033ff' : '#ff3300'}]}>
-                            <Text style={style.levelContainer}>
-                                <Text style={style.levelText}>
-                                    Difficulty level - 
+                <View style={style.container}>
+                    {played.length ?
+                        <View style={style.review}>
+                            <View style={style.content}>
+                                <Text style={style.questag}>Q{parseInt(parseInt(no) + 1)}</Text>
+                            </View>
+                            <View style={[style.levelContent,
+                            { backgroundColor: current.difficulty === 'EASY' ? '#019900' : current.difficulty === 'MODERATE' ? '#0033ff' : '#ff3300' }]}>
+                                <Text style={style.levelContainer}>
+                                    <Text style={style.levelText}>
+                                        Difficulty level -
+                                    </Text>
+                                    <Text style={style.levelText}>
+                                        -
+                                    </Text>
+                                    <Text style={style.levelText}>
+                                        {
+                                            current.difficulty === 'EASY' ?
+                                                'Easy' :
+                                                current.difficulty === 'MODERATE' ? 'Moderate' : 'Difficult'
+                                        }
+                                    </Text>
                                 </Text>
-                                <Text style={style.levelText}>
-                                    - 
+                            </View>
+                            <View style={style.textContent}>
+                                <View style={style.countContainer}>
+                                    <Text style={style.question}>
+                                        {current.question}
+                                    </Text>
+                                </View>
+                                <Text style={{ ...style.question, color: col }}>
+                                    YOUR ANSWER : {current.selected}
                                 </Text>
-                                <Text style={style.levelText}>
-                                    {
-                                        current.difficulty === 'EASY' ?
-                                            'Easy' : 
-                                            current.difficulty === 'MODERATE' ? 'Moderate' : 'Difficult'
-                                    }
+                                {current.answer !== current.selected ?
+                                    <Text style={{ ...style.question, color: '#00ff00' }}>
+                                        CORRECT ANSWER : {current.answer}
+                                    </Text> :
+                                    <Text />
+                                }
+                            </View>
+                            <View style={style.textContent}>
+                                <Text>
+                                    <Text style={style.note}>NOTE: </Text>
+                                    <Text style={style.noteContent}>{current.notes}</Text>
                                 </Text>
-                            </Text>      
+                            </View>
+                            <View style={style.next}>
+                                {no !== 0 ?
+                                    <Icon type="material" name="chevron-left" size={33} onPress={() => { prevQuestion() }} />
+                                    :
+                                    null
+                                }
+                                {no < played.length - 1 ?
+                                    <Icon type="material" name="navigate-next" size={33} onPress={() => nextQuestion()} />
+                                    :
+                                    null
+                                }
+                            </View>
+                            <MemoizedPlayAgainButton setStartAgain={setAgain} />
                         </View>
-                        <View style={style.textContent}>                          
-                            <View style={style.countContainer}>
-                                <Text style={style.question}>
-                                    {current.question}
-                                </Text>
-                            </View>                  
-                            <Text style={{...style.question, color: col}}>
-                                YOUR ANSWER : {current.selected}
-                            </Text>
-                            {current.answer !== current.selected ?
-                                <Text style={{...style.question, color: '#00ff00'}}>
-                                    CORRECT ANSWER : {current.answer}
-                                </Text> : 
-                                <Text />
-                            }
-                        </View>
-                        <View style={style.textContent}>
-                            <Text>
-                                <Text style={style.note}>NOTE: </Text>
-                                <Text style={style.noteContent}>{current.notes}</Text>
-                            </Text>
-                        </View>
-                        <View style={style.next}>
-                            {no < played.length - 1 ?
-                                <Button transparent onPress={() => nextQuestion()}>
-                                    <Text style={{color: '#0033ff', fontWeight: 'bold'}}>Next</Text>
-                                </Button>
-                            :
-                                null
-                            }
-                            {no !== 0 ?
-                                <Button transparent onPress={() => prevQuestion()}>
-                                    <Text style={{color: '#0033ff', fontWeight: 'bold'}}>Back</Text>
-                                </Button>
-                            :
-                                null
-                            }
-                        </View>
-                        <MemoizedPlayAgainButton setStartAgain={setAgain} />
-                    </View>
-                    : 
-                    <>
-                        <View style={style.noreview}>
-                            <Text style={style.noQuest}>You have not answered any question!</Text>
-                            <Image source={noQuestion()} style={style.img} />                       
-                        </View>
-                        <MemoizedPlayAgainButton setStartAgain={setAgain} />
-                    </>
-                }
-            </View>
+                        :
+                        <>
+                            <View style={style.noreview}>
+                                <Text style={style.noQuest}>You have not answered any question!</Text>
+                                <Image source={noQuestion()} style={style.img} />
+                            </View>
+                            <MemoizedPlayAgainButton setStartAgain={setAgain} />
+                        </>
+                    }
+                </View>
             </Content>
             <Footer >
                 <FooterTab>
                     <Button>
-                        <Text style={style.displayed}>You  answered {played.length} question</Text>
+                        <Text style={style.displayed}>You  answered {played.length} question(s)</Text>
                     </Button>
                 </FooterTab>
             </Footer>
-            <Modal
+            <CustomModal
+                defaultColor
+                visible={startAgain}
+                title={points ? "Play Again?" : "Not enough points"}
+                options={points ? ["No", "Yes"] : ["Cancel", "Subscribe"]}
+                close={() => { setStartAgain(false); navigation.navigate('SelectHome') }}
+                confirm={points ? () => playAgain() : () => navigation.navigate('Subscribe')}
+            />
+            {/*<Modal
                 useNativeDriver={true}
                 visible={startAgain}
                 swipeDirection={['up', 'down']} // can be string or an array
@@ -217,7 +223,7 @@ const ReviewQuestion = ({ navigation }) => {
                         }                        
                     </View>
                 </ModalContent>
-            </Modal>
+            </Modal> */}
             <Overlay isVisible={loading} >
                 <Rolling text='Loading ...' />
             </Overlay>

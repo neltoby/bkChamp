@@ -1,16 +1,16 @@
-import React, { useState, useCallback } from 'react'
-import { View, StyleSheet, BackHandler } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native';
-import Container from './Container'
-import { MemoResend } from './Resend'
-import { MemoCNOverlay } from './CNOverlay'
-import { MemoVerificationBody } from './VerificationBody'
+import React, { useCallback, useState } from 'react';
+import { BackHandler, StyleSheet, View } from 'react-native';
+import { MemoCNOverlay } from './CNOverlay';
+import Container from './Container';
+import { MemoResend } from './Resend';
+import { MemoVerificationBody } from './VerificationBody';
 
 
-const ConfirmNumber = ({ navigation }) => {  
+const ConfirmNumber = ({ navigation }) => {
     const [close, setClose] = useState(false)
-    
-    const closeApp = useCallback( () => {
+
+    const closeApp = useCallback(() => {
         setClose(false)
         BackHandler.exitApp()
     }, [])
@@ -21,13 +21,13 @@ const ConfirmNumber = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
-                if(!close){
+                if (!close) {
                     setClose(true)
                     return true
-                } else{
+                } else {
                     closeApp()
                     return false
-                }          
+                }
             }
             BackHandler.addEventListener('hardwareBackPress', backAction)
             return () => {
@@ -38,22 +38,22 @@ const ConfirmNumber = ({ navigation }) => {
 
     return (
         <>
-            <Container> 
+            <Container>
                 <View style={style.container}>
                     <MemoVerificationBody navigation={navigation} />
                     <View style={style.resend}>
-                        <MemoResend /> 
+                        <MemoResend />
                     </View>
                 </View>
             </Container>
-            {close ? 
+            {close ?
                 (
-                    <MemoCNOverlay 
+                    <MemoCNOverlay
                         close={close}
                         closeApp={closeApp}
                         cancel={cancel}
                     />
-                ): null
+                ) : null
             }
         </>
     )
@@ -65,9 +65,9 @@ const style = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: 20
-    },   
+    },
     resend: {
-        flex: 0.5, 
+        flex: 0.5,
         paddingTop: 20,
     }
 })

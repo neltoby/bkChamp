@@ -1,19 +1,35 @@
 {
-  "name": "bookChamp",
-  "displayName": "bookChamp",
   "expo": {
-    "name": "bookChamp",
-    "slug": "bookChamp",
+    "name": "Book Champ",
+    "slug": "BookChamp",
+    "owner": "dannyolah",
     "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/book-champ.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
-    "description": "Most recent expo version 39 for bookchamp",
-    "githubUrl": "https://github.com/neltoby/bkChamp",
-    "splash": {
-      "image": "./assets/splash.png",
-      "backgroundColor": "#ffffff",
-      "resizeMode": "contain"
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dannyolah.BookChamp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/book-champ.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.dannyolah.BookChamp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
   }
 }

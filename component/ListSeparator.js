@@ -1,21 +1,21 @@
-import React, { useRef } from 'react'
+import { useFocusEffect } from '@react-navigation/native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Icon } from 'react-native-elements';
 import Animated, { Easing } from 'react-native-reanimated';
-import { View, Text, StyleSheet } from 'react-native'
-import {  Icon } from 'react-native-elements';
-import deviceSize from '../processes/deviceSize'
-import { useFocusEffect } from '@react-navigation/native'
+import deviceSize from '../processes/deviceSize';
 
 const { Value, timing } = Animated;
 
 export default function ListSeparator(props) {
     const deviceHeight = deviceSize().deviceHeight
     const animVal = new Value(deviceHeight)
-    const {edit} = props
-    
+    const { edit } = props
+
     useFocusEffect(
         React.useCallback(() => {
             timing(animVal, {
-                delay: (props.time + 1)*100,
+                delay: (props.time + 1) * 100,
                 duration: 1000,
                 toValue: 0,
                 easing: Easing.inOut(Easing.ease),
@@ -27,10 +27,10 @@ export default function ListSeparator(props) {
                 //     toValue: -windowHeight,
                 // }).start(({finished}) => console.log(springVal))
             }
-        }, [edit]) 
+        }, [edit])
     )
     return (
-        <Animated.View style={{...style.container, marginTop: animVal}}>
+        <Animated.View style={{ ...style.container, marginTop: animVal }}>
             <View style={style.icon}>
                 <Icon
                     type='material'
@@ -38,7 +38,7 @@ export default function ListSeparator(props) {
                     size={24}
                     color='#f1f1f1'
                 />
-                
+
             </View>
             <View style={style.text}>
                 <Text style={style.title}>{Object.keys(props.data)[0]}</Text>
@@ -50,10 +50,10 @@ export default function ListSeparator(props) {
     )
 }
 
- const style = StyleSheet.create({
+const style = StyleSheet.create({
     container: {
         width: '100%',
-        flexDirection: 'row',      
+        flexDirection: 'row',
         padding: 10,
         marginBottom: 15,
     },
@@ -77,4 +77,4 @@ export default function ListSeparator(props) {
     title: {
         color: '#f1f1f1'
     }
- })
+})
