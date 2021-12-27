@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native';
-import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
+// import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
 import { Container, Header, Content, Footer, Left, Body, Title, Right, Button, FooterTab, Icon as NativeIcon } from 'native-base'
-import {View, Text, StyleSheet, StatusBar, Image, useWindowDimensions} from 'react-native'
+import {View, Text, StyleSheet, StatusBar, Image, Platform, useWindowDimensions} from 'react-native'
 import { useSelector, useDispatch } from 'react-redux';
 import Overlay from './Overlay';
 import Rolling from './Rolling'
@@ -163,7 +163,7 @@ const ReviewQuestion = ({ navigation }) => {
                     </Button>
                 </FooterTab>
             </Footer>
-            <Modal
+            {/*<Modal
                 useNativeDriver={true}
                 visible={startAgain}
                 swipeDirection={['up', 'down']} // can be string or an array
@@ -217,7 +217,7 @@ const ReviewQuestion = ({ navigation }) => {
                         }                        
                     </View>
                 </ModalContent>
-            </Modal>
+            </Modal> */}
             <Overlay isVisible={loading} >
                 <Rolling text='Loading ...' />
             </Overlay>

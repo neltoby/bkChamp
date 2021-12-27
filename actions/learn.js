@@ -23,7 +23,6 @@ export const ARTICLE_LOADING_FAILED = 'ARTICLE_LOADING_FAILED'
 
 // action function for liking an article
 export const like = payload => {
-    console.log('liked')
     return {
         type: LIKE,
         payload: payload
@@ -316,19 +315,18 @@ export const readArticle = payload => {
 export const onArticleSuccess = (payload) => {
     return function(dispatch, getState) {
         (async () => {
-            console.log(payload)
-            // const { subject } = getState().learn
+            // console.log(payload)
             const sql = 'INSERT OR REPLACE INTO articles(id, title, body, category, image_url, likes, idioms_1, idioms_2, idioms_3, new_word_1, new_word_2, new_word_3, read, archived, liked ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             const sqli = 'INSERT OR REPLACE INTO archive( id, category ) VALUES(?,?)'
             const sqlx = 'SELECT * FROM archive WHERE id = ?'
             for(let i = 0; i < payload.length; i++){
                 // let currentObj = payload[i]
                 const path = await CacheManager.get(payload[i].image_url).getPath();
-                console.log(payload[i].image_url)
+                // console.log(payload[i].image_url)
                 const val = Object.values(payload[i])
                 db.transaction(tx => {
                     tx.executeSql(sql, val, (txObj, { insertId, rowsAffected }) => {
-                        console.log(insertId, 'successful insert', `${rowsAffected} row affected`)
+                        // console.log(insertId, 'successful insert', `${rowsAffected} row affected`)
                         if(payload[i].archived){
                             const {id, category} = payload[i]
                             txObj.executeSql(sqlx, [id], (txObx, {rows}) => {

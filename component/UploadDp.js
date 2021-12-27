@@ -88,11 +88,11 @@ export default function UploadDp({navigation}) {
     const skip = () => {
         // dispatch(welcome('Welcome'))
         setTimeout(() => {
-            dispatch(login())  
+            navigation.navigate('Login', {open: true, msg: 'you can now Login with your new credentials'})
         }, 500);             
     }
     const finished = () => {
-        dispatch(login())
+        navigation.navigate('Login', {open: true, msg: 'you can now Login with your new credentials'})
     }
 
     useEffect(() => {

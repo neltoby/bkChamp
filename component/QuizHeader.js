@@ -6,7 +6,7 @@ export default function QuizHeader({navigation}) {
     return (
         <Header transparent>
             <Left>
-                <Button transparent onPress={() => navigation.navigate('Quiz')}>
+                <Button transparent onPress={() => navigation.navigate('SelectHome')}>
                 <NativeIcon name='arrow-back' />
                 </Button>
             </Left>

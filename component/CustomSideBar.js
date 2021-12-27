@@ -15,7 +15,7 @@ const CustomSideBar = (props) => {
     const {navigation} = props
     const dispatch = useDispatch()
     const points = isJson(useSelector(state => state.user.user)).points 
-    const userImg = isJson(useSelector(state => state.user)).user.image
+    const userImg = useSelector(state => state.user).user.image
     const storePreview = isJson(useSelector(state => state.learn)).preview
     const preview = useMemo(() => { uri: storePreview }, [storePreview])
     const uri = userImg 
@@ -28,21 +28,6 @@ const CustomSideBar = (props) => {
 
     let firstData = [
         {
-            text: 'Quiz', 
-            icon: <Icon type='material-community' name='gamepad-variant' size={24} color='#3480eb'/>,
-            onPress: () => navigation.navigate('Quiz'),
-        },
-        {
-            text: 'Ranking', 
-            icon: <Icon type='material-community' name='star' size={24} color='#3480eb'/>,
-            onPress: () => navigation.navigate('Ranking'),
-        },
-        {
-            text: 'Learn', 
-            icon: <Icon type='font-awesome' name='book' size={24} color='#3480eb'/>,
-            onPress: () => navigation.navigate('Learn'),
-        },
-        {
             text: 'Subcribe', 
             icon: <Icon type='material-community' name='account-check' size={24} color='#3480eb'/>,
             onPress: () => navigation.navigate('Subscribe'),
@@ -52,17 +37,10 @@ const CustomSideBar = (props) => {
             icon: <Icon type='material-community' name='archive' size={24} color='#3480eb'/>,
             onPress: () => navigation.navigate('Archive'),
         },
-    ]
-    let lastData = [
         {
             text: 'Settings', 
             icon: <Icon type='material-community' name='cogs' size={24} color='#3480eb'/>,
             onPress: () => navigation.navigate('Setting'),
-        },
-        {
-            text: 'Notification', 
-            icon: <Icon type='material-community' name='bell' size={24} color='#3480eb'/>,
-            onPress: () => navigation.navigate('Notifications'),
         },
         {
             text: 'FAQ(s)', 
@@ -86,7 +64,7 @@ const CustomSideBar = (props) => {
             <SafeAreaView style={style.container}>
                 <View style={style.imgContainer}>
                 <LinearGradient
-                    colors={['transparent', '#e1efef']}
+                    colors={['transparent', '#fff']}
                     style={{...style.gradient, height: 150,}}
                 />
                     <View style={style.imgView}>
@@ -122,17 +100,6 @@ const CustomSideBar = (props) => {
                         />
                     )
                 })}
-                <View style={style.divider}/>
-                {lastData.map((data, i) => {
-                    return(
-                        <DrawerItem 
-                        label={data.text}
-                        icon={() => data.icon}
-                        onPress={data.onPress}
-                        key={`${data}${i}`}
-                        />
-                    )
-                })}
             </SafeAreaView>
         </DrawerContentScrollView>
     )
@@ -146,7 +113,7 @@ const style = StyleSheet.create({
         height: 150,
         backgroundColor: '#054078',
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'space-around'
     },
     gradient: {
         position: 'absolute',
@@ -186,14 +153,6 @@ const style = StyleSheet.create({
         paddingLeft: 10,
         justifyContent: 'center',
         alignItems: 'flex-start'
-    },
-    divider: {
-        width: '90%',
-        borderWidth: 1,
-        borderColor: '#3480eb',
-        marginVertical: 10,
-        alignSelf: 'center',
-
     }
 
 })

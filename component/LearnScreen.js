@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import deviceSize from '../processes/deviceSize'
 import {db} from '../processes/db'
 import { Container, Header, Content, Toast, Left, Body, Title, Subtitle, Right, Button, Icon as NativeIcon } from 'native-base'
-import { View, FlatList, Text, StyleSheet, StatusBar, TouchableHighlight } from 'react-native'
+import { View, FlatList, Text, StyleSheet, StatusBar, TouchableHighlight, Platform } from 'react-native'
 import { useDispatch } from 'react-redux';
 import { getArticles } from '../actions/request'
 import useCheckpoint from './useCheckpoint'

@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, memo } from  'react'
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient'
 import { View, Text, StyleSheet, ScrollView, StatusBar, Image,
-    TouchableHighlight, BackHandler, Alert } from "react-native";
+    TouchableHighlight, BackHandler, Alert, Platform } from "react-native";
 import { Container, Content, Button } from 'native-base'
 import { MemoizedQuizHeader } from './QuizHeader'
 import DisplayTime from './DisplayTime'
@@ -53,7 +53,7 @@ const PlayQuizScreen = ({ navigation }) => {
                                 onPress: () => null,
                                 style: "cancel"
                             },
-                            { text: "YES", onPress: () => navigation.navigate('Quiz') }
+                            { text: "YES", onPress: () => navigation.navigate('SelectHome') }
                         ]
                     )
                     return true
@@ -75,7 +75,6 @@ const PlayQuizScreen = ({ navigation }) => {
             />
         <MemoizedQuizHeader navigation={navigation} />
         <Content >
-        <StatusBar barStyle="light-content" backgroundColor="#3480eb" />
         <View style={style.container}>
             {
                 Object.entries(question).length ?
@@ -120,7 +119,7 @@ const PlayQuizScreen = ({ navigation }) => {
         isVisible={setlay} 
         deviceWidth={deviceWidth} 
         deviceHeight={deviceHeight}
-        onBackButtonPress = {() => playAgain()}
+        onBackButtonPress = {() => playingAgain()}
         onBackdropPress={toggleOverlay} >
         
         <MemoizedQuizResult navigation={navigation} />      
@@ -149,7 +148,8 @@ const style = StyleSheet.create({
         marginTop: 5
     },
     subscribeText: {
-        fontSize: 17
+        fontSize: 17,
+        color: '#fff'
     },
     loading: {
         flex: 1,
@@ -168,9 +168,6 @@ const style = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 30
     },
-    subscribeText: {
-        color: '#fff'
-    }
 })
 
 export default PlayQuizScreen
