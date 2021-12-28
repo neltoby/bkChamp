@@ -26,38 +26,50 @@ const store = createStore(reducer, applyMiddleware(thunk));
 const App = () => {
   const [isReady, setIsReady] = React.useState(false);
   const prepareResources = async () => {
-    await Font.loadAsync({
-      Roboto: require('native-base/Fonts/Roboto.ttf'),
-      Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
-      ...Ionicons.font,
-      ...FontAwesome.font,
-      ...FontAwesome5.font,
-      ...MaterialIcons.font,
-      ...MaterialCommunityIcons.font,
-    });
-    const localUris = await Asset.loadAsync([
-      require('./assets/learn.png'),
-      require('./assets/quiz.png'),
-      require('./assets/splashscreen_image.png'),
-      require('./img/anonymous.jpg'),
-      require('./assets/bill.png'),
-      require('./assets/settings.png'),
-      require('./assets/question.png'),
-      require('./assets/information-button.png'),
-      require('./assets/log-out.png')
-    ]);
-    const val = await getKey(loginValue);
-    const value = await getKey(confirm);
-    console.log(val);
-    if (val !== undefined && val !== null) {
-      store.dispatch(loginWithUser(true));
-    } else {
-      if (value !== undefined && value !== null) {
-        store.dispatch(loginWithUser(false));
-      }
+    try {
+      const locaFonts = await Font.loadAsync({
+        Roboto: require('native-base/Fonts/Roboto.ttf'),
+        Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
+        ...Ionicons.font,
+        ...FontAwesome.font,
+        ...FontAwesome5.font,
+        ...MaterialIcons.font,
+        ...MaterialCommunityIcons.font,
+      });
+      console.log(locaFonts)
     }
-    setIsReady(true);
-    SplashScreen.hideAsync();
+    catch (e) {
+      console.log(e)
+    }
+    finally {
+      const localUris = await Asset.loadAsync([
+        require('./assets/learn.png'),
+        require('./assets/quiz.png'),
+        require('./assets/splashscreen_image.png'),
+        require('./img/anonymous.jpg'),
+        require('./assets/bill.png'),
+        require('./assets/settings.png'),
+        require('./assets/question.png'),
+        require('./assets/information-button.png'),
+        require('./assets/log-out.png')
+      ]);
+      const val = await getKey(loginValue);
+      const value = await getKey(confirm);
+
+      console.log(localUris, "<== localuris");
+
+      if (val !== undefined && val !== null) {
+        store.dispatch(loginWithUser(true));
+      } else {
+        if (value !== undefined && value !== null) {
+          store.dispatch(loginWithUser(false));
+        }
+      }
+      setIsReady(true);
+      SplashScreen.hideAsync();
+    }
+
+
   };
   useEffect(() => {
     (async () => {
