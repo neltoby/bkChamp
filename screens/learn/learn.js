@@ -95,7 +95,6 @@ const Learn = (props) => {
       () => console.log('completed transactions')
     );
   };
-
   const getAllArticles = async () => {
     // const getResult = useCheckpoint(onFailure, onSuccess, null);
     // unset/remove the error display page
@@ -227,7 +226,7 @@ const Learn = (props) => {
   };
 
   return (
-    <View style={{ marginBottom: 180, backgroundColor: "#fff" }}>
+    <View style={{ marginBottom: 90, backgroundColor: "#fff" }}>
       {
         store.loading_article ? (
           <ActivityIndicator size="small" color="blue" />
