@@ -44,7 +44,11 @@ export default function CustomOverlay(props) {
       }
     } else {
     }
+<<<<<<< HEAD
     return () => { };
+=======
+    return () => {};
+>>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
   }, [isVisible]);
 
   useEffect(() => {
@@ -61,6 +65,7 @@ export default function CustomOverlay(props) {
   const styleOption =
     animation === 'slide'
       ? [
+<<<<<<< HEAD
         {
           ...style.overlay,
           backgroundColor,
@@ -72,6 +77,19 @@ export default function CustomOverlay(props) {
       ]
       : animation === 'spring'
         ? [
+=======
+          {
+            ...style.overlay,
+            backgroundColor,
+            position: 'absolute',
+            height: '100%',
+            width: deviceWidth,
+          },
+          { transform: [{ translateY: editSpringVal }] },
+        ]
+      : animation === 'spring'
+      ? [
+>>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
           {
             ...style.overlay,
             backgroundColor,
@@ -82,7 +100,11 @@ export default function CustomOverlay(props) {
           },
           { transform: [{ translateY: editSpringVal }] },
         ]
+<<<<<<< HEAD
         : [
+=======
+      : [
+>>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
           {
             ...style.overlay,
             backgroundColor,
@@ -110,7 +132,11 @@ CustomOverlay.defaultProps = {
   backgroundColor: 'rgba(0,0,0,0.4)',
   alignItems: 'stretch',
   justifyContent: 'center',
+<<<<<<< HEAD
   backHandler: () => { },
+=======
+  backHandler: () => {},
+>>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
 };
 
 CustomOverlay.propTypes = {

@@ -90,10 +90,7 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
         throw new Error('Failed request with code ' + res.status);
       }
     })
-    .then((res) => {
-      console.log(res);
-      dispatch(callback(res));
-      })
+    .then((res) => dispatch(callback(res)))
     .catch((error) => {
       // console.log(error.message)
       // const err = error.message === 'A user with this username and password was not found' ?
@@ -508,7 +505,7 @@ export const signUp = (payload, navigateFxn) => {
   };
 };
 export const callStartGame = (fxn = null) => {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     (async () => {
       dispatch(loadQuiz(true));
       dispatch(loadQuestion({}));

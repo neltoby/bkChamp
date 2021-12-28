@@ -188,7 +188,11 @@ const SelectHome = ({ navigation }) => {
         isVisible={warning}
         animationIn={'slideInLeft'}
         animationOut={'slideOutRight'}>
+<<<<<<< HEAD
         <View style={{ backgroundColor: '#fff', justifyContent: 'center', }}>
+=======
+        <View style={{ backgroundColor: '#fff' }}>
+>>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
           <Text>Are you sure you want to log out?</Text>
           <View style={styles.buttonGroup}>
             <TouchableOpacity
@@ -204,7 +208,11 @@ const SelectHome = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+<<<<<<< HEAD
       <Modal
+=======
+      {/*   <Modal
+>>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
                 useNativeDriver={true}
                 visible={warning}
                 swipeDirection={['up', 'down']} // can be string or an array

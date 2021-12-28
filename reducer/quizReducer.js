@@ -46,7 +46,7 @@ export default function quizReducer(state = initialState, action) {
         draft.setOverlay = 'cancel';
         draft.answer = false;
         draft.correctAns = false;
-        //==============>convert ct from ms+10 mins+offset
+        //==============>convert ct from ms+6.5 mins+offset
         //===============^^^^^^^^^^^^^^^^---^^^^^^^^^^^^
         (draft.setTime = Date.now() / 1000 + 60 * 6.5 + 2),
           (draft.playedCurrent = 0);
