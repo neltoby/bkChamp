@@ -17,7 +17,6 @@ export default function DailyWins() {
     id: key.toString(),
     data: 'Item ' + key.toString(),
   }));
-
   const winnersStore = isJson(useSelector((state) => state.winners));
   const userStore = isJson(useSelector((state) => state.user));
   const daily_winners = winnersStore.daily_winners;

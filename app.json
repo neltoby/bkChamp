@@ -31,5 +31,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     }
+  },
+  "android": {
+    "package": "com.bookChamp.BookChamp",
+    "versionCode": "1"
   }
 }

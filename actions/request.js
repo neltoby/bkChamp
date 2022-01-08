@@ -93,7 +93,7 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
     .then((res) => {
       console.log(res);
       dispatch(callback(res));
-      })
+    })
     .catch((error) => {
       // console.log(error.message)
       // const err = error.message === 'A user with this username and password was not found' ?
