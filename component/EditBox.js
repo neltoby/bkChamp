@@ -2,7 +2,7 @@ import { Button, Card, Toast } from 'native-base';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native';
-import DatePicker from 'react-native-datepicker';
+// import DatePicker from 'react-native-datepicker';
 import { Badge, Icon, Input } from 'react-native-elements';
 import Animated, { Easing } from 'react-native-reanimated';
 import { updateUserinfo } from '../actions/user';
@@ -161,7 +161,7 @@ export default function EditBox(props) {
                         null
                     }
                     <View style={style.datePicker}>
-                        <DatePicker
+                        {/* <DatePicker
                             style={{ width: 200 }}
                             date={val || value}
                             mode="date"
@@ -183,7 +183,7 @@ export default function EditBox(props) {
                                 }
                             }}
                             onDateChange={(date) => setVal(date)}
-                        />
+                        /> */}
                     </View>
                     <View style={style.dateSave}>
                         {loading ?

@@ -131,11 +131,12 @@ const SelectHome = ({ navigation }) => {
         shifting={true}
         barStyle={{ backgroundColor: '#fff' }}>
         <Tab.Screen
-          name="Ranking"
-          component={RankingScreen}
+          name="Learn"
+          component={LearnScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="podium" type="ionicon" color={color} />
+              <Icon name="book" type="ionicon" color={color} />
+              // <Image style={{ width: 25, height: 25, }} source={require('../assets/open-book.png')} />
             ),
           }}
         />
@@ -150,12 +151,11 @@ const SelectHome = ({ navigation }) => {
           }}
         />
         <Tab.Screen
-          name="Learn"
-          component={LearnScreen}
+          name="Ranking"
+          component={RankingScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="book" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/open-book.png')} />
+              <Icon name="podium" type="ionicon" color={color} />
             ),
           }}
         />

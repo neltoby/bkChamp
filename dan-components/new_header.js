@@ -34,13 +34,13 @@ const DropdownComponent = () => {
     const dispatch = useDispatch();
     const pickerRef = useRef(null);
 
-    const selectCategory = async (category) => {
+    const selectCategory = (category) => {
         let sql =
             category === 'today'
                 ? `SELECT * FROM articles`
                 : `SELECT * FROM articles WHERE category = ? `;
 
-        let param = category === 'today' ? null : [category];
+        // let param = category === 'today' ? null : [category];
         dispatch(articleErrRem());
 
         // set the activityindicator rolling
@@ -48,15 +48,15 @@ const DropdownComponent = () => {
 
         // set article array to empty
         dispatch(setArticle([]));
-        console.log(sql);
+        // const selectedItems = store.displayItems.filter((item) => item.category === category)
+        // console.log(selectedItems, "selectedItems")
+        // dispatch(setArticle(selectedItems))
         db.transaction(
             (tx) => {
                 tx.executeSql(
                     sql,
                     param,
                     (txObj, { rows: { length, _array } }) => {
-                        console.log(length);
-                        console.log(_array);
                         if (length > 0) {
                             let newArr = [..._array];
                             newArr.forEach((obj) => {
@@ -65,7 +65,6 @@ const DropdownComponent = () => {
                                 obj.liked = obj.liked === 1 ? true : false;
                             });
                             dispatch(setArticle(newArr));
-                            console.log(newArr);
                             dispatch(loadingArticleStop());
                         } else {
                             dispatch(setArticle([]));
@@ -74,7 +73,6 @@ const DropdownComponent = () => {
                         }
                     },
                     (txObj, err) => {
-                        console.log(err);
                     }
                 );
             },

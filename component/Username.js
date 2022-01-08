@@ -82,7 +82,7 @@ const Username = ({ navigation, route }) => {
     React.useCallback(() => {
       if (errSignUp !== null) {
         Toast.show({
-          text: "A user already has this username",
+          text: errSignUp,
           buttonText: 'CLOSE',
           duration: 3000,
         });
@@ -173,7 +173,7 @@ const Username = ({ navigation, route }) => {
               title="SIGN UP"
             />
           </View>
-          <Text style={{ color: "white", fontSize: 10 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={Linking.openURL('www.google.com')}>Privacy Policy</Text></Text>
+          <Text style={{ color: "white", fontSize: 10 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={async () => await Linking.openURL('https://www.google.com')}>Privacy Policy</Text></Text>
         </Content>
       </Container>
       {loading ? (
