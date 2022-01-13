@@ -1,40 +1,24 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  Dimensions,
-  Image,
-  FlatList,
-  ActivityIndicator,
-  StatusBar,
-} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator, Dimensions, FlatList, Image, StatusBar, StyleSheet, RefreshControl,
+  Text,
+  View
+} from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import Content from './content';
-import Header from '../../dan-components/header';
-import LearnCarouselCardItem from '../../dan-components/learnCarouselCardItem';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  loadContent,
-  displayCarousel,
-  setCategory,
   articleErrRem,
-  loadingArticle,
-  setArticle,
-  loadingArticleStop,
+  loadingArticle, loadingArticleStop, setArticle, setCategoryImages,
 } from '../../actions/learn';
-import learn_data from '../../data/learn_data';
+import { getArticles } from '../../actions/request';
+import LearnCarouselCardItem from '../../dan-components/learnCarouselCardItem';
 import carousel_imgs from '../../data/carousel_data';
-import { category_imgs } from '../../data/cat_imgs';
 import { db } from '../../processes/db';
 import isJson from '../../processes/isJson';
-import { categories } from '../../dan-components/header';
-import { getArticles } from '../../actions/request';
-import { load_header_imgs } from '../../actions/learn';
-import { links } from '../../data/cat_imgs';
+import Content from './content';
+import { CacheManager } from "react-native-expo-image-cache";
+import { category_imgs } from '../../data/cat_imgs'
 
 export const SLIDER_WIDTH = Dimensions.get('window').width;
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.852);
@@ -52,9 +36,21 @@ const Learn = (props) => {
     }, [])
   );
 
+  const cacheCategoryImages = React.useCallback(
+    async (categories) => {
+      const cat_imgs = new Object()
+      for (const item of Object.entries(categories)) {
+        let key = item[0]
+        const path = await CacheManager.get(item[1]).getPath();
+        cat_imgs[key] = path
+      }
+      dispatch(setCategoryImages(cat_imgs))
+    }, []
+  )
+
   const handleRefresh = () => {
     setRefreshing(true);
-    getAllArticles();
+    onSuccess();
     setRefreshing(false);
   };
 
@@ -98,15 +94,15 @@ const Learn = (props) => {
   const getAllArticles = async () => {
     // const getResult = useCheckpoint(onFailure, onSuccess, null);
     // unset/remove the error display page
-    await dispatch(articleErrRem());
+    dispatch(articleErrRem());
 
     // set the activityindicator rolling
-    await dispatch(loadingArticle());
+    dispatch(loadingArticle());
 
     // set article array to empty
-    await dispatch(setArticle([]));
+    dispatch(setArticle([]));
 
-    await onSuccess();
+    onSuccess();
   };
 
   useEffect(() => {
@@ -130,6 +126,7 @@ const Learn = (props) => {
               (txO, { rows }) => {
                 console.log('table unsent created successfully');
                 getAllArticles();
+                cacheCategoryImages(category_imgs)
                 txO.executeSql(
                   sqlii,
                   null,
@@ -202,7 +199,7 @@ const Learn = (props) => {
             <Image
               style={{ width: SLIDER_WIDTH, height: 250 }}
               source={{
-                uri: category_imgs[store.subject],
+                uri: store.category_images[store.subject],
               }}
             />
           )
@@ -236,6 +233,7 @@ const Learn = (props) => {
             keyExtractor={(content) => content.id.toString()}
             renderItem={({ item, index }) => renderContent(item, index)}
             ListHeaderComponent={learnCarousel()}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
           />
         ) : (
           <Text>There are no articles for {store.subject}</Text>

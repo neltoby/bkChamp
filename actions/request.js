@@ -4,7 +4,7 @@ import { getKey, storeKey } from '../processes/keyStore';
 import { confirm, loginValue } from '../processes/lock';
 import {
   archived, archiveDisperse, articleErrDis, errArchive, getArchived, like, likeDisperse, onArticleSuccess, onFailedArchive, onFailedLike, resolveArchive,
-  resolveUnarchivedArticles, setArticle
+  resolveUnarchivedArticles, setArticle, newOnArticleSuccess
 } from './learn';
 import { createUserLoading, createUserStop, login, loginDetails, loginStatus, logOutUser, signUpErr, verificationPoint, vNumber } from './login';
 import {
@@ -91,7 +91,6 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
       }
     })
     .then((res) => {
-      console.log(res);
       dispatch(callback(res));
     })
     .catch((error) => {
@@ -195,7 +194,7 @@ export const getArticles = (payload) => {
         },
       };
       // onsuccess callback
-      const callback = onArticleSuccess;
+      const callback = newOnArticleSuccess;
       // onfail callback
       const err = articleErrDis;
       if (val !== undefined && val !== null) {

@@ -2,7 +2,6 @@ import { Button, Card, Toast } from 'native-base';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native';
-import DatePicker from 'react-native-datepicker';
 import { Badge, Icon, Input } from 'react-native-elements';
 import Animated, { Easing } from 'react-native-reanimated';
 import { updateUserinfo } from '../actions/user';
@@ -161,29 +160,6 @@ export default function EditBox(props) {
                         null
                     }
                     <View style={style.datePicker}>
-                        <DatePicker
-                            style={{ width: 200 }}
-                            date={val || value}
-                            mode="date"
-                            placeholder="select date"
-                            format="YYYY-MM-DD"
-                            minDate={minDate}
-                            maxDate={maxDate}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                                dateIcon: {
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 4,
-                                    marginLeft: 0
-                                },
-                                dateInput: {
-                                    marginLeft: 36
-                                }
-                            }}
-                            onDateChange={(date) => setVal(date)}
-                        />
                     </View>
                     <View style={style.dateSave}>
                         {loading ?

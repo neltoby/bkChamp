@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { Container, Content } from 'native-base';
-import React, { useEffect, useRef } from 'react';
-import { Dimensions, FlatList, StatusBar, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, StatusBar, StyleSheet, Text, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLiveRanks, getWeeklyWinners } from '../actions/request';
@@ -13,6 +13,7 @@ import AnimatedLoader from './AnimatedLoader'
 const deviceWidth = Dimensions.get('screen').width;
 
 const RankingScreen = () => {
+  const [refreshing, setRefreshing] = useState(false)
   const winnersStore = isJson(useSelector((state) => state.winners));
   const userStore = isJson(useSelector((state) => state.user));
   const daily_winners = winnersStore.daily_winners;
@@ -23,7 +24,9 @@ const RankingScreen = () => {
 
   const onSuccess = async () => {
     console.log('onsuccess was called');
-    await dispatch(getLiveRanks());
+    setRefreshing(!refreshing)
+    dispatch(getLiveRanks());
+    setRefreshing(!refreshing)
   };
 
 
@@ -101,6 +104,9 @@ const RankingScreen = () => {
             data={daily_winners}
             keyExtractor={(data) => data.id.toString()}
             renderItem={({ item, index }) => renderUsers(item, index)}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={liveRanks} />
+            }
           />
         ) : (<ActivityIndicator color="blue" size="large" />)}
       </Content>

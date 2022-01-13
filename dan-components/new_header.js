@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, AsyncStorage } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,8 @@ import {
 import FocusAwareStatusBar from '../component/FocusAwareStatusBar';
 import { db } from '../processes/db';
 import isJson from '../processes/isJson';
+
+// require("fs")
 
 const data = [
     { label: 'today', value: 'today' },
@@ -35,12 +37,12 @@ const DropdownComponent = () => {
     const pickerRef = useRef(null);
 
     const selectCategory = async (category) => {
-        let sql =
-            category === 'today'
-                ? `SELECT * FROM articles`
-                : `SELECT * FROM articles WHERE category = ? `;
+        // let sql =
+        //     category === 'today'
+        //         ? `SELECT * FROM articles`
+        //         : `SELECT * FROM articles WHERE category = ? `;
 
-        let param = category === 'today' ? null : [category];
+        // let param = category === 'today' ? null : [category];
         dispatch(articleErrRem());
 
         // set the activityindicator rolling
@@ -48,41 +50,61 @@ const DropdownComponent = () => {
 
         // set article array to empty
         dispatch(setArticle([]));
-        console.log(sql);
-        db.transaction(
-            (tx) => {
-                tx.executeSql(
-                    sql,
-                    param,
-                    (txObj, { rows: { length, _array } }) => {
-                        console.log(length);
-                        console.log(_array);
-                        if (length > 0) {
-                            let newArr = [..._array];
-                            newArr.forEach((obj) => {
-                                obj.read = obj.read === 1 ? true : false;
-                                obj.archived = obj.archived === 1 ? true : false;
-                                obj.liked = obj.liked === 1 ? true : false;
-                            });
-                            dispatch(setArticle(newArr));
-                            console.log(newArr);
-                            dispatch(loadingArticleStop());
-                        } else {
-                            dispatch(setArticle([]));
-                            console.log('nothing');
-                            dispatch(loadingArticleStop());
-                        }
-                    },
-                    (txObj, err) => {
-                        console.log(err);
-                    }
-                );
-            },
-            (err) => {
-                console.log(err);
-            },
-            () => console.log('completed transactions')
-        );
+        try {
+            const value = await AsyncStorage.getItem('@articles')
+            const articles = JSON.parse(value)
+            if (articles !== null && articles !== undefined) {
+                if (category === 'today') {
+                    dispatch(setArticle(articles))
+                } else {
+                    // console.log(value)
+                    const filtered_articles = articles.filter(article => article.category === category)
+                    dispatch(setArticle(filtered_articles))
+                }
+            }
+            else {
+                dispatch(setArticle([]))
+                console.log("nothing to show")
+            }
+        } catch (e) {
+            console.log(e, "error")
+        } finally {
+            dispatch(loadingArticleStop());
+        }
+        // db.transaction(
+        //     (tx) => {
+        //         tx.executeSql(
+        //             sql,
+        //             param,
+        //             (txObj, { rows: { length, _array } }) => {
+        //                 console.log(length);
+        //                 console.log(_array);
+        //                 if (length > 0) {
+        //                     let newArr = [..._array];
+        //                     newArr.forEach((obj) => {
+        //                         obj.read = obj.read === 1 ? true : false;
+        //                         obj.archived = obj.archived === 1 ? true : false;
+        //                         obj.liked = obj.liked === 1 ? true : false;
+        //                     });
+        //                     dispatch(setArticle(newArr));
+        //                     console.log(newArr);
+        //                     dispatch(loadingArticleStop());
+        //                 } else {
+        //                     dispatch(setArticle([]));
+        //                     console.log('nothing');
+        //                     dispatch(loadingArticleStop());
+        //                 }
+        //             },
+        //             (txObj, err) => {
+        //                 console.log(err);
+        //             }
+        //         );
+        //     },
+        //     (err) => {
+        //         console.log(err);
+        //     },
+        //     () => console.log('completed transactions')
+        // );
     };
 
     const renderItem = (item) => {
