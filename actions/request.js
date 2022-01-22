@@ -4,7 +4,7 @@ import { getKey, storeKey } from '../processes/keyStore';
 import { confirm, loginValue } from '../processes/lock';
 import {
   archived, archiveDisperse, articleErrDis, errArchive, getArchived, like, likeDisperse, onArticleSuccess, onFailedArchive, onFailedLike, resolveArchive,
-  resolveUnarchivedArticles, setArticle
+  resolveUnarchivedArticles, setArticle, newOnArticleSuccess
 } from './learn';
 import { createUserLoading, createUserStop, login, loginDetails, loginStatus, logOutUser, signUpErr, verificationPoint, vNumber } from './login';
 import {
@@ -90,7 +90,9 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
         throw new Error('Failed request with code ' + res.status);
       }
     })
-    .then((res) => dispatch(callback(res)))
+    .then((res) => {
+      dispatch(callback(res));
+    })
     .catch((error) => {
       // console.log(error.message)
       // const err = error.message === 'A user with this username and password was not found' ?
@@ -192,7 +194,7 @@ export const getArticles = (payload) => {
         },
       };
       // onsuccess callback
-      const callback = onArticleSuccess;
+      const callback = newOnArticleSuccess;
       // onfail callback
       const err = articleErrDis;
       if (val !== undefined && val !== null) {
@@ -505,7 +507,7 @@ export const signUp = (payload, navigateFxn) => {
   };
 };
 export const callStartGame = (fxn = null) => {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     (async () => {
       dispatch(loadQuiz(true));
       dispatch(loadQuestion({}));

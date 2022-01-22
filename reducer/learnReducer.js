@@ -11,6 +11,7 @@ import {
   LOADING_ARTICLE_STOP,
   ARTICLE_LOADING_FAILED,
   READ_ARTICLE,
+  SET_CATEGORY_IMAGES,
 } from '../actions/learn';
 import isJson from '../processes/isJson';
 import { img } from '../processes/db';
@@ -21,7 +22,8 @@ const initialState = {
   load_error: false,
   subject: "today",
   preview: img,
-  headerImgs: []
+  headerImgs: [],
+  category_images: null,
 };
 
 export default function learnReducer(state = initialState, action) {
@@ -117,6 +119,11 @@ export default function learnReducer(state = initialState, action) {
         });
         draft.displayItems = isJson(newItemRes);
       });
+    }
+    case SET_CATEGORY_IMAGES: {
+      return produce(state, (draft) => {
+        draft.category_images = action.payload
+      })
     }
     default: {
       return state;

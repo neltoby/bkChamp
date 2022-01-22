@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import {
   BackHandler, StyleSheet
 } from 'react-native';
-import { Icon } from 'react-native-elements';
+// import { Icon } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutWarning, notLogin } from '../actions/login';
 import { db } from '../processes/db';
@@ -135,6 +136,7 @@ const SelectHome = ({ navigation }) => {
           component={LearnScreen}
           options={{
             tabBarIcon: ({ color }) => (
+              // <IoBook />
               <Icon name="book" type="ionicon" color={color} />
               // <Image style={{ width: 25, height: 25, }} source={require('../assets/open-book.png')} />
             ),

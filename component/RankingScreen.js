@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { Container, Content } from 'native-base';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, RefreshControl, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, StatusBar, StyleSheet, Text, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLiveRanks, getWeeklyWinners } from '../actions/request';
@@ -9,8 +9,7 @@ import { loadingDailyWinners } from '../actions/winners';
 import isJson from '../processes/isJson';
 import FocusAwareStatusBar from './FocusAwareStatusBar';
 import WeeklyWinners from './WeeklyWins';
-
-
+import AnimatedLoader from './AnimatedLoader'
 const deviceWidth = Dimensions.get('screen').width;
 
 const RankingScreen = () => {
@@ -25,7 +24,9 @@ const RankingScreen = () => {
 
   const onSuccess = async () => {
     console.log('onsuccess was called');
+    setRefreshing(!refreshing)
     dispatch(getLiveRanks());
+    setRefreshing(!refreshing)
   };
 
 
@@ -50,7 +51,7 @@ const RankingScreen = () => {
       return () => clearInterval(intervalId);
     }, [])
   );
-
+  console.log(current_user, "<===current_user");
   const renderUsers = (user, index) => {
     const rankBgColor = index % 2 === 0 ? '#CCCCFF' : '#fff';
     const user_color = user.user_id === current_user.username ? "#00ff00" : "#000"
