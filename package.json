@@ -55,6 +55,7 @@
     "react-native-screens": "~2.15.2",
     "react-native-snap-carousel": "*",
     "react-native-sqlite-storage": "^6.0.1",
+    "react-native-svg": "^12.1.1",
     "react-native-tab-view": "^2.15.1",
     "react-native-unimodules": "0.14.10",
     "react-native-vector-icons": "*",

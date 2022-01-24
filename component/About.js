@@ -43,32 +43,25 @@ export default function About({ navigation }) {
       <ScrollView style={style.about}>
         <Text style={style.abtText}>
           <Text style={style.bold}>
-            “Knowledge is like a precious ornament, you decide how you want to be adorned.” – Joshua Akpovino (Founder, Book Champ).{`
-
-`}</Text>
-          <Text>
-            Book Champ is the brainchild of JVEC Solutions (a tech start-up in the city of Lagos, Nigeria). Book Champ is an educational platform that aims at helping its users to be diverse in knowledge. {`
-           
-`}The platform provides its audience with rich and educative content on eleven (11) categories of knowledge, viz; History, Science, Technology, Sports, Geography, Finance, Socials, Politics, Entertainment, Health, and Lifestyle. As the platform grows, more categories will be added for a richer user experience. {`
-
-`}Our contents contain a minimum of two (2) words (that are not commonly used in everyday communication) and an idiomatic expression or a phrasal verb. This is to help improve the written and spoken English of our audience; our users can get to see the meaning of these words in the context they were used with just a click.  {`
-
-`}More on, Book Champ has a Quiz section where users can test themselves on general knowledge. We give cash rewards to our best two (2) users, this happens once weekly. The user with the best score is given #5,000 and the runner-up is gifted #2,000. The idea behind this is to create financial incentives that will encourage people to get back to the reading culture. {`
-
-`}On Book Champ, there are two (2) modes of learning users can choose from - the free and the paid. Our educational contents are free for users but our quiz platform is not. Users will be required to buy a subscription plan to gain access to our quiz section. Subscription plans start from as little as #100. {`
-
-`}The primary target of the platform is the youthful population. One of the objectives of Book Champ is preparing the youths for Leadership; we believe that{' '}
-          </Text>
-          <Text style={style.bold}>
-            ‘Great Leaders are great readers’.
-          </Text>
+            {` 
+            “Knowledge is like a precious ornament, you decide how you want to be adorned.” – Joshua Akpovino (Founder, Book Champ).
+            `}</Text>
           <Text>
             {' '}
-            Meaningful change must begin from the mind, hence, we shall create highly engaging contents that would raise the overall productivity of the youths. Also, content that majors in Leadership shall be incorporated into the platform with time. As the platform grows, we shall create content for other age brackets too. {`
-             
-`}When we talk about ‘Leadership,’ we are not just referring to Political leadership. We believe that leadership begins from the basic unit of every society – the family. Leadership is a fundamental human need and everyone born into this world is a potential leader. Book Champ seeks to raise the next generation of leaders in various industries and human endeavors. {`
+            Book Champ is the brainchild of JVEC Solutions (a tech start-up in the city of Lagos, Nigeria).
 
-`}Book Champ will experience a progressive form of remodeling as we work towards becoming the world’s biggest educational hub.
+            Book Champ is an educational platform that aims at helping its users to be diverse in knowledge.
+          </Text>
+          <Text>
+            Book Champ has a Quiz section where users can test themselves on general knowledge. {`
+           
+`}We give cash rewards to our best two (2) users, this happens once weekly. {`
+
+`}The user with the best score wins #5,000 and the runner-up wins #2,000  {`
+
+`}The idea behind this is to create financial incentives that will encourage people to get back to the reading culture. {`
+
+`}Book Champ will experience a progressive form of remodeling as we work towards becoming the world's biggest educational community.
           </Text>
         </Text>
       </ScrollView>

@@ -2,10 +2,6 @@ import { db } from '../processes/db';
 import isJson from '../processes/isJson';
 import { getKey, storeKey } from '../processes/keyStore';
 import { confirm, loginValue } from '../processes/lock';
-import {
-  archived, archiveDisperse, articleErrDis, errArchive, getArchived, like, likeDisperse, onArticleSuccess, onFailedArchive, onFailedLike, resolveArchive,
-  resolveUnarchivedArticles, setArticle, newOnArticleSuccess
-} from './learn';
 import { createUserLoading, createUserStop, login, loginDetails, loginStatus, logOutUser, signUpErr, verificationPoint, vNumber } from './login';
 import {
   loadQuestion, loadQuiz, quizDispatcher, registerQuestion, removeQuestions, startGameErr

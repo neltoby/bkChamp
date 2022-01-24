@@ -1,26 +1,16 @@
-import React, { useMemo } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
+import React, { useMemo } from 'react';
+import {
+  Dimensions, Image as RNImage, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View
+} from 'react-native';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from 'react-native-elements';
-import { logoutWarning } from '../actions/login';
-import Image from './Image';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  Image as RNImage,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-  StatusBar
-} from 'react-native';
-import FocusAwareStatusBar from './FocusAwareStatusBar';
-import Constants from 'expo-constants'
-import { useFocusEffect } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux';
+import { logoutWarning } from '../actions/login';
 import isJson from '../processes/isJson';
+import FocusAwareStatusBar from './FocusAwareStatusBar';
+import Image from './Image';
 
 const Profile = (props) => {
   const deviceWidth = Dimensions.get('screen').width;

@@ -48,7 +48,7 @@ export default function quizReducer(state = initialState, action) {
         draft.correctAns = false;
         //==============>convert ct from ms+6.5 mins+offset
         //===============^^^^^^^^^^^^^^^^---^^^^^^^^^^^^
-        (draft.setTime = Date.now() / 1000 + 60 * 6.5 + 2),
+        (draft.setTime = Date.now() / 1000 + 60 * .5 + 2),
           (draft.playedCurrent = 0);
       });
     }

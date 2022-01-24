@@ -157,13 +157,12 @@ const Login = ({ navigation, route }) => {
                 <Icon type="material" name="https" size={24} color="#fff" />
               }
               rightIcon={
-                <Icon
-                  type="font-awesome"
-                  name={notVisible ? 'eye' : 'eye-slash'}
-                  size={24}
-                  color="#aaa"
+                <Text
                   onPress={() => setNotVisible(!notVisible)}
-                />
+                  style={{ color: "#fff" }}
+                >
+                  {notVisible ? "Show" : "Hide"}
+                </Text>
               }
               onChangeText={(value) => setPassword(value)}
             />

@@ -108,11 +108,7 @@ The laws of Lagos State shall govern this Privacy Policy. Any dispute which may 
 
 Contact Information:
 JVEC Solutions,
-<<<<<<< HEAD
 No. 39, Oluwaseun Street, Ikotun, Lagos state.
-=======
-No. 12, Rev. Ogunbiyi Street, Ikeja GRA, Lagos, Nigeria.
->>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
 If you have any questions about this Policy, please contact us at info@jvecsolutions.com
           `}</Text>
         </View>

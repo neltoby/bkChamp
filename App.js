@@ -39,7 +39,7 @@ const App = () => {
       console.log(locaFonts)
     }
     catch (e) {
-      console.log(e)
+      console.log(e, "font w")
     }
     finally {
       const localUris = await Asset.loadAsync([

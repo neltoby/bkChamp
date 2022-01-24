@@ -2,7 +2,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-  BackHandler, StyleSheet
+  BackHandler, StyleSheet, Image
 } from 'react-native';
 // import { Icon } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -12,7 +12,6 @@ import { db } from '../processes/db';
 import deviceSize from '../processes/deviceSize';
 import { deleteKey } from '../processes/keyStore';
 import { loginValue } from '../processes/lock';
-import LearnScreen from '../screens/learn';
 import CustomModal from './CustomModal';
 // import SettingsScreen from './SettingScreen'
 import Profile from './Profile';
@@ -132,23 +131,12 @@ const SelectHome = ({ navigation }) => {
         shifting={true}
         barStyle={{ backgroundColor: '#fff' }}>
         <Tab.Screen
-          name="Learn"
-          component={LearnScreen}
-          options={{
-            tabBarIcon: ({ color }) => (
-              // <IoBook />
-              <Icon name="book" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/open-book.png')} />
-            ),
-          }}
-        />
-        <Tab.Screen
           name="Quiz"
           component={QuizScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="game-controller" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/game-control.png')} />
+              // <Icon name="game-controller" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/game-control.png')} />
             ),
           }}
         />
@@ -157,7 +145,9 @@ const SelectHome = ({ navigation }) => {
           component={RankingScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="podium" type="ionicon" color={color} />
+              // <Icon name="podium" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/rank.png')} />
+
             ),
           }}
         />
@@ -166,8 +156,8 @@ const SelectHome = ({ navigation }) => {
           component={Profile}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="person-circle" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/user.png')} />
+              // <Icon name="person-circle" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/user.png')} />
             ),
           }}
         />
