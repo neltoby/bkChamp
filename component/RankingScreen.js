@@ -89,11 +89,7 @@ const RankingScreen = () => {
   };
 
   return (
-<<<<<<< HEAD
-    <Container style={styles.ranks}>
-=======
     <Container>
->>>>>>> production
       <FocusAwareStatusBar barStyle='light-content' backgroundColor='#054078' />
 
       <WeeklyWinners />
@@ -127,11 +123,3 @@ const styles = StyleSheet.create({
     borderRadius: 19,
   },
 });
-<<<<<<< HEAD
-/*
-box-shadow: 0 15px 25px rgba(0,0,0,0.12),0 5px 10px rgba(0,0,0,0.05);
-*/
-
-// TODO: 
-=======
->>>>>>> production
