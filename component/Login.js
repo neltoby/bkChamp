@@ -157,13 +157,12 @@ const Login = ({ navigation, route }) => {
                 <Icon type="material" name="https" size={24} color="#fff" />
               }
               rightIcon={
-                <Icon
-                  type="font-awesome"
-                  name={notVisible ? 'eye' : 'eye-slash'}
-                  size={24}
-                  color="#aaa"
+                <Text
                   onPress={() => setNotVisible(!notVisible)}
-                />
+                  style={{ color: "#fff" }}
+                >
+                  {notVisible ? "Show" : "Hide"}
+                </Text>
               }
               onChangeText={(value) => setPassword(value)}
             />
@@ -185,36 +184,35 @@ const Login = ({ navigation, route }) => {
         <Overlay isVisible={store.login.status === 'loading' ? true : false}>
           <Rolling text="Logging In..." />
         </Overlay>
-        {loginAlert ? _renderSignUpMsg() : null}
         {/* <Modal
-                    useNativeDriver={true}
-                    visible={exit}
-                    swipeDirection={['up', 'down']} // can be string or an array
-                    swipeThreshold={200} // default 100
-                    onSwipeOut={event => dispatch(exitLogin(false))}
-                    onHardwareBackPress={() => dispatch(exitLogin(false))}
-                    modalTitle={<ModalTitle title='Exit?' />}
-                    footer={
-                        <ModalFooter>
-                        <ModalButton
-                            text="No"
-                            onPress={() => dispatch(exitLogin(false))}
-                        />
-                        <ModalButton
-                            text="Yes"
-                            onPress={() => BackHandler.exitApp()}
-                        />
-                        </ModalFooter>
-                    }
-                >
-                    <ModalContent>
-                        <View style={style.showView}>
-                            <Text style={style.warning}>
-                                Are you sure you want to exit?
-                            </Text>
-                        </View>
-                    </ModalContent>
-                </Modal> */}
+            useNativeDriver={true}
+            visible={exit}
+            swipeDirection={['up', 'down']} // can be string or an array
+            swipeThreshold={200} // default 100
+            onSwipeOut={event => dispatch(exitLogin(false))}
+            onHardwareBackPress={() => dispatch(exitLogin(false))}
+            modalTitle={<ModalTitle title='Exit?' />}
+            footer={
+                <ModalFooter>
+                <ModalButton
+                    text="No"
+                    onPress={() => dispatch(exitLogin(false))}
+                />
+            <ModalButton
+                    text="Yes"
+                    onPress={() => BackHandler.exitApp()}
+                />
+                </ModalFooter>
+            }
+        >
+            <ModalContent>
+                <View style={style.showView}>
+                    <Text style={style.warning}>
+                        Are you sure you want to exit?
+                    </Text>
+                </View>
+            </ModalContent>
+        </Modal> */}
       </Content>
     </Container>
   );

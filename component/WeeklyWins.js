@@ -1,8 +1,8 @@
 import { useFocusEffect } from '@react-navigation/native';
 import Constants from 'expo-constants';
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  Animated, Dimensions, Image,
+  Animated, Dimensions, Image as RNImage,
   StyleSheet, Text, View
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,11 +11,19 @@ import {
   loadingWeeklyWinners, winnersErrDis
 } from '../actions/winners';
 import isJson from '../processes/isJson';
+import Image from './Image';
 import useCheckpoint from './useCheckpoint';
 
 const deviceWidth = Dimensions.get("screen").width;
 
 const WeeklyWinners = () => {
+  const userImg = useSelector((state) => state.user).user.image;
+  const storePreview = isJson(useSelector((state) => state.learn)).preview;
+
+  const preview = useMemo(() => {
+    uri: storePreview;
+  }, [storePreview]);
+  const uri = userImg;
   const dispatch = useDispatch();
   const store = isJson(useSelector((state) => state.winners));
 
@@ -140,15 +148,20 @@ const WeeklyWinners = () => {
             </View> */}
             <View
               style={{ justifyContent: 'space-around', alignItems: 'center' }}>
-              <Image
+              {/* <Image
                 style={{
                   ...styles.winnerAvatar,
-                  borderRadius: 50,
-                  width: 100,
-                  height: 100,
                 }}
                 source={require('../img/anonymous.jpg')}
-              />
+              /> */}
+              {userImg === null || userImg === undefined ? (
+                <RNImage
+                  source={require('../img/anonymous.jpg')}
+                  style={styles.winnerAvatar}
+                />
+              ) : (
+                <Image {...{ preview, uri }} style={styles.winnerAvatar} />
+              )}
               <View
                 style={{
                   ...styles.winnerBadge,
@@ -170,15 +183,14 @@ const WeeklyWinners = () => {
             </View>
             <View
               style={{ justifyContent: 'space-around', alignItems: 'center' }}>
-              <Image
-                style={{
-                  ...styles.winnerAvatar,
-                  borderRadius: 50,
-                  width: 100,
-                  height: 100,
-                }}
-                source={require('../img/anonymous.jpg')}
-              />
+              {userImg === null || userImg === undefined ? (
+                <RNImage
+                  source={require('../img/anonymous.jpg')}
+                  style={styles.winnerAvatar}
+                />
+              ) : (
+                <Image {...{ preview, uri }} style={styles.winnerAvatar} />
+              )}
               <View
                 style={{
                   ...styles.winnerBadge,
@@ -221,6 +233,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderRadius: 50,
+    width: 100,
+    height: 100,
   },
   winnerBadge: {
     width: 20,

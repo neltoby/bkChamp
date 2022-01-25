@@ -16,10 +16,10 @@ export const loadingWeeklyWinners = () => {
 };
 
 export const onWeeklyWinnersSuccess = (payload) => {
-  return async function (dispatch, getState) {
+  return function (dispatch, getState) {
     console.log(payload);
-    await dispatch(setWeeklyWinners(payload));
-    await dispatch(loadingWeeklyWinnersStop());
+    dispatch(setWeeklyWinners(payload));
+    dispatch(loadingWeeklyWinnersStop());
   };
 };
 export const setWeeklyWinners = (payload) => {

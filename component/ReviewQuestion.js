@@ -3,8 +3,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 // import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals';
 import { Body, Button, Container, Content, Footer, FooterTab, Header, Icon as NativeIcon, Left, Right, Title } from 'native-base';
 import React, { useCallback, useState } from 'react';
-import { Image, Platform, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Image, Platform, StatusBar, StyleSheet, Text, useWindowDimensions, View, BackHandler } from 'react-native';
+// import { Icon } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadQuestion, loadQuiz, playedCurrent, playedPrev, playingAgain, resetplayedCurrent, settime } from '../actions/quiz';
 import { callStartGame } from '../actions/request';
@@ -31,6 +31,11 @@ const ReviewQuestion = ({ navigation }) => {
         React.useCallback(() => {
             StatusBar.setBarStyle('light-content');
             Platform.OS === 'android' && StatusBar.setBackgroundColor('#054078');
+            const goback = () => {
+                navigation.navigate('SelectHome')
+            }
+
+            BackHandler.addEventListener('hardwareBackPress', goback)
             return () => {
                 dispatch(resetplayedCurrent(0))
                 dispatch(playingAgain())
@@ -131,12 +136,12 @@ const ReviewQuestion = ({ navigation }) => {
                             </View>
                             <View style={style.next}>
                                 {no !== 0 ?
-                                    <Icon type="material" name="chevron-left" size={33} onPress={() => { prevQuestion() }} />
+                                    <Text onPress={() => { prevQuestion() }}>Prev.</Text>
                                     :
                                     null
                                 }
                                 {no < played.length - 1 ?
-                                    <Icon type="material" name="navigate-next" size={33} onPress={() => nextQuestion()} />
+                                    <Text onPress={() => nextQuestion()}>Next</Text>
                                     :
                                     null
                                 }

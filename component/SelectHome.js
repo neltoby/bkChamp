@@ -2,16 +2,16 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-  BackHandler, StyleSheet
+  BackHandler, StyleSheet, Image
 } from 'react-native';
-import { Icon } from 'react-native-elements';
+// import { Icon } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutWarning, notLogin } from '../actions/login';
 import { db } from '../processes/db';
 import deviceSize from '../processes/deviceSize';
 import { deleteKey } from '../processes/keyStore';
 import { loginValue } from '../processes/lock';
-import LearnScreen from '../screens/learn';
 import CustomModal from './CustomModal';
 // import SettingsScreen from './SettingScreen'
 import Profile from './Profile';
@@ -131,22 +131,12 @@ const SelectHome = ({ navigation }) => {
         shifting={true}
         barStyle={{ backgroundColor: '#fff' }}>
         <Tab.Screen
-          name="Learn"
-          component={LearnScreen}
-          options={{
-            tabBarIcon: ({ color }) => (
-              <Icon name="book" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/open-book.png')} />
-            ),
-          }}
-        />
-        <Tab.Screen
           name="Quiz"
           component={QuizScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="game-controller" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/game-control.png')} />
+              // <Icon name="game-controller" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/game-control.png')} />
             ),
           }}
         />
@@ -155,7 +145,9 @@ const SelectHome = ({ navigation }) => {
           component={RankingScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="podium" type="ionicon" color={color} />
+              // <Icon name="podium" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/rank.png')} />
+
             ),
           }}
         />
@@ -164,8 +156,8 @@ const SelectHome = ({ navigation }) => {
           component={Profile}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="person-circle" type="ionicon" color={color} />
-              // <Image style={{ width: 25, height: 25, }} source={require('../assets/user.png')} />
+              // <Icon name="person-circle" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/user.png')} />
             ),
           }}
         />
@@ -188,11 +180,7 @@ const SelectHome = ({ navigation }) => {
         isVisible={warning}
         animationIn={'slideInLeft'}
         animationOut={'slideOutRight'}>
-<<<<<<< HEAD
-        <View style={{ backgroundColor: '#fff', justifyContent: 'center', }}>
-=======
         <View style={{ backgroundColor: '#fff' }}>
->>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
           <Text>Are you sure you want to log out?</Text>
           <View style={styles.buttonGroup}>
             <TouchableOpacity
@@ -208,11 +196,7 @@ const SelectHome = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-<<<<<<< HEAD
-      <Modal
-=======
       {/*   <Modal
->>>>>>> ec0e7d37058966a5beb01baac05f5d7a1273ab6b
                 useNativeDriver={true}
                 visible={warning}
                 swipeDirection={['up', 'down']} // can be string or an array

@@ -11,9 +11,9 @@ export default function QuizReport() {
   const skipped = isJson(useSelector((state) => state.quiz.skipped));
   const infos = useMemo(() => {
     return [
-      { name: 'check-square', value: correct.length },
-      { name: 'times', value: wrong.length },
-      { name: 'equals', value: score, type: 'font-awesome-5' },
+      { name: 'correct', value: correct.length },
+      { name: 'wrong', value: wrong.length },
+      { name: 'score', value: score, type: 'font-awesome-5' },
     ];
   }, [correct.length, wrong.length, score]);
 
@@ -49,6 +49,9 @@ export default function QuizReport() {
 
 const style = StyleSheet.create({
   update: {
+    flex: 1,
+    marginRight: 50,
+    // width: '85%',
     flexDirection: 'row',
   },
   count: {
