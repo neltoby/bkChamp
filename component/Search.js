@@ -49,7 +49,7 @@ export default function Search({navigation, route}) {
             dispatch(actionCreator(SEARCH_ITEM_ARRAY, []))
         }
     }, [])
-    console.log(useSelector(state => state.search))
+    null
 
     return (
         <Container style={style.container}>

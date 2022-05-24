@@ -43,7 +43,7 @@ export default function winnersReducer(state = initialState, action) {
     case SET_DAILY_WINNERS: {
       return produce(state, (draft) => {
         draft.daily_winners = action.payload;
-        console.log(draft.daily_winners)
+        null
       });
     }
     case DAILY_WINNER_LOADING_FAILED: {

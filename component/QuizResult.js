@@ -55,7 +55,7 @@ export default function QuizResult({navigation}) {
                 unanswered.push(element.id)
             });
             let payload = {skipped, undisplayed: unanswered, score}
-            console.log(payload)
+            null
             dispatch(endGame({payload}))
         }
         return () => {

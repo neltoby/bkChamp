@@ -37,7 +37,7 @@ export const answered = (payload) => {
 };
 
 export const setOverlay = (payload) => {
-  console.log('setOlays called');
+  null
   return {
     type: SET_OVERLAY,
     payload,
@@ -147,11 +147,10 @@ export const registerPoint = (payload) => {
                 dispatch(updateUser({ name: 'points', value: payload }));
               }
             },
-            (err) => console.log(err, 'err in sql')
+            (err) => null
           );
         },
-        (err) => console.log(err, 'err in buying point transaction'),
-        () => console.log('successful buy point transaction ')
+        (err) => null
       );
     })();
   };
@@ -166,13 +165,12 @@ export const createdb = async () => {
         sql,
         null,
         (txO, { rows }) => {
-          console.log('successfully created table');
+          null
         },
-        (err) => console.log(err, 'from createdb')
+        (err) => null
       );
     },
-    (err) => console.log(err, 'from createdb'),
-    () => console.log('successfully created')
+    (err) => null
   );
 };
 
@@ -186,9 +184,9 @@ export const registerQuestion = async (payload) => {
           sql,
           [id, 'skipped'],
           (txO, { rowsAffected }) => {
-            console.log(rowsAffected);
+            null
           },
-          (err) => console.log(err)
+          (err) => null
         );
       });
       undisplayed.forEach((id) => {
@@ -196,14 +194,13 @@ export const registerQuestion = async (payload) => {
           sql,
           [id, 'undisplayed'],
           (txO, { rowsAffected }) => {
-            console.log(rowsAffected);
+            null
           },
-          (err) => console.log(err)
+          (err) => null
         );
       });
     },
-    (err) => console.log(err, 'register failed'),
-    () => console.log('successful')
+    (err) => null
   );
 };
 
@@ -217,9 +214,9 @@ export const removeQuestions = async (payload) => {
           sql,
           [id],
           (txO, { rowsAffected }) => {
-            console.log(rowsAffected, 'removed successfully');
+            null
           },
-          (err) => console.log(err)
+          (err) => null
         );
       });
       undisplayed.forEach((id) => {
@@ -227,21 +224,20 @@ export const removeQuestions = async (payload) => {
           sql,
           [id],
           (txO, { rowsAffected }) => {
-            console.log(rowsAffected, 'removed successfully');
+            null
           },
-          (err) => console.log(err)
+          (err) => null
         );
       });
     },
-    (err) => console.log(err, 'removed failed'),
-    () => console.log('successfully removed')
+    (err) => null
   );
 };
 
 export const quizDispatcher = (payload) => {
   try {
     const { id, questions } = payload;
-    console.log(id, questions, "<===request payload")
+    null
     let easy = [];
     let moderate = [];
     let difficult = [];
@@ -286,6 +282,6 @@ export const quizDispatcher = (payload) => {
     });
     return { id, easy, moderate, difficult };
   } catch (err) {
-    console.log(err);
+    null
   }
 };

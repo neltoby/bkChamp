@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Container, Content, Toast } from 'native-base';
 import React, { useEffect } from 'react';
 import {
+  useWindowDimensions,
   ActivityIndicator,
   Dimensions, Image, StatusBar, StyleSheet, Text, View
 } from 'react-native';
@@ -33,9 +34,13 @@ const data = [
 const deviceHeight = Dimensions.get("window").height;
 
 const QuizScreen = ({ navigation }) => {
+  // const {width, height} = useWindowDimensions()
   const dispatch = useDispatch();
   const windowWidth = deviceSize().deviceWidth;
   const windowHeight = deviceSize().deviceHeight;
+  const store = useSelector(state => state)
+  null
+
   const points = isJson(useSelector((state) => state.user.user)).points;
   const loading = isJson(useSelector((state) => state.quiz)).loadingQuiz;
   const errStateGame = isJson(useSelector((state) => state.quiz)).startGameErr;

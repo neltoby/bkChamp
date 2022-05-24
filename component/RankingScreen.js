@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { Container, Content } from 'native-base';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, FlatList, StatusBar, StyleSheet, Text, View, ActivityIndicator, RefreshControl } from 'react-native';
+import {useWindowDimensions, Dimensions, FlatList, StatusBar, StyleSheet, Text, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLiveRanks, getWeeklyWinners } from '../actions/request';
@@ -14,6 +14,7 @@ import WeeklyWinners from './WeeklyWins';
 const deviceWidth = Dimensions.get('screen').width;
 
 const RankingScreen = () => {
+  const {height, width } = useWindowDimensions()
   const [refreshing, setRefreshing] = useState(false)
   const winnersStore = isJson(useSelector((state) => state.winners));
   const userStore = isJson(useSelector((state) => state.user));
@@ -24,7 +25,7 @@ const RankingScreen = () => {
   const refContainer = useRef(null);
 
   const onSuccess = async () => {
-    console.log('onsuccess was called');
+    null
     setRefreshing(!refreshing)
     dispatch(getLiveRanks());
     setRefreshing(!refreshing)
@@ -52,12 +53,12 @@ const RankingScreen = () => {
       return () => clearInterval(intervalId);
     }, [])
   );
-  console.log(current_user, "<===current_user");
+  null
   const renderUsers = (user, index) => {
     const rankBgColor = index % 2 === 0 ? '#CCCCFF' : '#fff';
     const user_color = user.user_id === current_user.username ? "#00ff00" : "#000"
     return (
-      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', height, width }}>
         <View style={styles.rank}>
           <Card style={{ paddingVertical: 15, backgroundColor: rankBgColor }}>
             <View

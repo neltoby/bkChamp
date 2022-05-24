@@ -98,33 +98,32 @@ export const logOutUser = (payload) => {
                                   sqlxii,
                                   null,
                                   (txOb, { rows }) => {
-                                    console.log('successfully dropped table');
+                                    null
                                     dispatch(notLogin());
                                   },
                                   (err) =>
-                                    console.log(err, 'failed dropped endpoints')
+                                    null
                                 );
                               },
-                              (err) => console.log('failed search dropped')
+                              (err) => null
                             );
                           },
-                          (err) => console.log('failed unsent drooped')
+                          (err) => null
                         );
                       },
-                      (err) => console.log('failed archiveunsent dropped')
+                      (err) => null
                     );
                   },
-                  (err) => console.log('failed dropped user')
+                  (err) => null
                 );
               },
-              (err) => console.log('failed dropped archive')
+              (err) => null
             );
           },
-          (err) => console.log(err, 'failed err dropping table')
+          (err) => null
         );
       },
-      (err) => console.log(err, 'failed transxn'),
-      () => console.log('successful transxn')
+      (err) => null
     );
   };
 };
@@ -151,18 +150,17 @@ export const loginDetails = (payload) => {
                   txO.executeSql(
                     sqlii,
                     Object.values(payload),
-                    (txOI, { rowsAffected }) => { dispatch(userProfile(payload));},
-                    (err) => console.log(err, 'sqlii query failed loginDetails')
+                    (txOI, { rowsAffected }) => { dispatch(userProfile({user_pk: payload.id, ...payload}));},
+                    (err) => null
                   );
                 },
-                (err) => console.log(err, 'sqli query failed loginDetails')
+                (err) => null
               );
             },
-            (err) => console.log(err, 'sql query failed loginDetails')
+            (err) => null
           );
         },
-        (err) => console.log(err, 'form transacto'),
-        () => console.log('user trnsaction success loginDetails')
+        (err) => null
       );
     })();
   };
@@ -170,16 +168,20 @@ export const loginDetails = (payload) => {
 export const verificationPoint = (payload) => {
   return (dispatch, getState) => {
     (async () => {
-        console.log("next=>1", payload)
-      dispatch(userProfile(payload));
+        null
+      dispatch(userProfile({user_pk: payload.id, ...payload}));
       dispatch(vNumber(payload.email_token))
-      
-      const sql = 'DROP TABLE IF EXISTS user';
+       const sql = 'DROP TABLE IF EXISTS user';
       const sqli =
         'CREATE TABLE IF NOT EXISTS user(id INT PRIMARY KEY, user_pk INT, username TEXT, email TEXT, phone_number INT, fullname TEXT, institution TEXT, date_of_birth TEXT, gender TEXT, image TEXT, points INT)';
       const sqlii =
-        'INSERT INTO user(user_pk, username, email, phone_number, fullname, institution, date_of_birth, gender, points, image) VALUES(?,?,?,?,?,?,?,?,?,?)';
+        'INSERT INTO user(username, email, phone_number, fullname, institution, date_of_birth, gender, points, image) VALUES(?,?,?,?,?,?,?,?,?,?)';
       delete payload.token;
+      delete payload.email_token;
+      delete payload.id
+      delete payload.referee
+      delete payload.referral_code
+      null
       db.transaction(
         (tx) => {
           tx.executeSql(
@@ -194,20 +196,19 @@ export const verificationPoint = (payload) => {
                     sqlii,
                     Object.values(payload),
                     (txOI, { rowsAffected }) => {
-                      console.log("tagged-2", payload)
+                      null
                       dispatch(userProfile(payload));
                     },
-                    (err) => console.log(err, 'sqlii query failed')
+                    (err) => null
                   );
                 },
-                (err) => console.log(err, 'sqli query failed')
+                (err) => null
               );
             },
-            (err) => console.log(err, 'sql query failed')
+            (err) => null
           );
         },
-        (err) => console.log(err),
-        () => console.log('user trnsaction success')
+        (err) => null
       );
     })();
   };
@@ -224,18 +225,19 @@ export const loginWithUser = (payload) => {
             null,
             (txObj, { rows }) => {
               const { _array } = rows;
-              dispatch(userProfile(_array[0]));
-              if (payload === true) {
+              null
+              if (payload === true && _array[0]) {
+                dispatch(userProfile(_array[0]));
                 dispatch(login());
               } else {
                 dispatch(verification());
               }
             },
-            (err) => console.log(err, 'failed getting details')
+            (err) => null
           );
         },
-        (err) => console.log(err, 'err from login transaction'),
-        () => console.log('login transaction successful')
+        (err) => null
+        // () => null
       );
     })();
   };

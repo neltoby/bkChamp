@@ -36,10 +36,10 @@ const App = () => {
         ...MaterialIcons.font,
         ...MaterialCommunityIcons.font,
       });
-      console.log(locaFonts)
+      null
     }
     catch (e) {
-      console.log(e, "font w")
+      null
     }
     finally {
       const localUris = await Asset.loadAsync([
@@ -56,7 +56,7 @@ const App = () => {
       const val = await getKey(loginValue);
       const value = await getKey(confirm);
 
-      // console.log(localUris, "<== localuris");
+      // null
 
       if (val !== undefined && val !== null) {
         store.dispatch(loginWithUser(true));

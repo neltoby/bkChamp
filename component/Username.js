@@ -33,7 +33,7 @@ const Username = ({ navigation, route }) => {
   details['password'] = route.params !== undefined ? route.params.password : '';
   const loading = useSelector((state) => state.login).createUser;
   const errSignUp = useSelector((state) => state.login).signUpErr;
-  console.log(loading, 'value for loading');
+  null
 
   const dispatch = useDispatch();
 
@@ -56,7 +56,7 @@ const Username = ({ navigation, route }) => {
         detail.phone_number.length === 10
           ? `0${detail.phone_number}`
           : detail.phone_number;
-      console.log(detail);
+      null
       dispatch(createUserLoading());
       // To be restored to VerificationBody once email verification is online
       const val = await getKey(confirm);
@@ -81,7 +81,7 @@ const Username = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (errSignUp !== null) {
-        console.log(errSignUp)
+        null
         Toast.show({
           text: errSignUp.split(":")[1],
           buttonText: 'CLOSE',

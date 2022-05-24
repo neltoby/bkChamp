@@ -15,7 +15,7 @@ export default function QuizFooter() {
     const skipQuestion = (id) => {
         dispatch(skip(id))
         if( level === 'difficult' && allQuestion[level].length === 0 ){
-            console.log('end')
+            null
             dispatch(settime(''))
             dispatch(setOverlay('end'))
         }else{

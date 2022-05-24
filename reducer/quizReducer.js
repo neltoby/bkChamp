@@ -240,7 +240,7 @@ export default function quizReducer(state = initialState, action) {
     }
     case NO_POINTS: {
       return produce(state, (draft) => {
-        console.log(action.payload);
+        null
         draft.noPoints = action.payload;
       });
     }

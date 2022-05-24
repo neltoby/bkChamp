@@ -23,7 +23,7 @@ const Splash = ({ navigation }) => {
         (async () => {
             const val = await getKey(loginValue)
             const value = await getKey(confirm)
-            console.log(val)
+            null
             if(val !== undefined && val !== null){
                 dispatch(login())
             }else{

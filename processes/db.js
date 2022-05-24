@@ -9,7 +9,7 @@ export const imageBase64 = (fileUri = '../img/previewImage.jpg') => {
         const base64 = FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.Base64 })
         return `data:image/png;base64,${base64}`
     } catch (err) {
-        console.log(err.message)
+        null
     }
 }
 

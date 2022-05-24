@@ -9,7 +9,7 @@ import { passwordStrength } from 'check-password-strength';
 
 const checkPasswordStrength = (value) => {
     if (value) {
-        console.log(passwordStrength(value));
+        null
         return passwordStrength(value);
     }
     return '';

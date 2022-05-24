@@ -17,7 +17,7 @@ export const loadingWeeklyWinners = () => {
 
 export const onWeeklyWinnersSuccess = (payload) => {
   return function (dispatch, getState) {
-    console.log(payload);
+    null
     dispatch(setWeeklyWinners(payload));
     dispatch(loadingWeeklyWinnersStop());
   };
@@ -51,7 +51,7 @@ export const loadingDailyWinners = () => {
 // onWinnersSuccess insert the payload into the Table Winners
 export const onDailyWinnersSuccess = (payload) => {
   return function (dispatch, getState) {
-    console.log(payload, '<====payload');
+    null
     let new_arr = [];
     payload.forEach((user) => {
       // returns the user_id in the new array, if it exists

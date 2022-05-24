@@ -79,34 +79,33 @@ const SelectHome = ({ navigation }) => {
                                   sqlxii,
                                   null,
                                   (txOb, { rows }) => {
-                                    console.log('successfully dropped table');
+                                    null
                                     dispatch(notLogin());
                                     navigation.navigate('Login');
                                   },
                                   (err) =>
-                                    console.log(err, 'failed dropped endpoints')
+                                    null
                                 );
                               },
-                              (err) => console.log('failed search dropped')
+                              (err) => null
                             );
                           },
-                          (err) => console.log('failed unsent drooped')
+                          (err) => null
                         );
                       },
-                      (err) => console.log('failed archiveunsent dropped')
+                      (err) => null
                     );
                   },
-                  (err) => console.log('failed dropped user')
+                  (err) => null
                 );
               },
-              (err) => console.log('failed dropped archive')
+              (err) => null
             );
           },
-          (err) => console.log(err, 'failed err dropping table')
+          (err) => null
         );
       },
-      (err) => console.log(err, 'failed transxn'),
-      () => console.log('failed successful transxn')
+      (err) => null
     );
   };
 

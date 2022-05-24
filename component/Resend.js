@@ -3,6 +3,7 @@ import React, { memo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { vNumber } from '../actions/login'
+import { requestVerification } from '../actions/request'
 
 export default function Resend() {
     const [disabled, setDisabled] = useState(false)
@@ -10,7 +11,7 @@ export default function Resend() {
     const resend = () => {
         setDisabled(true)
         dispatch(vNumber(23456))
-    //   dispatch(requestVerification({email}))
+      dispatch(requestVerification({email}))
 
         Toast.show({
             text: 'You will be able to send again in 10s',

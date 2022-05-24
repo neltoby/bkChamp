@@ -8,27 +8,31 @@ import { confirm, loginValue } from '../processes/lock'
 import { useDispatch, useSelector } from 'react-redux';
 import { vNumber, verification, welcome } from '../actions/login'
 import { Toast } from 'native-base';
-import { requestVerification, verifyEmail } from '../actions/request';
-
+import { awaitingRequest, requestVerification, verifyEmail } from '../actions/request';
+import isJson from '../processes/isJson';
 export default function VerificationBody({ navigation }) {
     // const codes = useSelector(state => state.login).v_number
-    const {user, request} = useSelector(state => state)
+    const email = isJson(useSelector((state) => state.user)).user.email;
+    null
+    const request_status = isJson(useSelector(state => state.request)).status
+
     const ref = useRef('')
     const dispatch = useDispatch()
 
     useFocusEffect(
     useCallback(() => {
-      dispatch(requestVerification({email: user.email}))
+      dispatch(requestVerification({ email}))
     }, [])
   );
 
     const onFulfill = async (code) => {
-        dispatch(verifyEmail({ email: user.email, email_token: code }))
-        if(request.status === "success"){
-        // if(code == codes){
-            console.log(code)
+        dispatch(verifyEmail({ email, email_token: code }))
+        null
+        if (request_status === "success") {
+            // if(code == login.v_number){
+            null
             const val = await getKey(confirm)
-            if(val !== undefined && val !== null){
+            if (val !== undefined && val !== null) {
                 // signed up but haven't confirmed 
                 await storeKey(loginValue, val)
                 await deleteKey(confirm)
@@ -38,14 +42,14 @@ export default function VerificationBody({ navigation }) {
                 
             }
             navigation.navigate('FinishSignUp')
-            // else if(request.status === "failed"){}
-        } else {
+        } else if(request_status === "failed"){
+        // } else {
             Toast.show({
                 text: "Invalid Token",
                 type: "danger",
                 duration: 5000
             })
-            console.log(code, 'error in the inputed code', code)
+            null
         }
     }
     // useFocusEffect(
@@ -96,6 +100,7 @@ export default function VerificationBody({ navigation }) {
                     onFulfill={(code) => onFulfill(code)}
                 />                                              
             </View>
+            {request_status === "awaiting" && <Text>Verifying...</Text>}
         </>
     )
 }

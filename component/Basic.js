@@ -49,7 +49,7 @@ const Basic = (props) => {
     });
   };
   const makePayment = () => {
-    //console.log(transaction_ref)
+    //null
     const payment_data = {
       game_plan: `${itemSelect.amt} plan`,
       reference_code: `${reference_code}`,
@@ -111,10 +111,10 @@ const Basic = (props) => {
                 SafeAreaViewContainer={{ marginTop: 0 }}
                 SafeAreaViewContainerModal={{ marginTop: 0 }}
                 handleWebViewMessage={(e) => {
-                  console.log(itemSelect.amt, 'processing');
+                  null
                 }}
                 onCancel={(e) => {
-                  console.log(e, 'cancel response');
+                  null
                 }}
                 onSuccess={({ transactionRef }) => {
                   const { trxref, message, transaction } = transactionRef
