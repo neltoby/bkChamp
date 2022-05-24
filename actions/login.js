@@ -170,6 +170,10 @@ export const loginDetails = (payload) => {
 export const verificationPoint = (payload) => {
   return (dispatch, getState) => {
     (async () => {
+        console.log("next=>1", payload)
+      dispatch(userProfile(payload));
+      dispatch(vNumber(payload.email_token))
+      
       const sql = 'DROP TABLE IF EXISTS user';
       const sqli =
         'CREATE TABLE IF NOT EXISTS user(id INT PRIMARY KEY, user_pk INT, username TEXT, email TEXT, phone_number INT, fullname TEXT, institution TEXT, date_of_birth TEXT, gender TEXT, image TEXT, points INT)';
@@ -190,6 +194,7 @@ export const verificationPoint = (payload) => {
                     sqlii,
                     Object.values(payload),
                     (txOI, { rowsAffected }) => {
+                      console.log("tagged-2", payload)
                       dispatch(userProfile(payload));
                     },
                     (err) => console.log(err, 'sqlii query failed')
@@ -219,7 +224,6 @@ export const loginWithUser = (payload) => {
             null,
             (txObj, { rows }) => {
               const { _array } = rows;
-              console.log(_array[0]);
               dispatch(userProfile(_array[0]));
               if (payload === true) {
                 dispatch(login());

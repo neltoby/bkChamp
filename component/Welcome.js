@@ -9,7 +9,7 @@ import logo from '../processes/image';
 
 const Welcome = ({ navigation }) => {
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user);
   const nextSlide = () => {
     dispatch(welcome('Home'));
     navigation.navigate('Home');
@@ -28,7 +28,7 @@ const Welcome = ({ navigation }) => {
             <Image source={logo()} style={style.img} />
           </View>
           <View style={style.backgrounds}>
-            <Text style={style.text}>WELCOME {store.user.username}</Text>
+            <Text style={style.text}>WELCOME {user.username}</Text>
             <View style={style.empty}></View>
           </View>
           <View style={style.note}>

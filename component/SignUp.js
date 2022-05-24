@@ -139,11 +139,11 @@ const SignUp = ({ navigation, route }) => {
                 </View>
                 <View style={style.const}>
                     <Input
-                        label='FullName'
+                        label='Full Name'
                         labelStyle={style.label}
                         inputContainerStyle={style.inputs}
                         inputStyle={style.input}
-                        placeholder='FullName'
+                        placeholder='Full Name'
                         autoCompleteType='name'
                         leftIcon={
                             <Icon

@@ -5,7 +5,7 @@ import { Button, Container, Content, Form, Spinner, Toast } from 'native-base';
 import React, { useState } from 'react';
 // import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals'
 import {
-  Alert, BackHandler, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View
+  Alert, BackHandler, Image, Linking, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import { Icon, Input } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,9 +28,9 @@ const Login = ({ navigation, route }) => {
   const exit = store.login.exitLogin;
   const signUpMsg = route.params;
   const [loginAlert, setloginAlert] = useState(false);
-  if (signUpMsg) {
-    () => setloginAlert(signUpMsg.open);
-  }
+  
+  if (signUpMsg) setloginAlert(signUpMsg.open);
+  
   const signUp = () => {
     navigation.navigate('SignUp');
   };
@@ -50,6 +50,7 @@ const Login = ({ navigation, route }) => {
           Toast.show({
             text: `Offline mode`,
             buttonText: 'CLOSE',
+            type: 'danger'
           });
         } else {
           if (isConnected && isInternetReachable) {
@@ -61,6 +62,7 @@ const Login = ({ navigation, route }) => {
         Toast.show({
           text: `Username and password required`,
           buttonText: 'CLOSE',
+          type: "danger"
         });
       }
     } catch (error) {
@@ -68,6 +70,7 @@ const Login = ({ navigation, route }) => {
       Toast.show({
         text: `Network request failed`,
         buttonText: 'CLOSE',
+        type: 'danger'
       });
     }
   };
@@ -92,11 +95,12 @@ const Login = ({ navigation, route }) => {
     }, [store.login.login])
   );
 
-  let toast =
     store.request.status === 'failed'
       ? Toast.show({
         text: store.request.err,
         buttonText: 'CLOSE',
+        duration: 5000,
+        type: 'danger',
       })
       : null;
   return (
@@ -166,6 +170,8 @@ const Login = ({ navigation, route }) => {
               }
               onChangeText={(value) => setPassword(value)}
             />
+            <Text style={{ fontSize: 14, color: "white", marginLeft: 10 }} onPress={async () => await Linking.openURL('https://thebookchamp.com/password_reset')}>Forgot Password?</Text>
+
             <Button
               disabled={store.login.status === 'loading' ? true : false}
               block

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { LOGGEDIN } from '../actions/login';
 import isJson from '../processes/isJson';
 import ConfirmNumber from './ConfirmNumber';
+import FinishSignUp from './FinishSignUp';
 import Home from './Home';
 import Login from './Login';
 import SignUp from './SignUp';
@@ -53,6 +54,11 @@ const Manager = () => {
                 name="UploadDp"
                 component={UploadDp}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name='FinishSignUp'
+                component={FinishSignUp}
+                options={{headerShown: false}}
               />
             </Stack.Navigator>
           ) : (

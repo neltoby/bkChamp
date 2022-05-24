@@ -56,7 +56,7 @@ const App = () => {
       const val = await getKey(loginValue);
       const value = await getKey(confirm);
 
-      console.log(localUris, "<== localuris");
+      // console.log(localUris, "<== localuris");
 
       if (val !== undefined && val !== null) {
         store.dispatch(loginWithUser(true));

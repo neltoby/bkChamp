@@ -479,8 +479,9 @@ export const signUp = (payload, navigateFxn) => {
           const obj = isJson(json);
           if (obj.constructor === Object && obj.token) {
             const objs = JSON.parse(JSON.stringify(obj));
+            console.log("tagged-1", objs)
             dispatch(verificationPoint(objs));
-            dispatch(vNumber(23456));
+            // dispatch(vNumber(23456));
             return obj;
           } else {
             const val = Object.entries(obj);
@@ -502,6 +503,59 @@ export const signUp = (payload, navigateFxn) => {
     })();
   };
 };
+
+export const requestVerification = (payload) => {
+  return (dispatch, getState) => {
+    (async () => {
+      const val = await getKey(loginValue);
+ 
+      const param = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+          Authorization: `Token ${val}`,
+      },
+      body: JSON.stringify(payload),
+      };
+      dispatch(awaitingRequest())
+      await fetch(`${domain}verify_email_request`, param)
+        .then(res => res.json)
+        .then((data) => {
+          dispatch(successfulRequest())
+        })
+        .catch((error) => {
+        dispatch(failedRequest())
+      })
+    })()
+  }
+}
+
+export const verifyEmail = (payload) => {
+  return (dispatch, getState) => {
+    (async () => {
+      const val = await getKey(loginValue);
+ 
+      const param = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+          Authorization: `Token ${val}`,
+      },
+      body: JSON.stringify(payload),
+      };
+     dispatch(awaitingRequest())
+      await fetch(`${domain}verify_email`, param)
+        .then(res => res.json)
+        .then((data) => {
+          dispatch(successfulRequest())
+        })
+        .catch((error) => {
+        dispatch(failedRequest())
+      })
+    })()
+  }
+}
+
 export const callStartGame = (fxn = null) => {
   return (dispatch, getState) => {
     (async () => {

@@ -1,9 +1,16 @@
 import React, { memo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { Button, Overlay } from 'react-native-elements'
+import { Button, Overlay, Icon } from 'react-native-elements'
+import { useDispatch } from 'react-redux'
+import { login, welcome } from '../actions/login'
 
 export default function FinishSignUp(props) {
-    const { visible } = props
+    const dispatch = useDispatch()
+    const { visible, navigation } = props
+    const nextSlide = () => {
+        dispatch(login())
+        dispatch(welcome('Welcome'))
+    }
     return (
         <Overlay isVisible={visible} >
             <View style={style.modalView}>

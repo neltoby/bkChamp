@@ -46,7 +46,7 @@ const Username = ({ navigation, route }) => {
     });
   };
   const nextSlide = () => {
-    navigation.navigate('UploadDp');
+    navigation.navigate('ConfirmNumber');
     // setVisible(false)
   };
   const handleSignUp = async () => {
@@ -65,10 +65,10 @@ const Username = ({ navigation, route }) => {
         await storeKey(loginValue, val);
         await deleteKey(confirm);
         // verication state set to false indicates that user is verified and confirm token removed
-        await dispatch(verification(false));
-        navigation.navigate('UploadDp');
+         dispatch(verification(false));
+        navigation.navigate('Welcome');
       }
-      dispatch(signUp({ ...detail, username }, nextSlide));
+       dispatch(signUp({ ...detail, username }, nextSlide))
       setUserName('');
     } else {
       Toast.show({
@@ -81,10 +81,12 @@ const Username = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (errSignUp !== null) {
+        console.log(errSignUp)
         Toast.show({
-          text: errSignUp,
+          text: errSignUp.split(":")[1],
           buttonText: 'CLOSE',
-          duration: 3000,
+          duration: 5000,
+
         });
       }
       return () => { };

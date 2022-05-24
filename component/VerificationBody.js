@@ -6,15 +6,26 @@ import CodeInput from 'react-native-confirmation-code-input'
 import { Icon } from 'react-native-elements'
 import { confirm, loginValue } from '../processes/lock'
 import { useDispatch, useSelector } from 'react-redux';
-import { vNumber, verification } from '../actions/login'
+import { vNumber, verification, welcome } from '../actions/login'
+import { Toast } from 'native-base';
+import { requestVerification, verifyEmail } from '../actions/request';
 
 export default function VerificationBody({ navigation }) {
-    const codes = useSelector(state => state.login).v_number
+    // const codes = useSelector(state => state.login).v_number
+    const {user, request} = useSelector(state => state)
     const ref = useRef('')
     const dispatch = useDispatch()
 
+    useFocusEffect(
+    useCallback(() => {
+      dispatch(requestVerification({email: user.email}))
+    }, [])
+  );
+
     const onFulfill = async (code) => {
-        if(code == codes){
+        dispatch(verifyEmail({ email: user.email, email_token: code }))
+        if(request.status === "success"){
+        // if(code == codes){
             console.log(code)
             const val = await getKey(confirm)
             if(val !== undefined && val !== null){
@@ -22,23 +33,31 @@ export default function VerificationBody({ navigation }) {
                 await storeKey(loginValue, val)
                 await deleteKey(confirm)
                 // verication state set to false indicates that user is verified and confirm token removed
-                await dispatch(verification(false))
-            }
-            navigation.navigate('UploadDp')
-        }else{
-            console.log(codes, 'error in the inputed code', code)
-        }
-    }
-    useFocusEffect(
-        useCallback(() => {
-            if(codes === null){
-                dispatch(vNumber(23456))
-            }
-            return () => {
+                dispatch(verification(false))
+                dispatch(welcome('Welcome'))
                 
             }
-        }, [codes])
-    )
+            navigation.navigate('FinishSignUp')
+            // else if(request.status === "failed"){}
+        } else {
+            Toast.show({
+                text: "Invalid Token",
+                type: "danger",
+                duration: 5000
+            })
+            console.log(code, 'error in the inputed code', code)
+        }
+    }
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         if(codes === null){
+    //             dispatch(vNumber(23456))
+    //         }
+    //         return () => {
+                
+    //         }
+    //     }, [codes])
+    // )
 
 
     return (
@@ -73,7 +92,6 @@ export default function VerificationBody({ navigation }) {
                     className={'border-b'}
                     space={5}
                     size={30}
-                    className='border-b'
                     inputPosition='left'
                     onFulfill={(code) => onFulfill(code)}
                 />                                              

@@ -6,10 +6,7 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 30
         targetSdkVersion = 30
-<<<<<<< HEAD
-=======
         googlePlayServicesAuthVersion = "16.0.1"
->>>>>>> production
         androidXCore= "1.6.0"
     }
     

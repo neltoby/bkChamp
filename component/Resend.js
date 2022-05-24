@@ -10,6 +10,8 @@ export default function Resend() {
     const resend = () => {
         setDisabled(true)
         dispatch(vNumber(23456))
+    //   dispatch(requestVerification({email}))
+
         Toast.show({
             text: 'You will be able to send again in 10s',
             buttonText: "CLOSE",
