@@ -1,19 +1,23 @@
 import { Button, Toast } from 'native-base'
 import React, { memo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { vNumber } from '../actions/login'
 import { requestVerification } from '../actions/request'
+import isJson from '../processes/isJson'
 
 export default function Resend() {
+    const email = isJson(useSelector((state) => state.user)).user.email;
+
     const [disabled, setDisabled] = useState(false)
     const dispatch = useDispatch()
-    const resend = () => {
+    const resend = async () => {
         setDisabled(true)
-        dispatch(vNumber(23456))
-      dispatch(requestVerification({email}))
+        // dispatch(vNumber(23456))
+      await dispatch(requestVerification({email})).unwrap()
 
         Toast.show({
+            type: "success",
             text: 'You will be able to send again in 10s',
             buttonText: "CLOSE",
             duration: 3000

@@ -50,10 +50,10 @@ export const vNumber = (payload) => {
     payload,
   };
 };
-export const verification = (payload) => {
+export const verification = () => {
   return {
     type: VERIFICATION,
-    payload,
+    payload: true,
   };
 };
 export const signUpErr = (payload) => ({ type: SIGN_UP_ERR, payload });

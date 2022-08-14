@@ -11,6 +11,7 @@ import {
   addSearchToDb,
   ADD_SEARCH_ITEM, LOAD_SEARCH, SEARCH_ITEM_ARRAY, SORT_SEARCH
 } from './search';
+import { updateUserinfo } from './user';
 import {
   onDailyWinnersSuccess, onWeeklyWinnersSuccess, winnersErrDis
 } from './winners';
@@ -90,7 +91,6 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
       dispatch(callback(res));
     })
     .catch((error) => {
-      // null
       // const err = error.message === 'A user with this username and password was not found' ?
       // 'A user with this username and password was not found' : 'Failed request' ;
       dispatch(errCallback(error.message));
@@ -473,33 +473,30 @@ export const signUp = (payload, navigateFxn) => {
       await fetch(`${domain}signup`, param)
         .then((res) => res.json())
         .then((json) => {
+          console.log(json)
           // dispatch stop creating user loading
           dispatch(createUserStop());
-          null
           const obj = isJson(json);
           if (obj.constructor === Object && obj.token) {
             const objs = JSON.parse(JSON.stringify(obj));
-            null
             storeKey(confirm, obj.token)
+            console.log(objs)
             dispatch(verificationPoint(objs));
             // dispatch(vNumber(23456));
             return obj;
           } else {
             const val = Object.entries(obj);
-            null
             throw new Error(`${val[0][0]}: ${val[0][1][0]}`);
           }
         })
         .then((obj) => storeKey(confirm, obj.token))
         .then((response) => navigateFxn())
         .catch((err) => {
-          null
           dispatch(signUpErr(err.message));
           dispatch(createUserStop());
           setTimeout(() => {
             dispatch(signUpErr(null));
           }, 3000);
-          null
         });
     })();
   };
@@ -522,7 +519,7 @@ export const requestVerification = (payload) => {
       await fetch(`${domain}verify_email_request`, param)
         .then(res => res.json())
         .then((data) => {
-          null
+          console.log(data)
           dispatch(successfulRequest())
         })
         .catch((error) => {
@@ -536,7 +533,7 @@ export const verifyEmail = (payload) => {
   return (dispatch, getState) => {
     (async () => {
       const val = await getKey(confirm);
-      null
+      console.log(payload)
       const param = {
       method: 'POST',
       headers: {
@@ -549,12 +546,17 @@ export const verifyEmail = (payload) => {
       await fetch(`${domain}verify_email`, param)
         .then(res => res.json())
         .then((data) => {
-          null
-          // dispatch(successfulRequest())
+          if (data.message === "success") {
+            console.log(data, "<=========")
+            storeKey(loginValue, data.token)
+            dispatch(successfulRequest())
+          } else {
+            dispatch(failedRequest())
+          }
         })
         .catch((error) => {
-        dispatch(failedRequest())
-      })
+            dispatch(failedRequest())
+        })
     })()
   }
 }
@@ -628,6 +630,7 @@ export const startGameFxn = (fxn = null) => {
           })
           .then((json) => {
             dispatch(loadQuestion(json));
+    dispatch(updateUserinfo({ name: "points", value: "-1" }))
             if (fxn !== null) fxn();
           })
           .catch((err) => {

@@ -72,6 +72,7 @@ const Username = ({ navigation, route }) => {
       setUserName('');
     } else {
       Toast.show({
+        type: "danger",
         text: 'Fill a username!',
         buttonText: 'CLOSE',
         duration: 3000,
@@ -83,6 +84,7 @@ const Username = ({ navigation, route }) => {
       if (errSignUp !== null) {
         null
         Toast.show({
+          type: "danger",
           text: errSignUp.split(":")[1],
           buttonText: 'CLOSE',
           duration: 5000,
@@ -201,6 +203,26 @@ const Username = ({ navigation, route }) => {
 export default Username;
 
 const style = StyleSheet.create({
+    activity: {
+    flex: 0.3,
+  },
+  cUserContainer: {
+    flex: 0.7,
+  },
+  cUserText: {
+    fontSize: 16,
+    color: '#054078',
+  },
+  createUser: {
+    height: 50,
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 3,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   label: {
     color: '#fff',
   },
@@ -228,23 +250,5 @@ const style = StyleSheet.create({
   inputs: {
     borderColor: '#fff',
   },
-  createUser: {
-    height: 50,
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 3,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  activity: {
-    flex: 0.3,
-  },
-  cUserContainer: {
-    flex: 0.7,
-  },
-  cUserText: {
-    fontSize: 16,
-    color: '#054078',
-  },
+
 });

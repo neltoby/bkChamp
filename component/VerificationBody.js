@@ -10,27 +10,31 @@ import { vNumber, verification, welcome } from '../actions/login'
 import { Toast } from 'native-base';
 import { awaitingRequest, requestVerification, verifyEmail } from '../actions/request';
 import isJson from '../processes/isJson';
+
+
 export default function VerificationBody({ navigation }) {
-    // const codes = useSelector(state => state.login).v_number
+    const login = useSelector(state => state.login)
     const email = isJson(useSelector((state) => state.user)).user.email;
-    null
     const request_status = isJson(useSelector(state => state.request)).status
 
     const ref = useRef('')
     const dispatch = useDispatch()
 
-    useFocusEffect(
-    useCallback(() => {
-      dispatch(requestVerification({ email}))
-    }, [])
-  );
+//     useFocusEffect(
+//     useCallback(() => {
+//       dispatch(requestVerification({ email}))
+//     }, [])
+//   );
 
     const onFulfill = async (code) => {
-        dispatch(verifyEmail({ email, email_token: code }))
-        null
+        navigation.navigate("FinishSignUp")
+        await dispatch(verifyEmail({ email, email_token: code })).unwrap()
         if (request_status === "success") {
-            // if(code == login.v_number){
-            null
+            Toast.show({
+                text: "Email Verified!",
+                type: "success",
+                duration: 5000
+            })
             const val = await getKey(confirm)
             if (val !== undefined && val !== null) {
                 // signed up but haven't confirmed 
@@ -39,30 +43,16 @@ export default function VerificationBody({ navigation }) {
                 // verication state set to false indicates that user is verified and confirm token removed
                 dispatch(verification(false))
                 dispatch(welcome('Welcome'))
-                
             }
-            navigation.navigate('FinishSignUp')
+            return
         } else if(request_status === "failed"){
-        // } else {
-            Toast.show({
+            return Toast.show({
                 text: "Invalid Token",
                 type: "danger",
                 duration: 5000
             })
-            null
         }
     }
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         if(codes === null){
-    //             dispatch(vNumber(23456))
-    //         }
-    //         return () => {
-                
-    //         }
-    //     }, [codes])
-    // )
-
 
     return (
         <>
@@ -85,7 +75,7 @@ export default function VerificationBody({ navigation }) {
                     Please enter the verification text we 
                 </Text>
                 <Text style={style.verificationText}>
-                    sent to  your phone
+                    sent to  your email
                 </Text>
             </View>
             <View style={style.textContainer}>

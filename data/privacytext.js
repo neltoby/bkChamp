@@ -67,7 +67,4 @@ Contact Information
 JVEC Solutions,
 No. 12, Rev. Ogunbiyi Street, Ikeja GRA, Lagos, Nigeria.
 If you have any questions about this Policy, please contact us at info@jvecsolutions.com
-
-
-
 `

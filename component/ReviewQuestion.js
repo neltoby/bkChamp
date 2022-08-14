@@ -136,12 +136,12 @@ const ReviewQuestion = ({ navigation }) => {
                             </View>
                             <View style={style.next}>
                                 {no !== 0 ?
-                                    <Text onPress={() => { prevQuestion() }}>Prev</Text>
+                                    <Text style={{fontSize: 15}} onPress={() => { prevQuestion() }}>Prev</Text>
                                     :
                                     null
                                 }
                                 {no < played.length - 1 ?
-                                    <Text onPress={() => nextQuestion()}>Next</Text>
+                                    <Text style={{fontSize: 15}} onPress={() => nextQuestion()}>Next</Text>
                                     :
                                     null
                                 }

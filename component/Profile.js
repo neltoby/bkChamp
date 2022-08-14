@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import {
   Dimensions, Image as RNImage, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
@@ -13,7 +13,9 @@ import FocusAwareStatusBar from './FocusAwareStatusBar';
 import Image from './Image';
 
 const Profile = (props) => {
+  const [headerDisplay, setHeaderDisplay] = useState("flex")
   const deviceWidth = Dimensions.get('screen').width;
+  const deviceHeight = Dimensions.get('screen').height;
   const { navigation } = props;
   const dispatch = useDispatch();
   const points = isJson(useSelector((state) => state.user.user)).points;
@@ -30,6 +32,18 @@ const Profile = (props) => {
       StatusBar.setBarStyle('light-content');
     }, [])
   );
+
+  useEffect(() => {
+    const es = Dimensions.addEventListener('change', ({window:{width,height}})=>{
+      if (width > height) {
+        setHeaderDisplay("none")
+      } else {
+        setHeaderDisplay("flex")
+      }
+    })
+     return () => es && es.remove()
+  }, [])
+  
 
   const logout = () => {
     dispatch(logoutWarning(true));
@@ -68,7 +82,7 @@ const Profile = (props) => {
   return (
     <SafeAreaView style={style.container}>
       <FocusAwareStatusBar barStyle='light-content' backgroundColor='#054078' />
-      <View style={style.imgContainer}>
+      <View style={{...style.imgContainer, display:headerDisplay}}>
         <LinearGradient
           colors={['transparent', '#fff']}
           style={{ ...style.gradient, height: 150 }}
