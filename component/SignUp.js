@@ -2,12 +2,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { passwordStrength } from 'check-password-strength';
 import { Button as NButton, Content, Toast } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StatusBar, StyleSheet, Text, View, Linking } from 'react-native';
 import { Icon, Input } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import SimpleReactValidator from 'simple-react-validator';
 import { createUserLoading, verification } from '../actions/login';
-import { signUp } from '../actions/request';
+import { idleRequest, signUp } from '../actions/request';
 import deviceSize from '../processes/deviceSize';
 import logo from '../processes/image';
 import { deleteKey, getKey, storeKey } from '../processes/keyStore';
@@ -38,26 +38,47 @@ const SignUp = ({ navigation, route }) => {
      const loading = useSelector((state) => state.login).createUser;
     const errSignUp = useSelector((state) => state.login).signUpErr;
     
-    useFocusEffect(
-        React.useCallback(() => {
-        if (errSignUp !== null) {
+//     useFocusEffect(
+//         React.useCallback(() => {
+//         if (errSignUp !== null) {
+//             null
+//             Toast.show({
+//             type: "danger",
+//             text: errSignUp.split(":")[1],
+//             buttonText: 'CLOSE',
+//             duration: 5000,
+
+//             });
+//         }
+//         return () => { };
+//         }, [errSignUp])
+//   );
+
+    const onSuccess = () => {
+         dispatch(idleRequest())
+         Toast.show({
+            type: "success",
+            text: "You've successfully registered!",
+            buttonText: 'CLOSE',
+            duration: 5000,
+
+            });
+    navigation.navigate('ConfirmNumber');
+    // setVisible(false)
+    };
+    
+    const onFail = ({message = null}) => {
+        if (message !== null) {
             null
             Toast.show({
             type: "danger",
-            text: errSignUp.split(":")[1],
+            text: message.split(":")[1],
             buttonText: 'CLOSE',
             duration: 5000,
 
             });
         }
-        return () => { };
-        }, [errSignUp])
-  );
-
-     const nextSlide = () => {
-    navigation.navigate('ConfirmNumber');
-    // setVisible(false)
-  };
+    }
 
     const handleSignUp = async () => {
         let phone_number =
@@ -79,10 +100,11 @@ const SignUp = ({ navigation, route }) => {
         await deleteKey(confirm);
         // verication state set to false indicates that user is verified and confirm token removed
          dispatch(verification(false));
-        navigation.navigate('Welcome');
+        // navigation.navigate('Welcome');
       }
-       dispatch(signUp(payload, () => {}))
-      setUserName('');
+        dispatch(signUp(payload, onSuccess, onFail))
+        
+    //   setUserName('');
     }
 
     const validate = () => {
@@ -287,13 +309,12 @@ const SignUp = ({ navigation, route }) => {
                                 />
                             }
                             rightIcon={
-                                <Icon
-                                    type='font-awesome'
-                                    name={notVisible ? 'eye' : 'eye-slash'}
-                                    size={24}
-                                    color='#fff'
-                                    onPress={() => setNotVisible(!notVisible)}
-                                />
+                                <Text
+                                onPress={() => setNotVisible(!notVisible)}
+                                style={{ color: "#fff" }}
+                                >
+                                {notVisible ? "Show" : "Hide"}
+                                </Text>
                             }
                             onChangeText={value => checkPassword(value)}
                         />
@@ -331,7 +352,7 @@ const SignUp = ({ navigation, route }) => {
                             style={{ backgroundColor: '#1258ba', width: '100%', borderRadius: 50 }}
                             full
                         >
-                            <Text style={{ color: '#fff' }}>CONTINUE</Text>
+                            <Text style={{ color: '#fff' }}>Sign Up</Text>
                             <Icon
                                 type='font-awesome'
                                 name="chevron-circle-right"
@@ -340,6 +361,8 @@ const SignUp = ({ navigation, route }) => {
                                 containerStyle={{ marginLeft: 8 }}
                             />
                         </NButton>
+          <Text style={{ color: "white", fontSize: 10, padding: 37 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={async () => await Linking.openURL('http://thebookchamp.com/privacy')}>Privacy Policy</Text></Text>
+
                     </View>
                 </View>
                  {loading && (

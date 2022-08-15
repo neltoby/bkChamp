@@ -1,112 +1,103 @@
-import { useFocusEffect } from '@react-navigation/native';
 import {
-  Body, Button as NButton, Content, Header, Icon as NativeIcon, Left,
-  Right, Title, Toast
+  Body, Content, Header, Left,
+  Right, Spinner, Title, Toast
 } from 'native-base';
 import React, { useState } from 'react';
-import {
-  ActivityIndicator, BackHandler, Image,
-  Linking,
-  Platform, StyleSheet, Text, View
-} from 'react-native';
+import { Alert, Image, Text, View } from 'react-native';
 import { Button, Icon, Input } from 'react-native-elements';
+import EStyleSheet from 'react-native-extended-stylesheet';
 import { useDispatch, useSelector } from 'react-redux';
-import { createUserLoading, verification } from '../actions/login';
-import { signUp } from '../actions/request';
+import { login, welcome } from '../actions/login';
+import { editUserProfile } from '../actions/request';
+import { updateUserinfo } from '../actions/user';
 import deviceSize from '../processes/deviceSize';
 import logo from '../processes/image';
-import { deleteKey, getKey, storeKey } from '../processes/keyStore';
-import { confirm, loginValue } from '../processes/lock';
 import Container from './Container';
 import FocusAwareStatusBar from './FocusAwareStatusBar';
-import Overlay from './Overlay';
 
 const Username = ({ navigation, route }) => {
   const [username, setUserName] = useState('');
   const deviceWidth = deviceSize().deviceWidth;
   const deviceHeight = deviceSize().deviceHeight;
-  const details = {};
-  details['fullname'] = route.params !== undefined ? route.params.name : '';
-  details['email'] = route.params !== undefined ? route.params.email : '';
-  details['phone_number'] =
-    route.params !== undefined ? route.params.phone : '';
-  details['password'] = route.params !== undefined ? route.params.password : '';
-  const loading = useSelector((state) => state.login).createUser;
-  const errSignUp = useSelector((state) => state.login).signUpErr;
-  null
-
+  const request_status = useSelector(state => state.request).status
+  console.log(request_status)
   const dispatch = useDispatch();
-
-  const handleBack = () => {
-    navigation.navigate('SignUp', {
-      name: details.fullname,
-      email: details.email,
-      phone: details.phone_number,
-      password: details.password,
-    });
-  };
-  const nextSlide = () => {
-    navigation.navigate('ConfirmNumber');
-    // setVisible(false)
-  };
-  const handleSignUp = async () => {
-    if (username.trim().length > 1) {
-      const detail = JSON.parse(JSON.stringify(details));
-      detail.phone_number =
-        detail.phone_number.length === 10
-          ? `0${detail.phone_number}`
-          : detail.phone_number;
-      null
-      dispatch(createUserLoading());
-      // To be restored to VerificationBody once email verification is online
-      const val = await getKey(confirm);
-      if (val !== undefined && val !== null) {
-        // signed up but haven't confirmed
-        await storeKey(loginValue, val);
-        await deleteKey(confirm);
-        // verication state set to false indicates that user is verified and confirm token removed
-         dispatch(verification(false));
-        navigation.navigate('Welcome');
+  const skip = () => {
+    Alert.alert("Are you sure?", "If you skip this step a default username will be created for you", [
+      {
+        text: "Ok",
+        onPress: nextSlide
+      },
+      {
+        text: "Cancel",
+        onPress: () => { },
+        style: "cancel"
       }
-       dispatch(signUp({ ...detail, username }, nextSlide))
+    ])
+  }
+  const nextSlide = () => {
+      dispatch(login())
+        dispatch(welcome('Welcome'))
+  }
+  const onSuccess = () => {
+    Toast.show({
+      type: "success",
+      text: "Username created", 
+      buttonText: 'CLOSE',
+      duration: 5000,
+    })
+    dispatch(updateUserinfo({name: "username", value: username}))
+  nextSlide()
+  };
+
+   const onFail = ({message = null}) => {
+        if (message !== null) {
+            null
+            Toast.show({
+            type: "danger",
+            text: message.split(":")[1],
+            buttonText: 'CLOSE',
+            duration: 5000,
+
+            });
+        }
+    }
+  const updateUsername = async () => {
+    if (username.trim().length > 1) {
+      if (username.trim().split(" ").length === 1) {
+        dispatch(editUserProfile({username }, onSuccess, onFail))
+      } else {
+        Toast.show({
+          type: "danger",
+          text: "Username may not contain spoaces",
+           buttonText: 'CLOSE',
+        duration: 3000,
+        })
+      }
       setUserName('');
     } else {
       Toast.show({
         type: "danger",
-        text: 'Fill a username!',
+        text: 'Please fill a username',
         buttonText: 'CLOSE',
         duration: 3000,
       });
     }
   };
-  useFocusEffect(
-    React.useCallback(() => {
-      if (errSignUp !== null) {
-        null
-        Toast.show({
-          type: "danger",
-          text: errSignUp.split(":")[1],
-          buttonText: 'CLOSE',
-          duration: 5000,
+  
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const backAction = () => {
+  //       handleBack();
+  //       return true;
+  //     };
 
-        });
-      }
-      return () => { };
-    }, [errSignUp])
-  );
-  useFocusEffect(
-    React.useCallback(() => {
-      const backAction = () => {
-        handleBack();
-        return true;
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', backAction);
-      return () => {
-        BackHandler.removeEventListener('hardwareBackPress', backAction);
-      };
-    }, [])
-  );
+  //     BackHandler.addEventListener('hardwareBackPress', backAction);
+  //     return () => {
+  //       BackHandler.removeEventListener('hardwareBackPress', backAction);
+  //     };
+  //   }, [])
+  // );
 
   return (
     <>
@@ -117,11 +108,11 @@ const Username = ({ navigation, route }) => {
         />
         <Header transparent>
           <Left>
-            <NButton transparent onPress={handleBack}>
+            {/* <NButton transparent onPress={handleBack}>
               <NativeIcon
                 name={Platform.OS == 'ios' ? 'chevron-back' : 'arrow-back'}
               />
-            </NButton>
+            </NButton> */}
           </Left>
           <Body>
             <Title>Book Champ</Title>
@@ -137,12 +128,11 @@ const Username = ({ navigation, route }) => {
             justifyContent: 'center',
           }}>
           <View style={style.usertextContainer}>
-            <Text style={style.usertext}>Create a username</Text>
+            <Text style={style.usertext}>You're almost there!, create a unique username to identify yourself on Book Champ</Text>
           </View>
           <View style={style.inputContainer}>
             <Input
               value={username}
-              label="Username"
               labelStyle={style.label}
               inputContainerStyle={style.inputs}
               inputStyle={style.input}
@@ -160,7 +150,7 @@ const Username = ({ navigation, route }) => {
           </View>
           <View style={{ ...style.viewImg, marginTop: 20 }}>
             <Button
-              onPress={handleSignUp}
+              onPress={updateUsername}
               raised
               buttonStyle={{ width: 150, backgroundColor: '#1258ba' }}
               type="solid"
@@ -174,35 +164,21 @@ const Username = ({ navigation, route }) => {
               }
               iconRight
               titleStyle={{ marginRight: 10 }}
-              title="SIGN UP"
+              title={request_status.status === "awaiting" ? "Creating username...": "Continue"}
             />
+            <Text style={style.skipText} onPress={skip}>{"Skip>>"}</Text>
           </View>
-          <Text style={{ color: "white", fontSize: 10 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={async () => await Linking.openURL('http://bookchamp.herokuapp.com/privacy')}>Privacy Policy</Text></Text>
         </Content>
       </Container>
-      {loading ? (
-        <Overlay
-          isVisible={true}
-          deviceHeight={deviceHeight}
-          deviceWidth={deviceWidth}>
-          <View style={style.createUser}>
-            <View style={style.activity}>
-              <ActivityIndicator color="#054078" size={24} />
-            </View>
-            <View style={style.cUserContainer}>
-              <Text numberOfLines={1} style={style.cUserText}>
-                signing you up ...
-              </Text>
-            </View>
-          </View>
-        </Overlay>
-      ) : null}
+      
     </>
   );
 };
+
+//eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NDcwLCJleHAiOjE2NjIxNzQ2MTV9.RQby_ff1_2ACbidGFfcRjYp-ujGZ1PyeOVeVCNaZLbc
 export default Username;
 
-const style = StyleSheet.create({
+const style = EStyleSheet.create({
     activity: {
     flex: 0.3,
   },
@@ -232,12 +208,15 @@ const style = StyleSheet.create({
   },
   viewImg: {
     margin: 10,
+    justifyContent: "space-between",
     alignItems: 'center',
   },
   usertextContainer: {
     alignItems: 'center',
+    padding: '2rem'
   },
   usertext: {
+    textAlign: "center",
     fontSize: 22,
     color: '#fff',
   },
@@ -250,5 +229,9 @@ const style = StyleSheet.create({
   inputs: {
     borderColor: '#fff',
   },
-
+  skipText: {
+    margin: "3rem",
+    color: "#fff",
+    fontSize: "1rem"
+  }
 });

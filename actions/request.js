@@ -1,6 +1,6 @@
 import { db } from '../processes/db';
 import isJson from '../processes/isJson';
-import { getKey, storeKey } from '../processes/keyStore';
+import { deleteKey, getKey, storeKey } from '../processes/keyStore';
 import { confirm, loginValue } from '../processes/lock';
 import { createUserLoading, createUserStop, login, loginDetails, loginStatus, logOutUser, signUpErr, verificationPoint, vNumber } from './login';
 import {
@@ -18,9 +18,15 @@ import {
 export const AWAITING_REQUEST = 'AWAITING_REQUEST';
 export const SUCCESSFUL_REQUEST = 'SUCCESSFUL_REQUEST';
 export const FAILED_REQUEST = 'FAILED_REQUEST';
+export const IDLE_REQUEST = 'IDLE_REQUEST';
 
 const domain = 'https://bookchamp.herokuapp.com/api/v1/';
 
+export const idleRequest = () => {
+  return {
+    type: IDLE_REQUEST
+  }
+}
 export const awaitingRequest = () => {
   return {
     type: AWAITING_REQUEST,
@@ -457,7 +463,7 @@ export const endGame = (payloads) => {
   };
 };
 
-export const signUp = (payload, navigateFxn) => {
+export const signUp = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
       // dispatch creating user loading
@@ -490,9 +496,11 @@ export const signUp = (payload, navigateFxn) => {
           }
         })
         .then((obj) => storeKey(confirm, obj.token))
-        .then((response) => navigateFxn())
+        .then((response) => onSuccess())
         .catch((err) => {
+          console.log(err.message)
           dispatch(signUpErr(err.message));
+          onFail({message: getState().login.signUpErr})
           dispatch(createUserStop());
           setTimeout(() => {
             dispatch(signUpErr(null));
@@ -502,7 +510,41 @@ export const signUp = (payload, navigateFxn) => {
   };
 };
 
-export const requestVerification = (payload) => {
+export const editUserProfile = (payload, onSuccess, onFail) => {
+  return (dispatch, getState) => {
+    (async () => {
+      const val = await getKey(loginValue);
+      const param = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+          Authorization: `Token ${val}`,
+      },
+      body: JSON.stringify(payload),
+      };
+      dispatch(awaitingRequest())
+      await fetch(`${domain}user/edit`, param)
+        .then(res => res.json())
+        .then((data) => {
+          console.log(data)
+          if (data.status === "success") {
+            dispatch(successfulRequest())
+            onSuccess()
+          } else {
+             const val = Object.entries(data);
+            throw new Error(`${val[0][0]}: ${val[0][1][0]}`);
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          dispatch(failedRequest())
+          dispatch(signUpErr(error.message));
+          onFail({message: getState().login.signUpErr})
+      })
+    })()
+  }
+}
+export const requestVerification = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
       const val = await getKey(confirm);
@@ -519,17 +561,19 @@ export const requestVerification = (payload) => {
       await fetch(`${domain}verify_email_request`, param)
         .then(res => res.json())
         .then((data) => {
-          console.log(data)
+          console.log(data, "<====verify request")
+          onSuccess()
           dispatch(successfulRequest())
         })
         .catch((error) => {
+          onFail()
         dispatch(failedRequest())
       })
     })()
   }
 }
 
-export const verifyEmail = (payload) => {
+export const verifyEmail = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
       const val = await getKey(confirm);
@@ -549,9 +593,13 @@ export const verifyEmail = (payload) => {
           if (data.message === "success") {
             console.log(data, "<=========")
             storeKey(loginValue, data.token)
+            deleteKey("confirm")
             dispatch(successfulRequest())
+            onSuccess()
           } else {
+            console.log(data)
             dispatch(failedRequest())
+            onFail()
           }
         })
         .catch((error) => {

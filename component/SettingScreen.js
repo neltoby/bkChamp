@@ -42,7 +42,7 @@ import {
 import { deleteUser } from '../actions/request';
 import { storeKey, getKey, deleteKey } from '../processes/keyStore';
 import { loginValue, confirm } from '../processes/lock';
-import { logOutUser } from '../actions/login';
+import { logOutUser, notLogin } from '../actions/login';
 
 const {
   Value,
@@ -330,7 +330,7 @@ const SettingScreen = ({ navigation }) => {
           if (res.status === 'Success') {
             dispatch(logOutUser());
             setLoader(false);
-            navigation.navigate('Login');
+            dispatch(notLogin())
           }
         })
         .catch((err) => {

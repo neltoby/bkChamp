@@ -25,11 +25,8 @@ export default function VerificationBody({ navigation }) {
 //       dispatch(requestVerification({ email}))
 //     }, [])
 //   );
-
-    const onFulfill = async (code) => {
-        navigation.navigate("FinishSignUp")
-        await dispatch(verifyEmail({ email, email_token: code })).unwrap()
-        if (request_status === "success") {
+    const onSuccess = async () => {
+        console.log("called")
             Toast.show({
                 text: "Email Verified!",
                 type: "success",
@@ -44,14 +41,20 @@ export default function VerificationBody({ navigation }) {
                 dispatch(verification(false))
                 dispatch(welcome('Welcome'))
             }
-            return
-        } else if(request_status === "failed"){
-            return Toast.show({
+            // return
+        return navigation.navigate("Username")
+    }
+    const onFail = () => {
+        Toast.show({
                 text: "Invalid Token",
                 type: "danger",
                 duration: 5000
             })
-        }
+    }
+    const onFulfill = async (code) => {
+        // navigation.navigate("FinishSignUp")
+        dispatch(verifyEmail({ email, email_token: code }, onSuccess, onFail))
+        
     }
 
     return (

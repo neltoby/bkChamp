@@ -11,17 +11,29 @@ export default function Resend() {
 
     const [disabled, setDisabled] = useState(false)
     const dispatch = useDispatch()
-    const resend = async () => {
-        setDisabled(true)
-        // dispatch(vNumber(23456))
-      await dispatch(requestVerification({email})).unwrap()
-
+    const onSuccess = () => {
         Toast.show({
             type: "success",
             text: 'You will be able to send again in 10s',
             buttonText: "CLOSE",
             duration: 3000
         })
+    }
+
+    const onFail = () => {
+         Toast.show({
+            type: "danger",
+            text: 'Resend request failed',
+            buttonText: "CLOSE",
+            duration: 3000
+        })
+    }
+    const resend = async () => {
+        setDisabled(true)
+        // dispatch(vNumber(23456))
+      dispatch(requestVerification({email}, onSuccess, onFail))
+
+        
         setTimeout(() => {
             setDisabled(false)
         }, 1000 * 10);
@@ -50,6 +62,7 @@ const style = StyleSheet.create({
         paddingHorizontal: 20,
     },
     resendText: {
+        textAlign: "center",
         fontSize: 13,
         color: '#fff',
     },
