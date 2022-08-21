@@ -548,6 +548,7 @@ export const requestVerification = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
       const val = await getKey(confirm);
+      console.log(payload, val)
       null
       const param = {
       method: 'POST',
@@ -559,13 +560,14 @@ export const requestVerification = (payload, onSuccess, onFail) => {
       };
       dispatch(awaitingRequest())
       await fetch(`${domain}verify_email_request`, param)
-        .then(res => res.json())
+        .then(res => console.log(res))
         .then((data) => {
           console.log(data, "<====verify request")
           onSuccess()
           dispatch(successfulRequest())
         })
         .catch((error) => {
+          console.log(error)
           onFail()
         dispatch(failedRequest())
       })

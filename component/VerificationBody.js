@@ -75,10 +75,10 @@ export default function VerificationBody({ navigation }) {
             </View>
             <View style={style.info}>
                 <Text style={style.verificationText}>
-                    Please enter the verification text we 
+                    Please enter the verification pin we 
                 </Text>
                 <Text style={style.verificationText}>
-                    sent to  your email
+                    sent to  your mail. Check your inbox or Spam/Junk Messages
                 </Text>
             </View>
             <View style={style.textContainer}>

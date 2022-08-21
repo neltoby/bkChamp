@@ -31,7 +31,7 @@ export default function Resend() {
     const resend = async () => {
         setDisabled(true)
         // dispatch(vNumber(23456))
-      dispatch(requestVerification({email}, onSuccess, onFail))
+      dispatch(requestVerification({email: "danielchibuezeolah@gmail.com"}, onSuccess, onFail))
 
         
         setTimeout(() => {
