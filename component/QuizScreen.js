@@ -1,26 +1,20 @@
-import React, { useEffect } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
-import FocusAwareStatusBar from './FocusAwareStatusBar';
 import { useFocusEffect } from '@react-navigation/native';
+import Constants from 'expo-constants';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Container, Content, Toast } from 'native-base';
+import React, { useEffect } from 'react';
 import {
-  ScrollView,
-  View,
-  Text,
-  Image,
-  StyleSheet,
   ActivityIndicator,
-  Dimensions,
-  StatusBar
+  Dimensions, Image, StatusBar, StyleSheet, Text, View
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { Icon } from 'react-native-elements';
-import Constants from 'expo-constants'
-import isJson from '../processes/isJson';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadQuiz, createdb } from '../actions/quiz';
+import { createdb, loadQuiz } from '../actions/quiz';
 import { callStartGame } from '../actions/request';
+import { updateUserinfo } from '../actions/user';
 import deviceSize from '../processes/deviceSize';
-import { Container, Content, Toast } from 'native-base';
+import isJson from '../processes/isJson';
+import FocusAwareStatusBar from './FocusAwareStatusBar';
 
 const ContainerView = ({ width, height, styleProp, children }) => {
   if (width > height) {
@@ -33,7 +27,7 @@ const data = [
   { no: 2, text: 'Every wrong answer attracts -0.1' },
   { no: 3, text: 'You have the option to skip question up to 3 times' },
   { no: 4, text: 'Winners are selected every Sunday by 6pm' },
-  { no: 5, text: 'Quiz Duration: 10 minutes' },
+  { no: 5, text: 'Quiz Duration: 6 minutes 30 secs' },
 ];
 
 const deviceHeight = Dimensions.get("window").height;
@@ -49,10 +43,11 @@ const QuizScreen = ({ navigation }) => {
   const redirect = () => navigation.navigate('PlayQuiz');
 
   const playQuiz = () => {
+    dispatch(updateUserinfo({ name: "points", value: "-1" }))
     dispatch(callStartGame(redirect));
   };
 
-  const disable = () => {};
+  const disable = () => { };
 
   const subscribe = () => navigation.navigate('Subscribe');
 
@@ -66,7 +61,7 @@ const QuizScreen = ({ navigation }) => {
 
   useEffect(() => {
     createdb();
-    return () => {};
+    return () => { };
   }, []);
 
   useFocusEffect(
@@ -85,7 +80,9 @@ const QuizScreen = ({ navigation }) => {
       height={windowHeight}
       width={windowWidth}
       style={style.container}
-      >
+    >
+      <FocusAwareStatusBar barStyle='dark-content' backgroundColor='#fff' />
+
       <View
         style={[style.fore, { flex: windowHeight > windowWidth ? 0.20 : 0.5 }]}>
         <Image
@@ -104,19 +101,19 @@ const QuizScreen = ({ navigation }) => {
           colors={['transparent', '#e1efef']}
           style={{ ...style.gradient, height: windowHeight }}
         />
-        <View style={{...style.viewImg, marginTop: Constants.statusBarHeight}}>
+        <View style={{ ...style.viewImg, marginTop: Constants.statusBarHeight }}>
           {/*    <Image source={require('../img/book-champ.png')} style={style.img} />*/}
         </View>
         <View style={style.guide}>
           <Text style={style.head}>QUIZ GUIDELINES</Text>
-            {data.map((item, i) => {
-              return (
-                <Text style={style.textContainer} key={`${item}${i}`}>
-                  <Text style={style.thick}>{item.no}.</Text>
-                  <Text style={style.info}>{item.text}</Text>
-                </Text>
-              );
-            })}
+          {data.map((item, i) => {
+            return (
+              <Text style={style.textContainer} key={`${item}${i}`}>
+                <Text style={style.thick}>{item.no}.</Text>
+                <Text style={style.info}>{item.text}</Text>
+              </Text>
+            );
+          })}
         </View>
         <View style={{ flex: 0.3, alignItems: 'center', width: '100%' }}>
           {points > 0 ? (
@@ -165,7 +162,6 @@ const style = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: '#054078',
-    height: deviceHeight - 250,
   },
   fore: {
     justifyContent: 'center',

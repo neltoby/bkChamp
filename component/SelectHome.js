@@ -1,32 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Avatar } from 'react-native-elements';
-import { Container, Header, Button, Right } from 'native-base';
-import { LinearGradient } from 'expo-linear-gradient';
-import FocusAwareStatusBar from './FocusAwareStatusBar';
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  TouchableOpacity,
-  BackHandler,
-} from 'react-native';
-import { Icon } from 'react-native-elements';
-import Modal from 'react-native-modal';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import RankingScreen from './RankingScreen';
-import QuizScreen from './QuizScreen';
-import LearnScreen from '../screens/learn';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState } from 'react';
+import {
+  BackHandler, StyleSheet, Image
+} from 'react-native';
+// import { Icon } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutWarning, notLogin } from '../actions/login';
+import { db } from '../processes/db';
+import deviceSize from '../processes/deviceSize';
+import { deleteKey } from '../processes/keyStore';
+import { loginValue } from '../processes/lock';
+import CustomModal from './CustomModal';
 // import SettingsScreen from './SettingScreen'
 import Profile from './Profile';
-import deviceSize from '../processes/deviceSize';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteKey } from '../processes/keyStore';
-import { notLogin, logoutWarning } from '../actions/login';
-import { loginValue } from '../processes/lock';
-import { db } from '../processes/db';
+import QuizScreen from './QuizScreen';
+import RankingScreen from './RankingScreen';
 
 const sql = 'DROP TABLE IF EXISTS articles';
 const sqli = 'DROP TABLE IF EXISTS archive';
@@ -41,6 +31,20 @@ const SelectHome = ({ navigation }) => {
   const [back, setBack] = useState(false);
   const dispatch = useDispatch();
   const warning = useSelector((state) => state.login).logoutWarning;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        setBack(true)
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', backAction);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', backAction);
+    }, [])
+  )
 
   const setLogout = async () => {
     dispatch(logoutWarning(false));
@@ -120,36 +124,30 @@ const SelectHome = ({ navigation }) => {
     <>
       <Tab.Navigator
         screenOptions={{
+          activeColor: "#054078",
+          inactiveColor: "#CCCCFF",
           headerShown: false,
         }}
         shifting={true}
-        activeColor="#054078"
-        inactiveColor="#b0b6e3"
-        barStyle={{ backgroundColor: 'whitesmoke' }}>
-        <Tab.Screen
-          name="Ranking"
-          component={RankingScreen}
-          options={{
-            tabBarIcon: ({color}) => (
-              <Icon name="trophy" color={color} type="font-awesome" />
-            ),
-          }}
-        />
+        barStyle={{ backgroundColor: '#fff' }}>
         <Tab.Screen
           name="Quiz"
           component={QuizScreen}
           options={{
-            tabBarIcon: ({color}) => (
-              <Icon name="gamepad" color={color} type="font-awesome" />
+            tabBarIcon: ({ color }) => (
+              // <Icon name="game-controller" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/game-control.png')} />
             ),
           }}
         />
         <Tab.Screen
-          name="Learn"
-          component={LearnScreen}
+          name="Ranking"
+          component={RankingScreen}
           options={{
-            tabBarIcon: ({color}) => (
-              <Icon name="book" color={color} type="font-awesome" />
+            tabBarIcon: ({ color }) => (
+              // <Icon name="podium" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/rank.png')} />
+
             ),
           }}
         />
@@ -157,12 +155,27 @@ const SelectHome = ({ navigation }) => {
           name="Profile"
           component={Profile}
           options={{
-            tabBarIcon: ({color}) => (
-              <Icon name="user-circle" color={color} type="font-awesome" />
+            tabBarIcon: ({ color }) => (
+              // <Icon name="person-circle" type="ionicon" color={color} />
+              <Image style={{ width: 25, height: 25, }} source={require('../assets/user.png')} />
             ),
           }}
         />
       </Tab.Navigator>
+      <CustomModal
+        visible={warning}
+        title={"Are you sure?"}
+        options={["No", "Yes"]}
+        close={() => dispatch(logoutWarning(false))}
+        confirm={() => setLogout()} />
+      <CustomModal
+        visible={back}
+        title={"Exit App?"}
+        options={["No", "Yes"]}
+        close={() => setBack(false)}
+        confirm={() => exitApp()}
+      />
+      {/*   
       <Modal
         isVisible={warning}
         animationIn={'slideInLeft'}
@@ -257,7 +270,9 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     flexDirection: 'row',
+    justifyContent: "space-between"
   },
 });
 
 export default SelectHome;
+

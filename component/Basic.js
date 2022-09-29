@@ -39,14 +39,17 @@ const Basic = (props) => {
     setItem({});
     setSelected(false);
   };
-  const naviTrans = () => {
+  const naviTrans = (trxref, message, transaction) => {
     navigation.navigate('TransSummary', {
       amt: itemSelect.amt,
       unit: itemSelect.unit,
+      ref: trxref,
+      id: transaction,
+      message: message
     });
   };
-  const makePayment = (transaction_ref) => {
-    console.log(transaction_ref)
+  const makePayment = () => {
+    //console.log(transaction_ref)
     const payment_data = {
       game_plan: `${itemSelect.amt} plan`,
       reference_code: `${reference_code}`,
@@ -113,12 +116,13 @@ const Basic = (props) => {
                 onCancel={(e) => {
                   console.log(e, 'cancel response');
                 }}
-                onSuccess={(transaction_ref) => {
+                onSuccess={({ transactionRef }) => {
+                  const { trxref, message, transaction } = transactionRef
                   // setTransactionFinished(true);
-                  makePayment(transaction_ref);
+                  makePayment();
                   dispatch(noPoints(false));
                   dispatch(updateUserinfo({ name: 'points', value: points }));
-                  naviTrans();
+                  naviTrans(trxref, message, transaction);
                 }}
                 ref={paystackWebViewRef}
               />

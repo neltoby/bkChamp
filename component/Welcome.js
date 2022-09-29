@@ -1,15 +1,15 @@
-import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import logo from '../processes/image';
+import { Container, Content } from 'native-base';
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
-import { Container, Content, H1 } from 'native-base';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { welcome } from '../actions/login';
 import { useDispatch, useSelector } from 'react-redux';
+import { welcome } from '../actions/login';
+import logo from '../processes/image';
 
 const Welcome = ({ navigation }) => {
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user);
   const nextSlide = () => {
     dispatch(welcome('Home'));
     navigation.navigate('Home');
@@ -28,7 +28,7 @@ const Welcome = ({ navigation }) => {
             <Image source={logo()} style={style.img} />
           </View>
           <View style={style.backgrounds}>
-            <Text style={style.text}>WELCOME {store.user.username}</Text>
+            <Text style={style.text}>WELCOME {user.username}</Text>
             <View style={style.empty}></View>
           </View>
           <View style={style.note}>
@@ -97,9 +97,9 @@ const style = StyleSheet.create({
     color: '#aaa',
   },
   empty: {
-    width: 85,
+    width: '70%',
     height: 0,
-    borderBottomWidth: 3,
+    borderBottomWidth: 1.5,
     borderColor: '#888',
   },
   note: {

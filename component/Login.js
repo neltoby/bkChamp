@@ -1,30 +1,21 @@
-import React, { useState, useEffect } from 'react';
-// import NetInfo from '@react-native-community/netinfo'
-import * as Network from 'expo-network';
-import { LinearGradient } from 'expo-linear-gradient';
-import logo from '../processes/image';
-import Overlay from './Overlay';
 import { useFocusEffect } from '@react-navigation/native';
-import { Container, Content, Form, Button, Toast, Spinner } from 'native-base';
-import { Input, Icon } from 'react-native-elements';
-import { loginRequest } from '../actions/request';
-import { exitLogin } from '../actions/login';
-import Rolling from './Rolling';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Network from 'expo-network';
+import { Button, Container, Content, Form, Spinner, Toast } from 'native-base';
+import React, { useState } from 'react';
 // import Modal, { ModalContent, ModalTitle, ModalFooter, ModalButton } from 'react-native-modals'
 import {
-  StatusBar,
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  BackHandler,
-  Alert,
+  Alert, BackHandler, Image, Linking, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
+import { Icon, Input } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
-import isJson from '../processes/isJson';
+import { exitLogin } from '../actions/login';
+import { loginRequest } from '../actions/request';
 import deviceSize from '../processes/deviceSize';
+import logo from '../processes/image';
+import isJson from '../processes/isJson';
+import Overlay from './Overlay';
+import Rolling from './Rolling';
 
 const Login = ({ navigation, route }) => {
   const windowHeight = deviceSize().deviceHeight;
@@ -37,9 +28,9 @@ const Login = ({ navigation, route }) => {
   const exit = store.login.exitLogin;
   const signUpMsg = route.params;
   const [loginAlert, setloginAlert] = useState(false);
-  if (signUpMsg) {
-    () => setloginAlert(signUpMsg.open);
-  }
+  
+  if (signUpMsg) setloginAlert(signUpMsg.open);
+  
   const signUp = () => {
     navigation.navigate('SignUp');
   };
@@ -50,12 +41,6 @@ const Login = ({ navigation, route }) => {
     ]);
   };
   const submit = async () => {
-    // NetInfo.fetch().then(state => {
-    //     console.log('Connection type ', state.type)
-    //     console.log('Is connected ', state.isConnected)
-    //     // const network = await Network.getNetworkStateAsync();
-    //     // console.log(network)
-    // })
     try {
       if (username.trim().length && password.length) {
         const { isConnected, isInternetReachable } =
@@ -65,6 +50,7 @@ const Login = ({ navigation, route }) => {
           Toast.show({
             text: `Offline mode`,
             buttonText: 'CLOSE',
+            type: 'danger'
           });
         } else {
           if (isConnected && isInternetReachable) {
@@ -76,6 +62,7 @@ const Login = ({ navigation, route }) => {
         Toast.show({
           text: `Username and password required`,
           buttonText: 'CLOSE',
+          type: "danger"
         });
       }
     } catch (error) {
@@ -83,6 +70,7 @@ const Login = ({ navigation, route }) => {
       Toast.show({
         text: `Network request failed`,
         buttonText: 'CLOSE',
+        type: 'danger'
       });
     }
   };
@@ -107,12 +95,13 @@ const Login = ({ navigation, route }) => {
     }, [store.login.login])
   );
 
-  let toast =
     store.request.status === 'failed'
       ? Toast.show({
-          text: store.request.err,
-          buttonText: 'CLOSE',
-        })
+        text: store.request.err,
+        buttonText: 'CLOSE',
+        duration: 5000,
+        type: 'danger',
+      })
       : null;
   return (
     <Container style={style.content}>
@@ -172,16 +161,17 @@ const Login = ({ navigation, route }) => {
                 <Icon type="material" name="https" size={24} color="#fff" />
               }
               rightIcon={
-                <Icon
-                  type="font-awesome"
-                  name={notVisible ? 'eye' : 'eye-slash'}
-                  size={24}
-                  color="#aaa"
+                <Text
                   onPress={() => setNotVisible(!notVisible)}
-                />
+                  style={{ color: "#fff" }}
+                >
+                  {notVisible ? "Show" : "Hide"}
+                </Text>
               }
               onChangeText={(value) => setPassword(value)}
             />
+            <Text style={{ fontSize: 14, color: "white", marginLeft: 10 }} onPress={async () => await Linking.openURL('https://thebookchamp.com/password_reset')}>Forgot Password?</Text>
+
             <Button
               disabled={store.login.status === 'loading' ? true : false}
               block
@@ -200,36 +190,35 @@ const Login = ({ navigation, route }) => {
         <Overlay isVisible={store.login.status === 'loading' ? true : false}>
           <Rolling text="Logging In..." />
         </Overlay>
-        {loginAlert ? _renderSignUpMsg() : null}
         {/* <Modal
-                    useNativeDriver={true}
-                    visible={exit}
-                    swipeDirection={['up', 'down']} // can be string or an array
-                    swipeThreshold={200} // default 100
-                    onSwipeOut={event => dispatch(exitLogin(false))}
-                    onHardwareBackPress={() => dispatch(exitLogin(false))}
-                    modalTitle={<ModalTitle title='Exit?' />}
-                    footer={
-                        <ModalFooter>
-                        <ModalButton
-                            text="No"
-                            onPress={() => dispatch(exitLogin(false))}
-                        />
-                        <ModalButton
-                            text="Yes"
-                            onPress={() => BackHandler.exitApp()}
-                        />
-                        </ModalFooter>
-                    }
-                >
-                    <ModalContent>
-                        <View style={style.showView}>
-                            <Text style={style.warning}>
-                                Are you sure you want to exit?
-                            </Text>
-                        </View>
-                    </ModalContent>
-                </Modal> */}
+            useNativeDriver={true}
+            visible={exit}
+            swipeDirection={['up', 'down']} // can be string or an array
+            swipeThreshold={200} // default 100
+            onSwipeOut={event => dispatch(exitLogin(false))}
+            onHardwareBackPress={() => dispatch(exitLogin(false))}
+            modalTitle={<ModalTitle title='Exit?' />}
+            footer={
+                <ModalFooter>
+                <ModalButton
+                    text="No"
+                    onPress={() => dispatch(exitLogin(false))}
+                />
+            <ModalButton
+                    text="Yes"
+                    onPress={() => BackHandler.exitApp()}
+                />
+                </ModalFooter>
+            }
+        >
+            <ModalContent>
+                <View style={style.showView}>
+                    <Text style={style.warning}>
+                        Are you sure you want to exit?
+                    </Text>
+                </View>
+            </ModalContent>
+        </Modal> */}
       </Content>
     </Container>
   );
@@ -293,6 +282,7 @@ const style = StyleSheet.create({
   but: {
     backgroundColor: '#1258ba',
     marginTop: 50,
+    borderRadius: 50
   },
 });
 

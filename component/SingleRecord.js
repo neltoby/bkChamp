@@ -9,14 +9,12 @@ export default function SingleRecord(props) {
     return (
         <View style={style.updateOptions}>
             <View>
-                <Avatar
-                    rounded
-                    icon={{ name, type: props.info.type || props.type }}
-                    size="small"
-                />
+                <Text style={{ color: "#fff" }}>
+                    {name}
+                </Text>
             </View>
             <View style={style.count}>
-                <Text style={{...style.info,color: '#A8FF33'}}>{value}</Text>
+                <Text style={{ ...style.info, color: '#A8FF33' }}>{value}</Text>
             </View>
         </View>
     )
@@ -24,9 +22,8 @@ export default function SingleRecord(props) {
 
 const style = StyleSheet.create({
     updateOptions: {
-        width: '10%'
-    }, 
-    count: {
+        width: '15%',
+        flexDirection: 'column',
         alignItems: 'center',
     },
     info: {
@@ -47,5 +44,5 @@ SingleRecord.propTypes = {
         ]).isRequired,
         type: PropTypes.string
     })
-    
+
 }

@@ -1,21 +1,12 @@
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  ImageBackground,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  ActivityIndicator,
-  Dimensions,
+  Dimensions, FlatList, StyleSheet, Text, View
 } from 'react-native';
-import { Avatar } from 'react-native-elements';
 import { Card } from 'react-native-paper';
-import { useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDailyWinners } from '../actions/request';
-import { loadingWinners, setDailyWinners } from '../actions/winners';
+import { loadingWinners } from '../actions/winners';
 import isJson from '../processes/isJson';
 
 const HEADER_WIDTH = Dimensions.get('window').width
@@ -26,7 +17,6 @@ export default function DailyWins() {
     id: key.toString(),
     data: 'Item ' + key.toString(),
   }));
-  
   const winnersStore = isJson(useSelector((state) => state.winners));
   const userStore = isJson(useSelector((state) => state.user));
   const daily_winners = winnersStore.daily_winners;
@@ -64,10 +54,10 @@ export default function DailyWins() {
       index === 0
         ? '#FFD700'
         : index === 1
-        ? '#c0c0c0'
-        : index === 2
-        ? '#CD7F32'
-        : '#fff';
+          ? '#c0c0c0'
+          : index === 2
+            ? '#CD7F32'
+            : '#fff';
 
     return (
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>

@@ -1,14 +1,14 @@
-import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, BackHandler } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Container } from 'native-base';
+import React from 'react';
+import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native';
 // import { pricacytext } from '../data/privacytext';
 
-const PrivacyPolicy = ({navigation}) => {
-    useFocusEffect(
+const PrivacyPolicy = ({ navigation }) => {
+  useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
-        navigation.goBack()
+        navigation.navigate('Setting')
       };
       BackHandler.addEventListener('hardwareBackPress', backAction);
       return () => {
@@ -26,24 +26,24 @@ const PrivacyPolicy = ({navigation}) => {
           <Text>BOOK CHAMP – PRIVACY POLICY</Text>
           <Text style={styles.bold}>About Book Champ</Text>
           <Text>
-{`        JVEC Solutions is the developer, operator and publisher of onlinegames for the web and mobile, in various platforms and devices. The Company operates, among others, the mobile application for android of the app “Book Champ”, and also the website https://www.book-champ.com.            
+            {`        JVEC Solutions is the developer, operator and publisher of onlinegames for the web and mobile, in various platforms and devices. The Company operates, among others, the mobile application for android of the app “Book Champ”, and also the website https://www.book-champ.com.            
 `}
           </Text>
           <Text style={styles.bold}>{`Who are we?`}</Text>
           <Text>
-{`      JVEC Solutions is the developer and operator of the platforms, including the website and all services supplied by it (all, the ” Platform”).
+            {`      JVEC Solutions is the developer and operator of the platforms, including the website and all services supplied by it (all, the ” Platform”).
 `}
           </Text>
           <Text style={styles.bold}>{`What’s this Privacy Policy about`}</Text>
           <Text>
-{`      We have created this Privacy Policy because we highly evaluate yourPersonal Data and information. Please read it, as it includesimportant information in respect to your Personal Data and information.`}
+            {`      We have created this Privacy Policy because we highly evaluate yourPersonal Data and information. Please read it, as it includesimportant information in respect to your Personal Data and information.`}
           </Text>
           <Text>
- {`
+            {`
  We make our best efforts to protect our users’ privacy, and to be compatible with privacy protection laws and regulations, including the Nigerian Data Protection Regulation (the “NDPR”). We have created this document and our privacy practices with great efforts to comply with the NDPR. Please read this Privacy Policy carefully. For any questions or concerns, please contact us via our email address: info@jvecsolutions.com.`}
           </Text>
           <Text style={styles.bold}>
-           {`
+            {`
 Consent : By using the Platform or allowing someone else to use it on your behalf, you give your consent to our collection, use, disclosure, transfer and storage of any Personal Data and information received by us as a result of such use, in accordance with this Privacy Policy.`}
           </Text>
           <Text>{`
@@ -108,7 +108,7 @@ The laws of Lagos State shall govern this Privacy Policy. Any dispute which may 
 
 Contact Information:
 JVEC Solutions,
-No. 12, Rev. Ogunbiyi Street, Ikeja GRA, Lagos, Nigeria.
+No. 39, Oluwaseun Street, Ikotun, Lagos state.
 If you have any questions about this Policy, please contact us at info@jvecsolutions.com
           `}</Text>
         </View>

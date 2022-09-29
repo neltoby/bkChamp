@@ -1,29 +1,8 @@
 import produce from 'immer';
-import isJson from '../processes/isJson';
 import {
-  CORRECT,
-  WRONG,
-  DISPLAYED,
-  PLAYED,
-  NEXT,
-  INCREASE_SCORE,
-  DECREASE_SCORE,
-  LOAD_QUESTION,
-  SKIP,
-  ACTIVE,
-  TIME_OUT,
-  PLAY_AGAIN,
-  ANSWER,
-  CORRECT_ANS,
-  SET_TIME,
-  START_GAME_ERR,
-  NO_POINTS,
-  PLAYED_CURRENT,
-  PLAYED_PREV,
-  RESET_PLAYED_CURRENT,
-  SET_OVERLAY,
-  LOADING_QUIZ,
-  START_GAME,
+  ACTIVE, ANSWER, CORRECT, CORRECT_ANS, DECREASE_SCORE, DISPLAYED, INCREASE_SCORE, LOADING_QUIZ, LOAD_QUESTION, NEXT, NO_POINTS, PLAYED, PLAYED_CURRENT,
+  PLAYED_PREV, PLAY_AGAIN, RESET_PLAYED_CURRENT,
+  SET_OVERLAY, SET_TIME, SKIP, START_GAME, START_GAME_ERR, TIME_OUT, WRONG
 } from '../actions/quiz';
 
 const initialState = {
@@ -67,16 +46,16 @@ export default function quizReducer(state = initialState, action) {
         draft.setOverlay = 'cancel';
         draft.answer = false;
         draft.correctAns = false;
-        //==============>convert ct from ms+10 mins+offset
+        //==============>convert ct from ms+6.5 mins+offset
         //===============^^^^^^^^^^^^^^^^---^^^^^^^^^^^^
-        (draft.setTime = Date.now() / 1000 + 60 * 1 + 2),
+        (draft.setTime = Date.now() / 1000 + 60 * 6.5 + 2),
           (draft.playedCurrent = 0);
       });
     }
     case LOAD_QUESTION: {
       return produce(state, (draft) => {
         const { payload } = action;
-        draft.game_id = payload.id  
+        draft.game_id = payload.id
         if (Object.entries(payload).length) {
           draft.recievedQuestion = JSON.parse(JSON.stringify(payload));
           let level;

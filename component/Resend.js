@@ -1,8 +1,8 @@
-import React, { memo, useState } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
 import { Button, Toast } from 'native-base'
-import { vNumber } from '../actions/login'
+import React, { memo, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch } from 'react-redux'
+import { vNumber } from '../actions/login'
 
 export default function Resend() {
     const [disabled, setDisabled] = useState(false)
@@ -10,11 +10,13 @@ export default function Resend() {
     const resend = () => {
         setDisabled(true)
         dispatch(vNumber(23456))
+    //   dispatch(requestVerification({email}))
+
         Toast.show({
             text: 'You will be able to send again in 10s',
             buttonText: "CLOSE",
             duration: 3000
-          })
+        })
         setTimeout(() => {
             setDisabled(false)
         }, 1000 * 10);
@@ -22,9 +24,9 @@ export default function Resend() {
     return (
         <View style={style.resendContainer}>
             <Text style={style.resendText}>
-                if you didn't get the verification 
+                if you didn't get the verification
                 number sent to your phone please
-                click the resend button below 
+                click the resend button below
             </Text>
             <View style={style.buttonContainer}>
                 <Button style={style.buttons} disabled={disabled} small onPress={resend}>
@@ -45,7 +47,7 @@ const style = StyleSheet.create({
     resendText: {
         fontSize: 13,
         color: '#fff',
-    }, 
+    },
     buttonContainer: {
         flexDirection: 'row',
         alignItems: 'center'

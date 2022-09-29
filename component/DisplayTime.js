@@ -1,9 +1,9 @@
-import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
-import { View, Text, StyleSheet } from 'react-native'
-import useTime from './useTime'
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import isJson from '../processes/isJson'
-import { useSelector } from 'react-redux';
+import useTime from './useTime'
 
 export default function DisplayTime() {
     const store = isJson(useSelector(state => state))
@@ -12,7 +12,7 @@ export default function DisplayTime() {
         <View style={style.time}>
             <LinearGradient
                 colors={['transparent', '#e1efef']}
-                style={{...style.gradient, height: 70, width: 70, borderRadius: 35}}
+                style={{ ...style.gradient, height: 70, width: 70, borderRadius: 35 }}
             />
             <Text style={style.textTime}>{time}</Text>
         </View>

@@ -1,39 +1,25 @@
-import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import logo from '../processes/image';
-import Container from './Container';
-// import ErrorBoundary from './ErrorBoundary'
-import ErrorUi from './ErrorUi';
-import Overlay from './Overlay';
-import FocusAwareStatusBar from './FocusAwareStatusBar';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Platform,
-  BackHandler,
-  ActivityIndicator,
-} from 'react-native';
-import { Input, Button, Icon } from 'react-native-elements';
-import {
-  Header,
-  Content,
-  Left,
-  Right,
-  Body,
-  Title,
-  Icon as NativeIcon,
-  Button as NButton,
-  Toast,
+  Body, Button as NButton, Content, Header, Icon as NativeIcon, Left,
+  Right, Title, Toast
 } from 'native-base';
-import { deleteKey, getKey, storeKey } from '../processes/keyStore'
-import { confirm, loginValue } from '../processes/lock'
-import { vNumber, verification } from '../actions/login'
-import { createUserLoading } from '../actions/login';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator, BackHandler, Image,
+  Linking,
+  Platform, StyleSheet, Text, View
+} from 'react-native';
+import { Button, Icon, Input } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
+import { createUserLoading, verification } from '../actions/login';
 import { signUp } from '../actions/request';
 import deviceSize from '../processes/deviceSize';
-import { useDispatch, useSelector } from 'react-redux';
+import logo from '../processes/image';
+import { deleteKey, getKey, storeKey } from '../processes/keyStore';
+import { confirm, loginValue } from '../processes/lock';
+import Container from './Container';
+import FocusAwareStatusBar from './FocusAwareStatusBar';
+import Overlay from './Overlay';
 
 const Username = ({ navigation, route }) => {
   const [username, setUserName] = useState('');
@@ -60,7 +46,7 @@ const Username = ({ navigation, route }) => {
     });
   };
   const nextSlide = () => {
-    navigation.navigate('UploadDp');
+    navigation.navigate('ConfirmNumber');
     // setVisible(false)
   };
   const handleSignUp = async () => {
@@ -79,10 +65,10 @@ const Username = ({ navigation, route }) => {
         await storeKey(loginValue, val);
         await deleteKey(confirm);
         // verication state set to false indicates that user is verified and confirm token removed
-        await dispatch(verification(false));
-        navigation.navigate('UploadDp');
+         dispatch(verification(false));
+        navigation.navigate('Welcome');
       }
-      dispatch(signUp({ ...detail, username }, nextSlide));
+       dispatch(signUp({ ...detail, username }, nextSlide))
       setUserName('');
     } else {
       Toast.show({
@@ -95,13 +81,15 @@ const Username = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (errSignUp !== null) {
+        console.log(errSignUp)
         Toast.show({
-          text: errSignUp,
+          text: errSignUp.split(":")[1],
           buttonText: 'CLOSE',
-          duration: 3000,
+          duration: 5000,
+
         });
       }
-      return () => {};
+      return () => { };
     }, [errSignUp])
   );
   useFocusEffect(
@@ -187,6 +175,7 @@ const Username = ({ navigation, route }) => {
               title="SIGN UP"
             />
           </View>
+          <Text style={{ color: "white", fontSize: 10 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={async () => await Linking.openURL('http://bookchamp.herokuapp.com/privacy')}>Privacy Policy</Text></Text>
         </Content>
       </Container>
       {loading ? (

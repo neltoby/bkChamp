@@ -1,34 +1,35 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ActivityIndicator,
-  Animated,
-} from 'react-native';
-import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
-import useCheckpoint from './useCheckpoint';
 import { useFocusEffect } from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux';
-import isJson from '../processes/isJson';
+import Constants from 'expo-constants';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  loadingWeeklyWinners,
-  getWeeklyWinners,
-  winnersErrDis,
-  setWeeklyWinners,
-  loadingWeeklyWinnersStop,
+  Animated, Dimensions, Image as RNImage,
+  StyleSheet, Text, View
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { getWeeklyWinners } from '../actions/request';
+import {
+  loadingWeeklyWinners, winnersErrDis
 } from '../actions/winners';
+import isJson from '../processes/isJson';
+import Image from './Image';
+import useCheckpoint from './useCheckpoint';
+
+const deviceWidth = Dimensions.get("screen").width;
 
 const WeeklyWinners = () => {
+  const userImg = useSelector((state) => state.user).user.image;
+  const storePreview = isJson(useSelector((state) => state.learn)).preview;
+
+  const preview = useMemo(() => {
+    uri: storePreview;
+  }, [storePreview]);
+  const uri = userImg;
   const dispatch = useDispatch();
   const store = isJson(useSelector((state) => state.winners));
 
+
   const onWinnerSuccess = async () => {
-    setWeeklyWinners([]);
-    await dispatch(loadingWeeklyWinners());
-    await dispatch(getWeeklyWinners());
+    dispatch(getWeeklyWinners());
   };
   const onWinnerFailure = () => {
     dispatch(winnersErrDis('weekly'));
@@ -36,11 +37,15 @@ const WeeklyWinners = () => {
 
   const loadWeeklyWins = async () => {
     const getResult = useCheckpoint(onWinnerFailure, onWinnerSuccess);
-    await getResult();
+    await onWinnerSuccess();
   };
-  useEffect(() => {
-    loadWeeklyWins();
-  }, [loadWeeklyWins]);
+
+
+  const date = new Date()
+  if (date.getDay() === 0 && date.getHours >= 18) {
+    loadWeeklyWins()
+  }
+
 
   const fadeAnim = useRef(new Animated.Value(0.2)).current;
 
@@ -63,18 +68,29 @@ const WeeklyWinners = () => {
 
   useEffect(() => {
     dispatch(loadingWeeklyWinners());
-    animatedLoader();
-    setTimeout(() => {
-      dispatch(loadingWeeklyWinnersStop())
-    }, 10000)
+    animatedLoader()
+    loadWeeklyWins();
   }, []);
+  // console.log(store.weekly_winners, "<===rendered winners")
+
+
+  useFocusEffect(
+    useCallback(
+      () => {
+        let weeklyWins = setInterval(() => {
+          loadWeeklyWins();
+        }, 10000)
+        return () => clearInterval(weeklyWins)
+      },
+      [],
+    )
+  );
 
   return (
     <View
       style={{
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#054078',
         borderBottomLeftRadius: 33,
         borderBottomRightRadius: 33,
         ...styles.elevation,
@@ -91,8 +107,8 @@ const WeeklyWinners = () => {
           <Animated.Image
             style={{
               opacity: fadeAnim,
-              width: 100,
-              height: 100,
+              width: 150,
+              height: 150,
               alignSelf: 'center',
             }}
             source={require('../img/winners_cup.png')}
@@ -102,14 +118,14 @@ const WeeklyWinners = () => {
             There was an error loading weekly winners, Check your internet
             connection and try again
           </Text>
-        ) : (
+        ) : store.weekly_winners.length > 1 ? (
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            {/* <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               <Image
                 style={{
                   ...styles.winnerAvatar,
@@ -127,20 +143,25 @@ const WeeklyWinners = () => {
                   color: '#fff',
                   fontSize: 15,
                   marginVertical: 7,
-                }}>{`@DannyEll`}</Text>
-              <Text style={styles.textColor}>129 points</Text>
-            </View>
+                }}>@{store.daily_winners[2]['user_id']}</Text>
+              <Text style={styles.textColor}>{store.daily_winners[2]['score']} points</Text>
+            </View> */}
             <View
               style={{ justifyContent: 'space-around', alignItems: 'center' }}>
-              <Image
+              {/* <Image
                 style={{
                   ...styles.winnerAvatar,
-                  borderRadius: 50,
-                  width: 100,
-                  height: 100,
                 }}
                 source={require('../img/anonymous.jpg')}
-              />
+              /> */}
+              {userImg === null || userImg === undefined ? (
+                <RNImage
+                  source={require('../img/anonymous.jpg')}
+                  style={styles.winnerAvatar}
+                />
+              ) : (
+                <Image {...{ preview, uri }} style={styles.winnerAvatar} />
+              )}
               <View
                 style={{
                   ...styles.winnerBadge,
@@ -157,32 +178,47 @@ const WeeklyWinners = () => {
                   ...styles.textColor,
                   fontSize: 20,
                   marginVertical: 7,
-                }}>{`@Thelma`}</Text>
-              <Text style={styles.textColor}>129 points</Text>
+                }}>@{store.weekly_winners[0]["user_id"]}</Text>
+              <Text style={styles.textColor}>{store.weekly_winners[0]['score']} points</Text>
             </View>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <Image
+            <View
+              style={{ justifyContent: 'space-around', alignItems: 'center' }}>
+              {userImg === null || userImg === undefined ? (
+                <RNImage
+                  source={require('../img/anonymous.jpg')}
+                  style={styles.winnerAvatar}
+                />
+              ) : (
+                <Image {...{ preview, uri }} style={styles.winnerAvatar} />
+              )}
+              <View
                 style={{
-                  ...styles.winnerAvatar,
-                  borderRadius: 35,
-                  width: 70,
-                  height: 70,
-                }}
-                source={require('../img/anonymous.jpg')}
-              />
-              <View style={{ ...styles.winnerBadge, top: -15 }}>
-                <Text>2</Text>
+                  ...styles.winnerBadge,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  top: -8,
+                }}>
+                <Text style={{ fontSize: 15 }}>2</Text>
               </View>
+
               <Text
                 style={{
-                  color: '#fff',
-                  fontSize: 15,
+                  ...styles.textColor,
+                  fontSize: 20,
                   marginVertical: 7,
-                }}>{`@JoshAOC`}</Text>
-              <Text style={styles.textColor}>129 points</Text>
+                }}>@{store.weekly_winners[1]["user_id"]}</Text>
+              <Text style={styles.textColor}>{store.weekly_winners[1]['score']} points</Text>
             </View>
           </View>
-        )}
+        ) : (<Image
+          style={{
+            width: 150,
+            height: 150,
+            alignSelf: 'center',
+          }}
+          source={require('../img/winners_cup.png')}
+        />)}
       </View>
     </View>
   );
@@ -197,6 +233,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderRadius: 50,
+    width: 100,
+    height: 100,
   },
   winnerBadge: {
     width: 20,
@@ -219,12 +258,10 @@ const styles = StyleSheet.create({
     marginVertical: 25,
   },
   elevation: {
-    borderRadius: 6,
+    position: "absolute",
+    width: deviceWidth,
     elevation: 15,
-    shadowColor: '#333',
-    shadowRadius: 35,
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.6,
+    backgroundColor: '#054078',
   },
   textColor: {
     color: 'white',

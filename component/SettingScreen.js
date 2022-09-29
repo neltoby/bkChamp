@@ -24,6 +24,7 @@ import {
 // import { WebView } from 'react-native-webview';
 // import { Badge } from 'react-native-elements'
 import { Container, Button, Badge, Toast, Icon as NBIcon } from 'native-base';
+import Rolling from './Rolling'
 import Overlay from './Overlay';
 import Image from './Image';
 import { Icon } from 'react-native-elements';
@@ -77,6 +78,7 @@ const SettingScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const store = isJson(useSelector((state) => state));
   const user = [];
+  var deleteTimer;
   const storePreview = isJson(useSelector((state) => state.learn)).preview;
   const user_pk = isJson(useSelector((state) => state.user.user));
   const preview = useMemo(() => {
@@ -89,12 +91,12 @@ const SettingScreen = ({ navigation }) => {
       label === 'username' || label === 'fullname'
         ? 'person'
         : label === 'email'
-        ? 'email'
-        : label === 'phone_number'
-        ? 'call'
-        : label === 'institution'
-        ? 'school'
-        : null;
+          ? 'email'
+          : label === 'phone_number'
+            ? 'call'
+            : label === 'institution'
+              ? 'school'
+              : null;
     if (
       label === 'username' ||
       label === 'fullname' ||
@@ -293,7 +295,7 @@ const SettingScreen = ({ navigation }) => {
           text: 'DELETE',
           onPress: () => {
             setLoader(true);
-            setTimeout(() => {
+            deleteTimer = setTimeout(() => {
               deleteAccount();
             }, 3000);
           },
@@ -337,6 +339,7 @@ const SettingScreen = ({ navigation }) => {
   };
   useEffect(() => {
     const backAction = () => {
+      clearTimeout(deleteTimer)
       navigation.goBack()
       return false;
     };
@@ -378,7 +381,7 @@ const SettingScreen = ({ navigation }) => {
           easing: Easing.inOut(Easing.ease),
         }).start();
       }
-      return () => {};
+      return () => { };
     }, [edit])
   );
 
@@ -442,7 +445,7 @@ const SettingScreen = ({ navigation }) => {
         <AnimatedContent
           style={[
             style.profileview,
-            { transform: [{ translate: springVal }] },
+            // { transform: [{ translate: springVal }] },
           ]}>
           <View style={style.profile}>
             {uri === null ? (
@@ -471,37 +474,39 @@ const SettingScreen = ({ navigation }) => {
               colors={['transparent', '#e1efef']}
               style={{ ...style.gradient, height: windowHeight }}
             />
-            <View style={style.emptyview}>
-              <Button
-                transparent
-                style={{
-                  paddingHorizontal: 20,
-                  paddingVertical: 2,
-                  borderColor: '#fff',
-                }}>
-                <Text style={{ color: 'yellow', fontWeight: 'bold' }}>
-                  Details
-                </Text>
-              </Button>
-              <Button
-                iconLeft
-                onPress={editSpring}
-                bordered
-                style={{
-                  paddingHorizontal: 20,
-                  paddingVertical: 2,
-                  borderColor: '#fff',
-                }}>
-                <Icon
-                  type="material"
-                  name="folder-shared"
-                  size={24}
-                  color="#f1f1f1"
-                  containerStyle={{ marginRight: 15 }}
-                />
-                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Edit</Text>
-              </Button>
+            <View style={{ ...style.emptyview, width: deviceWidth, flexDirection: "row", justifyContent: "space-between" }}>
+
+              <Text style={{ color: 'yellow', fontWeight: 'bold' }}>
+                Details
+              </Text>
+              <View style={{
+                width: deviceWidth - 50,
+                height: 0,
+                borderTopWidth: 1,
+                borderTopColor: "#fff",
+                alignSelf: "center"
+              }}>
+              </View>
             </View>
+            <Button
+              iconLeft
+              onPress={editSpring}
+              bordered
+              style={{
+                paddingHorizontal: 20,
+                borderColor: '#fff',
+                alignSelf: "flex-end",
+                marginHorizontal: 20,
+              }}>
+              <Icon
+                type="material"
+                name="folder-shared"
+                size={24}
+                color="#f1f1f1"
+                containerStyle={{ marginRight: 15 }}
+              />
+              <Text style={{ color: '#fff', fontWeight: 'bold', }}>Edit</Text>
+            </Button>
             <View style={style.list}>
               {details.map((det, i) => {
                 if (Object.keys(det).includes('fullname')) {
@@ -515,16 +520,20 @@ const SettingScreen = ({ navigation }) => {
             </View>
           </View>
           <View style={{ paddingHorizontal: 20 }}>
-            <Text style={{ color: '#fff', fontSize: 23, textAlign: 'center' }}>
-              Manage Account
-            </Text>
-            <View
-              style={{
-                borderTopColor: '#fff',
-                borderTopWidth: 3,
-                width: 50,
-                alignSelf: 'center',
-              }}></View>
+            <View style={{ paddingBottom: 13, width: deviceWidth, flexDirection: "row", justifyContent: "space-between" }}>
+
+              <Text style={{ color: 'yellow', fontWeight: 'bold' }}>
+                Manage Account
+              </Text>
+              <View style={{
+                width: deviceWidth - 50,
+                height: 0,
+                borderTopWidth: 1,
+                borderTopColor: "#fff",
+                alignSelf: "center"
+              }}>
+              </View>
+            </View>
             <View>
               <TouchableOpacity
                 style={{ paddingVertical: 10 }}
@@ -547,7 +556,7 @@ const SettingScreen = ({ navigation }) => {
         </AnimatedContent>
       </Container>
       <Overlay isVisible={loader}>
-        <ActivityIndicator />
+        <Rolling text="Deleting User..." />
       </Overlay>
 
       {edit ? (
@@ -632,10 +641,10 @@ const SettingScreen = ({ navigation }) => {
                       style={[style.imgUrl, { opacity: iconOpacity }]}
                     />
                   )}
-                  {/* <AnimatedBadge containerStyle={[style.badge]}
-                                        value = {<Icon name="camera" style={{ fontSize: 25, color: "#054078" }}/>}
-                                        onPress= {pickImage}
-                                    /> */}
+                  <AnimatedBadge containerStyle={[style.badge]}
+                    value={<Icon name="camera" style={{ fontSize: 25, color: "#054078" }} />}
+                    onPress={pickImage}
+                  />
                   <AnimatedBadge style={[style.badge, { left: translateX }]}>
                     <AnimatedIcon
                       name="camera"
@@ -694,7 +703,6 @@ const style = StyleSheet.create({
     paddingBottom: 10,
   },
   list: {
-    marginTop: 30,
     width: '100%',
     alignSelf: 'center',
   },

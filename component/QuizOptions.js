@@ -1,11 +1,10 @@
-import React, { useMemo, useState, useEffect } from 'react'
-import { View, ScrollView, Text, TouchableHighlight, StyleSheet } from 'react-native'
-import {Icon } from 'react-native-elements';
-import isJson from '../processes/isJson'
-import { useFocusEffect } from '@react-navigation/native'
-import { useSelector, useDispatch } from 'react-redux'
-import {next, correctAnswers, wrongAnswers, displayedQuestion, answered, active, setOverlay,
-    decreaseScore, increaseScore, correctAns, played, settime } from '../actions/quiz'
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { Icon } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
+import { answered, correctAns, correctAnswers, decreaseScore, displayedQuestion, increaseScore, next, played, setOverlay, settime, wrongAnswers } from '../actions/quiz';
+import isJson from '../processes/isJson';
 
 export default function QuizOptions() {
     // const store = isJson(useSelector(state => state))
@@ -20,7 +19,7 @@ export default function QuizOptions() {
     useFocusEffect(
         React.useCallback(() => {
             dispatch(displayedQuestion(question.id))
-            return () => {}
+            return () => { }
         }, [question.id])
     )
 
@@ -28,21 +27,21 @@ export default function QuizOptions() {
         setSelval(val)
         question['selected'] = val
         dispatch(played(question))
-        if(val === question.answer){
+        if (val === question.answer) {
             dispatch(correctAns(true))
             dispatch(correctAnswers(question.id))
             dispatch(increaseScore())
-        }else{
-            dispatch(wrongAnswers(question.id)) 
-            dispatch(decreaseScore())        
+        } else {
+            dispatch(wrongAnswers(question.id))
+            dispatch(decreaseScore())
         }
 
         dispatch(answered(true))
         setTimeout(() => {
-            if(level === 'difficult' && allquestion[level].length === 0){
+            if (level === 'difficult' && allquestion[level].length === 0) {
                 dispatch(settime(''))
                 dispatch(setOverlay('end'))
-            }else{
+            } else {
                 dispatch(answered(false))
                 dispatch(correctAns(false))
                 setSelval('');
@@ -52,7 +51,7 @@ export default function QuizOptions() {
     }
 
     return (
-        <ScrollView contentContainerStyle={{justifyContent: 'center',alignItems: 'center'}} style={style.optionContainer}>
+        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }} style={style.optionContainer}>
             {
                 !answer ? question.options.map((option, i) => {
                     return (
@@ -65,7 +64,7 @@ export default function QuizOptions() {
                                     <Text style={style.optionText}>{option}</Text>
                                 </View>
                                 <View style={style.iconContainer}>
-                                    <Icon 
+                                    <Icon
                                         type='material'
                                         name='radio-button-unchecked'
                                         size={24}
@@ -76,112 +75,112 @@ export default function QuizOptions() {
                         </TouchableHighlight>
                     )
                 }) : correct ?
-                question.options.map((option, i) => {
-                    if(selVal == option){
-                        return (
-                            <View style={{...style.optionView, borderColor: 'green'}} key={`${option}${i}`}>
-                                <>
+                    question.options.map((option, i) => {
+                        if (selVal == option) {
+                            return (
+                                <View style={{ ...style.optionView, borderColor: 'green' }} key={`${option}${i}`}>
+                                    <>
+                                        <View style={style.textContainer}>
+                                            <Text style={{ ...style.optionText, color: '#fff' }}>{option}</Text>
+                                        </View>
+                                        <View style={style.iconContainer}>
+                                            <Icon
+                                                type='material'
+                                                name='check-circle'
+                                                size={24}
+                                                color='green'
+                                            />
+                                        </View>
+                                    </>
+                                </View>
+                            )
+                        } else {
+                            return (
+                                <View style={style.optionView} key={`${option}${i}`}>
                                     <View style={style.textContainer}>
-                                        <Text style={{...style.optionText, color: '#fff'}}>{option}</Text>
+                                        <Text style={style.optionText}>{option}</Text>
                                     </View>
                                     <View style={style.iconContainer}>
-                                        <Icon 
+                                        <Icon
+                                            type='material'
+                                            name='radio-button-unchecked'
+                                            size={24}
+                                            color='#054078'
+                                        />
+                                    </View>
+                                </View>
+                            )
+                        }
+                    }) :
+                    question.options.map((option, i) => {
+                        if (selVal == option) {
+                            return (
+                                <View style={{ ...style.optionView, borderColor: '#e85f29' }} key={`${option}${i}`}>
+                                    <View style={style.textContainer}>
+                                        <Text style={{ ...style.optionText, color: '#fff' }}>{option}</Text>
+                                    </View>
+                                    <View style={style.iconContainer}>
+                                        <Icon
+                                            type='material'
+                                            name='cancel'
+                                            size={24}
+                                            color='#ff4632'
+                                        />
+                                    </View>
+                                </View>
+                            )
+                        } else if (option == question.answer) {
+                            return (
+                                <View style={{ ...style.optionView, borderColor: 'green' }} key={`${option}${i}`}>
+                                    <View style={style.textContainer}>
+                                        <Text style={{ ...style.optionText, color: '#fff' }}>{option}</Text>
+                                    </View>
+                                    <View style={style.iconContainer}>
+                                        <Icon
                                             type='material'
                                             name='check-circle'
                                             size={24}
                                             color='green'
                                         />
                                     </View>
-                                </>
-                            </View>
-                        )
-                    }else{
-                        return (
-                            <View style={style.optionView} key={`${option}${i}`}>
-                                <View style={style.textContainer}>
-                                    <Text style={style.optionText}>{option}</Text>
                                 </View>
-                                <View style={style.iconContainer}>
-                                    <Icon 
-                                        type='material'
-                                        name='radio-button-unchecked'
-                                        size={24}
-                                        color='#054078'
-                                    />
+                            )
+                        } else {
+                            return (
+                                <View style={style.optionView} key={`${option}${i}`}>
+                                    <View style={style.textContainer}>
+                                        <Text style={style.optionText}>{option}</Text>
+                                    </View>
+                                    <View style={style.iconContainer}>
+                                        <Icon
+                                            type='material'
+                                            name='radio-button-unchecked'
+                                            size={24}
+                                            color='#054078'
+                                        />
+                                    </View>
                                 </View>
-                            </View>
-                        )
-                    }
-                }) : 
-                question.options.map((option, i) => {
-                    if(selVal == option){
-                        return (
-                            <View style={{...style.optionView, borderColor: '#e85f29'}} key={`${option}${i}`}>
-                                <View style={style.textContainer}>
-                                    <Text style={{...style.optionText, color: '#fff'}}>{option}</Text>
-                                </View>
-                                <View style={style.iconContainer}>
-                                    <Icon 
-                                        type='material'
-                                        name='cancel'
-                                        size={24}
-                                        color='#ff4632'
-                                    />
-                                </View>
-                            </View>
-                        )
-                    }else if(option == question.answer){
-                        return (
-                            <View style={{...style.optionView, borderColor: 'green'}}  key={`${option}${i}`}>
-                                <View style={style.textContainer}>
-                                    <Text style={{...style.optionText, color: '#fff'}}>{option}</Text>
-                                </View>
-                                <View style={style.iconContainer}>
-                                    <Icon 
-                                        type='material'
-                                        name='check-circle'
-                                        size={24}
-                                        color='green'
-                                    />
-                                </View>
-                            </View>
-                        )
-                    }else{
-                        return (
-                            <View style={style.optionView}  key={`${option}${i}`}>
-                                <View style={style.textContainer}>
-                                    <Text style={style.optionText}>{option}</Text>
-                                </View>
-                                <View style={style.iconContainer}>
-                                    <Icon 
-                                        type='material'
-                                        name='radio-button-unchecked'
-                                        size={24}
-                                        color='#054078'
-                                    />
-                                </View>
-                            </View>
-                        )
-                    }
-                })
+                            )
+                        }
+                    })
             }
-            
+
         </ScrollView>
     )
 }
 
- const style = StyleSheet.create({
+const style = StyleSheet.create({
     optionContainer: {
         marginTop: 10,
     },
     optionView: {
         borderRadius: 4,
-        width: '70%', 
+        width: '70%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center', 
+        justifyContent: 'center',
         marginTop: 10,
-        paddingVertical: 5, 
+        paddingVertical: 5,
         borderColor: '#054078',
         borderWidth: 2,
     },
@@ -198,4 +197,4 @@ export default function QuizOptions() {
     iconContainer: {
         flex: 0.2
     },
- })
+})

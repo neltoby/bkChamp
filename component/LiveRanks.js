@@ -1,21 +1,12 @@
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  ImageBackground,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  ActivityIndicator,
-  Dimensions,
+  Dimensions, FlatList, StyleSheet, Text, View
 } from 'react-native';
-import { Avatar } from 'react-native-elements';
 import { Card } from 'react-native-paper';
-import { useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDailyWinners } from '../actions/request';
-import { loadingWinners, setDailyWinners } from '../actions/winners';
+import { loadingWinners } from '../actions/winners';
 import isJson from '../processes/isJson';
 
 const HEADER_WIDTH = Dimensions.get('window').width
@@ -26,7 +17,6 @@ export default function DailyWins() {
     id: key.toString(),
     data: 'Item ' + key.toString(),
   }));
-  
   const winnersStore = isJson(useSelector((state) => state.winners));
   const userStore = isJson(useSelector((state) => state.user));
   const daily_winners = winnersStore.daily_winners;
@@ -66,7 +56,7 @@ export default function DailyWins() {
         : '#fff'
 
     return (
-      <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
         <View style={styles.rank}>
           <Card style={{ paddingVertical: 10, backgroundColor: rankBgColor }}>
             <View
@@ -97,12 +87,12 @@ export default function DailyWins() {
   }
 
   return (
-    
-      <FlatList
-        data={daily_winners}
-        keyExtractor={(data) => data.id.toString()}
-        renderItem={({ item, index }) => renderUser(item, index)}
-      />
+
+    <FlatList
+      data={daily_winners}
+      keyExtractor={(data) => data.id.toString()}
+      renderItem={({ item, index }) => renderUser(item, index)}
+    />
   );
 }
 

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import PropTypes from'prop-types'
-import { useFocusEffect } from '@react-navigation/native'
-import { View, StyleSheet, Text, ActivityIndicator, Keyboard } from 'react-native'
-import { Input, Icon, Badge} from 'react-native-elements';
-import DatePicker from 'react-native-datepicker'
-import { Button, Card, Toast } from 'native-base'
-import Animated, { Easing } from 'react-native-reanimated'
-import { capitalize } from '../processes/category'
-import {config} from './CustomOverlay'
-import { getKey } from '../processes/keyStore'
-import { loginValue } from '../processes/lock'
-import { updateUserinfo } from '../actions/user'
+import { Button, Card, Toast } from 'native-base';
+import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native';
+// import DatePicker from 'react-native-datepicker';
+import { Badge, Icon, Input } from 'react-native-elements';
+import Animated, { Easing } from 'react-native-reanimated';
+import { updateUserinfo } from '../actions/user';
+import { capitalize } from '../processes/category';
+import { getKey } from '../processes/keyStore';
+import { loginValue } from '../processes/lock';
+import { config } from './CustomOverlay';
 
 const {
     timing,
@@ -26,7 +25,7 @@ const colors = ['#992438', '#AD2425', '#9224AD', '#696969', '#AD2425', '#92AD24'
 const domain = 'https://bookchamp.herokuapp.com/api/v1/'
 
 export default function EditBox(props) {
-    const {value, label, icon} = props.item
+    const { value, label, icon } = props.item
     const [edit, setEdit] = useState(false)
     const [val, setVal] = useState('')
     const [success, setSuccess] = useState(false)
@@ -35,59 +34,59 @@ export default function EditBox(props) {
     const undoEdit = new Value(0)
     const randomColor = Math.floor(Math.random() * 10)
     const keyboardType = label === 'username' || label === 'fullname' ? 'default' :
-    label === 'phone_number' ? 'phone-pad' : label === 'email' ? 'email-address' : 'default' ;
+        label === 'phone_number' ? 'phone-pad' : label === 'email' ? 'email-address' : 'default';
     const saveInfo = async () => {
         // get token from securestore
         const val = await getKey(loginValue)
         // set headers and other params
-        let str = label === 'date_of_birth' ? {date_of_birth: val} : 
-        label === 'email' ? {email: val} : label === 'fullname' ? {fullname: val} :
-        label === 'gender' ? {gender: val} : label === 'institution' ? {institution: val} :
-        label === 'phone_number' ? {phone_number: val} : label === 'username' ? {username: val} : {}
+        let str = label === 'date_of_birth' ? { date_of_birth: val } :
+            label === 'email' ? { email: val } : label === 'fullname' ? { fullname: val } :
+                label === 'gender' ? { gender: val } : label === 'institution' ? { institution: val } :
+                    label === 'phone_number' ? { phone_number: val } : label === 'username' ? { username: val } : {}
         const param = {
             method: 'POST',
-            headers:{
+            headers: {
                 'Authorization': `Token ${val}`
             },
-            body: JSON.stringify(str)          
+            body: JSON.stringify(str)
         }
         console.log(str)
         setLoading(true)
         fetch(`${domain}user/edit`, param)
-        .then(res => res.json())
-        .then(resp => {
-            console.log(resp)
-            const val = Object.entries(str)[0]
-            dispatch(updateUserinfo({name: val[0], value: val[1]}))
-            setLoading(false)
-            setSuccess(true)     
-            Toast.show({
-                text: `${capitalize(label)} changed`,
-                buttonText: "CLOSE",
-                duration: 3000, 
-                style: {backgroundColor: 'green'}
-            })      
-        })
-        .catch(err => {
-            console.log(err)
-            setLoading(false)
-            setEdit(false)
-            setSuccess(false)
-            Toast.show({
-                text: `${err.message}`,
-                buttonText: "CLOSE",
-                duration: 3000, 
-                style: {backgroundColor: 'red'}
+            .then(res => res.json())
+            .then(resp => {
+                console.log(resp)
+                const val = Object.entries(str)[0]
+                dispatch(updateUserinfo({ name: val[0], value: val[1] }))
+                setLoading(false)
+                setSuccess(true)
+                Toast.show({
+                    text: `${capitalize(label)} changed`,
+                    buttonText: "CLOSE",
+                    duration: 3000,
+                    style: { backgroundColor: 'green' }
+                })
             })
-        })
-        .then(res => {
-            console.log(res)            
-            setTimeout(() => {
+            .catch(err => {
+                console.log(err)
+                setLoading(false)
                 setEdit(false)
                 setSuccess(false)
-            },3000) 
-        })
-        
+                Toast.show({
+                    text: `${err.message}`,
+                    buttonText: "CLOSE",
+                    duration: 3000,
+                    style: { backgroundColor: 'red' }
+                })
+            })
+            .then(res => {
+                console.log(res)
+                setTimeout(() => {
+                    setEdit(false)
+                    setSuccess(false)
+                }, 3000)
+            })
+
     }
 
     useEffect(() => {
@@ -100,26 +99,26 @@ export default function EditBox(props) {
     }, [])
 
     useEffect(() => {
-        if(edit && !success && !loading){
+        if (edit && !success && !loading) {
             block([
-                spring(undoEdit, {                        
+                spring(undoEdit, {
                     toValue: 1,
                     ...config()
                 }).start()
             ])
-        }else{
+        } else {
             undoEdit.setValue(1)
         }
         return () => {
         }
-    }) 
+    })
 
     const _keyboardDidShow = e => {
         timing(animatedMargin, {
             duration: e.duration,
             toValue: e.endCoordinates.height,
             easing: Easing.inOut(Easing.ease),
-        }).start()         
+        }).start()
     }
     const _keyboardDidHide = e => {
         timing(animatedMargin, {
@@ -148,128 +147,128 @@ export default function EditBox(props) {
         <Card style={style.container}>
             {edit ? label === 'date_of_birth' ? (
                 <>
-                {!loading ?
-                    <Animated.View style={[{flexDirection: 'row', opacity: icon_opacity, justifyContent: 'flex-end', position: 'absolute', top: 10, right: margin_shift }]}>                        
-                        <Icon 
-                            type='material'
-                            name='reply'
-                            size={20}
-                            color={colors[randomColor]}
-                            onPress={() => setEdit(false)}
-                        /> 
-                    </Animated.View>
-                    : 
-                    null
-                }
+                    {!loading ?
+                        <Animated.View style={[{ flexDirection: 'row', opacity: icon_opacity, justifyContent: 'flex-end', position: 'absolute', top: 10, right: margin_shift }]}>
+                            <Icon
+                                type='material'
+                                name='reply'
+                                size={20}
+                                color={colors[randomColor]}
+                                onPress={() => setEdit(false)}
+                            />
+                        </Animated.View>
+                        :
+                        null
+                    }
                     <View style={style.datePicker}>
-                    <DatePicker
-                        style={{width: 200}}
-                        date={val || value}
-                        mode="date"
-                        placeholder="select date"
-                        format="YYYY-MM-DD"
-                        minDate={minDate}
-                        maxDate={maxDate}
-                        confirmBtnText="Confirm"
-                        cancelBtnText="Cancel"
-                        customStyles={{
-                        dateIcon: {
-                            position: 'absolute',
-                            left: 0,
-                            top: 4,
-                            marginLeft: 0
-                        },
-                        dateInput: {
-                            marginLeft: 36
-                        }
-                        }}
-                        onDateChange={(date) => setVal(date)}
-                    />
+                        {/* <DatePicker
+                            style={{ width: 200 }}
+                            date={val || value}
+                            mode="date"
+                            placeholder="select date"
+                            format="YYYY-MM-DD"
+                            minDate={minDate}
+                            maxDate={maxDate}
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            customStyles={{
+                                dateIcon: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 4,
+                                    marginLeft: 0
+                                },
+                                dateInput: {
+                                    marginLeft: 36
+                                }
+                            }}
+                            onDateChange={(date) => setVal(date)}
+                        /> */}
                     </View>
                     <View style={style.dateSave}>
-                        {loading ? 
-                            <ActivityIndicator size="small" color="#0000ff" /> : 
-                            success ? 
-                                <Icon 
+                        {loading ?
+                            <ActivityIndicator size="small" color="#0000ff" /> :
+                            success ?
+                                <Icon
                                     type='material'
                                     name='check-circle'
                                     size={24}
                                     color='green'
-                                /> 
-                            :
-                            <Button transparent onPress={saveInfo}>                          
-                                <Text style={[style.editText]}>SAVE</Text>
-                            </Button>
+                                />
+                                :
+                                <Button transparent onPress={saveInfo}>
+                                    <Text style={[style.editText]}>SAVE</Text>
+                                </Button>
                         }
                     </View>
                 </>
-            ) : (  
+            ) : (
                 <>
-                {!loading ?
-                    <Animated.View
-                        style={[{ opacity: icon_opacity, position: 'absolute', top: 10, right: margin_shift }]}                    
-                    >
-                        <Icon 
-                            type='material'
-                            name='reply'
-                            size={20}
-                            color={colors[randomColor]}
-                            onPress={setBack}
-                        /> 
-                    </Animated.View> 
-                    : null
-                } 
-                <Animated.View style={[{flex: 1, marginBottom: animatedMargin}]}>                           
-                    <Input
-                        secureTextEntry={label === 'password' ? true : false}
-                        inputContainerStyle={style.inputs}
-                        label = {capitalize(label)}
-                        defaultValue={value}
-                        value={val !== null ? val : 'select a date'}
-                        labelStyle = {style.label}
-                        keyboardType={keyboardType}
-                        placeholder={capitalize(label)}
-                        style={style.input}
-                        leftIcon={
-                            <Icon 
+                    {!loading ?
+                        <Animated.View
+                            style={[{ opacity: icon_opacity, position: 'absolute', top: 10, right: margin_shift }]}
+                        >
+                            <Icon
                                 type='material'
-                                name={icon}
-                                size={24}
+                                name='reply'
+                                size={20}
                                 color={colors[randomColor]}
-                            /> 
-                        }
-                        rightIcon={
-                            loading ? 
-                                <ActivityIndicator size="small" color="#0000ff" />
-                                :
-                                success ? 
-                                <Icon 
+                                onPress={setBack}
+                            />
+                        </Animated.View>
+                        : null
+                    }
+                    <Animated.View style={[{ flex: 1, marginBottom: animatedMargin }]}>
+                        <Input
+                            secureTextEntry={label === 'password' ? true : false}
+                            inputContainerStyle={style.inputs}
+                            label={capitalize(label)}
+                            defaultValue={value}
+                            value={val !== null ? val : 'select a date'}
+                            labelStyle={style.label}
+                            keyboardType={keyboardType}
+                            placeholder={capitalize(label)}
+                            style={style.input}
+                            leftIcon={
+                                <Icon
                                     type='material'
-                                    name='check-circle'
+                                    name={icon}
                                     size={24}
-                                    color='green'
-                                /> 
-                                :
-                                <Button transparent onPress={saveInfo}>                          
-                                    <Text style={[style.editText]}>SAVE</Text>
-                                </Button>
-                        }      
-                        onChangeText={setVal}
-                    /> 
-                </Animated.View>  
-                </>            
-            ):(
+                                    color={colors[randomColor]}
+                                />
+                            }
+                            rightIcon={
+                                loading ?
+                                    <ActivityIndicator size="small" color="#0000ff" />
+                                    :
+                                    success ?
+                                        <Icon
+                                            type='material'
+                                            name='check-circle'
+                                            size={24}
+                                            color='green'
+                                        />
+                                        :
+                                        <Button transparent onPress={saveInfo}>
+                                            <Text style={[style.editText]}>SAVE</Text>
+                                        </Button>
+                            }
+                            onChangeText={setVal}
+                        />
+                    </Animated.View>
+                </>
+            ) : (
                 <View style={style.textContainer}>
                     <View style={style.badgeContainer}>
                         <Badge
                             value={label.charAt(0).toUpperCase()}
-                            textStyle={{fontSize: 17, fontWeight: 'bold'}}
+                            textStyle={{ fontSize: 17, fontWeight: 'bold' }}
                             badgeStyle={{ backgroundColor: colors[randomColor], width: 40, height: 40, borderRadius: 20 }}
                         />
                     </View>
                     <View style={style.textContent}>
                         <Text style={style.textLabel}>{capitalize(label)}</Text>
-                        <Text numberOfLines={1} style={style.textValue}>{label === 'password' ? '***' : value === null ? `Fill your ${label}` :value}</Text>
+                        <Text numberOfLines={1} style={style.textValue}>{label === 'password' ? '***' : value === null ? `Fill your ${label}` : value}</Text>
                     </View>
                     <View style={style.editContainer}>
                         <Button transparent onPress={() => setEdit(true)}>
@@ -317,12 +316,12 @@ const style = StyleSheet.create({
     },
     textContent: {
         flex: 0.6,
-    }, 
+    },
     editContainer: {
         flex: 0.2,
         alignItems: 'flex-end',
         paddingRight: 10,
-    }, 
+    },
     editText: {
         fontWeight: 'bold',
         color: '#054078'
@@ -336,13 +335,13 @@ const style = StyleSheet.create({
         fontSize: 17,
         fontWeight: 'bold',
         color: '#777'
-    }, 
+    },
     dateContainer: {
         flex: 1
-    }, 
+    },
     datePicker: {
         flex: 0.8
-    }, 
+    },
     dateSave: {
         flex: 0.2,
         alignItems: 'flex-end',

@@ -1,54 +1,19 @@
-import { loginStatus, login, vNumber } from './login';
-import { storeKey, getKey, deleteKey } from '../processes/keyStore';
-import { loginValue, confirm } from '../processes/lock';
+import { db } from '../processes/db';
 import isJson from '../processes/isJson';
+import { getKey, storeKey } from '../processes/keyStore';
+import { confirm, loginValue } from '../processes/lock';
+import { createUserLoading, createUserStop, login, loginDetails, loginStatus, logOutUser, signUpErr, verificationPoint, vNumber } from './login';
+import {
+  loadQuestion, loadQuiz, quizDispatcher, registerQuestion, removeQuestions, startGameErr
+} from './quiz';
 import {
   actionCreator,
   addSearchToDb,
-  ADD_SEARCH_ITEM,
-  SEARCH_ITEM_ARRAY,
-  LOAD_SEARCH,
-  SORT_SEARCH,
+  ADD_SEARCH_ITEM, LOAD_SEARCH, SEARCH_ITEM_ARRAY, SORT_SEARCH
 } from './search';
 import {
-  onArticleSuccess,
-  setArticle,
-  articleErrDis,
-  onFailedLike,
-  getArchived,
-  setSubject,
-  likeDisperse,
-  archiveDisperse,
-  archived,
-  like,
-  resolveArchive,
-  resolveUnarchivedArticles,
-  errArchive,
-  onFailedArchive,
-} from './learn';
-import {
-  registerPoint,
-  registerQuestion,
-  loadQuiz,
-  startGameErr,
-  quizDispatcher,
-  removeQuestions,
-  loadQuestion,
-} from './quiz';
-import {
-  onWeeklyWinnersSuccess,
-  onDailyWinnersSuccess,
-  winnersErrDis,
+  onDailyWinnersSuccess, onWeeklyWinnersSuccess, winnersErrDis
 } from './winners';
-import {
-  createUserStop,
-  createUserLoading,
-  verificationPoint,
-  loginDetails,
-  signUpErr,
-  logOutUser,
-} from './login';
-import { db } from '../processes/db';
 export const AWAITING_REQUEST = 'AWAITING_REQUEST';
 export const SUCCESSFUL_REQUEST = 'SUCCESSFUL_REQUEST';
 export const FAILED_REQUEST = 'FAILED_REQUEST';
@@ -77,7 +42,7 @@ export const failedRequest = (payload) => {
 const successLogin = (payload) => {
   return function (dispatch, getState) {
     storeKey(loginValue, payload.token);
-    console.log(payload);
+    console.log(payload.token);
     const newObj = JSON.parse(JSON.stringify(payload));
     dispatch(loginDetails(newObj));
     dispatch(successfulRequest());
@@ -121,7 +86,9 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
         throw new Error('Failed request with code ' + res.status);
       }
     })
-    .then((res) => dispatch(callback(res)))
+    .then((res) => {
+      dispatch(callback(res));
+    })
     .catch((error) => {
       // console.log(error.message)
       // const err = error.message === 'A user with this username and password was not found' ?
@@ -223,7 +190,7 @@ export const getArticles = (payload) => {
         },
       };
       // onsuccess callback
-      const callback = onArticleSuccess;
+      const callback = newOnArticleSuccess;
       // onfail callback
       const err = articleErrDis;
       if (val !== undefined && val !== null) {
@@ -233,7 +200,7 @@ export const getArticles = (payload) => {
   };
 };
 
-export const getDailyWinners = () => {
+export const getLiveRanks = () => {
   return function (dispatch, getState) {
     (async () => {
       console.log('getWinners was called');
@@ -432,12 +399,13 @@ export const buyPoints = (payload) => {
         method: 'POST',
         headers: {
           Authorization: `Token ${val}`,
-          'Content-Type': 'application/json',          
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       };
       if (val !== undefined || val !== null) {
         await fetch(`${domain}purchase_game_points`, param)
+          .then((res) => res.json())
           .then((response) => {
             console.log(response)
           })
@@ -511,8 +479,9 @@ export const signUp = (payload, navigateFxn) => {
           const obj = isJson(json);
           if (obj.constructor === Object && obj.token) {
             const objs = JSON.parse(JSON.stringify(obj));
+            console.log("tagged-1", objs)
             dispatch(verificationPoint(objs));
-            dispatch(vNumber(23456));
+            // dispatch(vNumber(23456));
             return obj;
           } else {
             const val = Object.entries(obj);
@@ -534,8 +503,61 @@ export const signUp = (payload, navigateFxn) => {
     })();
   };
 };
+
+export const requestVerification = (payload) => {
+  return (dispatch, getState) => {
+    (async () => {
+      const val = await getKey(loginValue);
+ 
+      const param = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+          Authorization: `Token ${val}`,
+      },
+      body: JSON.stringify(payload),
+      };
+      dispatch(awaitingRequest())
+      await fetch(`${domain}verify_email_request`, param)
+        .then(res => res.json)
+        .then((data) => {
+          dispatch(successfulRequest())
+        })
+        .catch((error) => {
+        dispatch(failedRequest())
+      })
+    })()
+  }
+}
+
+export const verifyEmail = (payload) => {
+  return (dispatch, getState) => {
+    (async () => {
+      const val = await getKey(loginValue);
+ 
+      const param = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+          Authorization: `Token ${val}`,
+      },
+      body: JSON.stringify(payload),
+      };
+     dispatch(awaitingRequest())
+      await fetch(`${domain}verify_email`, param)
+        .then(res => res.json)
+        .then((data) => {
+          dispatch(successfulRequest())
+        })
+        .catch((error) => {
+        dispatch(failedRequest())
+      })
+    })()
+  }
+}
+
 export const callStartGame = (fxn = null) => {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     (async () => {
       dispatch(loadQuiz(true));
       dispatch(loadQuestion({}));

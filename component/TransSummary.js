@@ -3,14 +3,14 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Text, StyleSheet, useWindowDimensions } from 'react-native'
 import { Container, Header, Body, Title, Left, Right, Content, View } from 'native-base'
 
-const TransSummary = ({navigation, route}) => {
+const TransSummary = ({ navigation, route }) => {
     const windowHeight = useWindowDimensions().height;
-    const {amt, unit} = route.params
-    return(
+    const { amt, unit, ref, id, message } = route.params
+    return (
         <Container style={style.header}>
             <LinearGradient
                 colors={['transparent', '#e1efef']}
-                style={{...style.gradient, height: windowHeight,}}
+                style={{ ...style.gradient, height: windowHeight, }}
             />
             <Header transparent>
                 <Left />
@@ -21,7 +21,7 @@ const TransSummary = ({navigation, route}) => {
                 </Body>
                 <Right />
             </Header>
-            <Content contentContainerStyle={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Content contentContainerStyle={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <View style={style.content}>
                     <View style={style.cover}>
                         <View style={style.right}>
@@ -41,10 +41,10 @@ const TransSummary = ({navigation, route}) => {
                     </View>
                     <View style={style.cover}>
                         <View style={style.right}>
-                            <Text style={style.text}>User ID</Text>
+                            <Text style={style.text}>Transaction Ref.</Text>
                         </View>
                         <View style={style.left}>
-                            <Text style={style.text}>XXXXX</Text>
+                            <Text style={style.text}>{ref}</Text>
                         </View>
                     </View>
                     <View style={style.cover}>
@@ -52,11 +52,11 @@ const TransSummary = ({navigation, route}) => {
                             <Text style={style.text}>Transaction ID</Text>
                         </View>
                         <View style={style.left}>
-                            <Text style={style.text}>XXXXX</Text>
+                            <Text style={style.text}>{id}</Text>
                         </View>
                     </View>
                     <View style={style.datecover}>
-                            <Text style={style.color}>Date : </Text>
+                        <Text style={style.color}>Date : </Text>
                     </View>
                     <View style={style.datecover}>
                         <Text style={style.color}>Thanks for your patronage</Text>

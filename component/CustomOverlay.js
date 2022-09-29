@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { BackHandler, ScrollView, StyleSheet } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
-import { StyleSheet, ScrollView, BackHandler } from 'react-native';
 import deviceSize from '../processes/deviceSize';
 
 const { Value, spring, timing, useCode, call } = Animated;
@@ -45,7 +44,7 @@ export default function CustomOverlay(props) {
       }
     } else {
     }
-    return () => {};
+    return () => { };
   }, [isVisible]);
 
   useEffect(() => {
@@ -62,17 +61,17 @@ export default function CustomOverlay(props) {
   const styleOption =
     animation === 'slide'
       ? [
-          {
-            ...style.overlay,
-            backgroundColor,
-            position: 'absolute',
-            height: '100%',
-            width: deviceWidth,
-          },
-          { transform: [{ translateY: editSpringVal }] },
-        ]
+        {
+          ...style.overlay,
+          backgroundColor,
+          position: 'absolute',
+          height: '100%',
+          width: deviceWidth,
+        },
+        { transform: [{ translateY: editSpringVal }] },
+      ]
       : animation === 'spring'
-      ? [
+        ? [
           {
             ...style.overlay,
             backgroundColor,
@@ -83,7 +82,7 @@ export default function CustomOverlay(props) {
           },
           { transform: [{ translateY: editSpringVal }] },
         ]
-      : [
+        : [
           {
             ...style.overlay,
             backgroundColor,
@@ -111,7 +110,7 @@ CustomOverlay.defaultProps = {
   backgroundColor: 'rgba(0,0,0,0.4)',
   alignItems: 'stretch',
   justifyContent: 'center',
-  backHandler: () => {},
+  backHandler: () => { },
 };
 
 CustomOverlay.propTypes = {
