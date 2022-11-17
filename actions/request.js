@@ -595,7 +595,7 @@ export const verifyEmail = (payload, onSuccess, onFail) => {
           if (data.message === "success") {
             console.log(data, "<=========")
             storeKey(loginValue, data.token)
-            deleteKey("confirm")
+            deleteKey(confirm)
             dispatch(successfulRequest())
             onSuccess()
           } else {

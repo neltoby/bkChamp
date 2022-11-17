@@ -78,7 +78,7 @@ export default function VerificationBody({ navigation }) {
                     Please enter the verification pin we 
                 </Text>
                 <Text style={style.verificationText}>
-                    sent to  your mail. Check your inbox or Spam/Junk Messages
+                    sent to  {email}. Check your inbox or Spam/Junk Messages
                 </Text>
             </View>
             <View style={style.textContainer}>

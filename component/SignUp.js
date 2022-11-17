@@ -95,12 +95,13 @@ const SignUp = ({ navigation, route }) => {
       // To be restored to VerificationBody once email verification is online
       const val = await getKey(confirm);
       if (val !== undefined && val !== null) {
-        // signed up but haven't confirmed
-        await storeKey(loginValue, val);
-        await deleteKey(confirm);
-        // verication state set to false indicates that user is verified and confirm token removed
-         dispatch(verification(false));
-        // navigation.navigate('Welcome');
+            await storeKey(loginValue, val);
+            await deleteKey(confirm);
+            // verification state set to false indicates that user is verified and confirm token removed
+            dispatch(verification(false));
+            // navigation.navigate('Welcome');
+      } else {
+          dispatch(verification(true))
       }
         dispatch(signUp(payload, onSuccess, onFail))
         

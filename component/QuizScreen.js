@@ -1,13 +1,13 @@
 import { useFocusEffect } from '@react-navigation/native';
-import EStyleSheet from 'react-native-extended-stylesheet';
-import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Network from 'expo-network';
 import { Container, Content, Toast } from 'native-base';
 import React, { useEffect } from 'react';
+import EStyleSheet from 'react-native-extended-stylesheet';
+
 import {
-  PixelRatio,
   ActivityIndicator,
-  Dimensions, Image, StatusBar, StyleSheet, Text, View, ScrollView
+  Dimensions, Image, ScrollView, StatusBar, Text, View
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
@@ -66,7 +66,23 @@ const QuizScreen = ({ navigation }) => {
 
   const redirect = () => navigation.navigate('PlayQuiz');
 
-  const playQuiz = () => {
+  const playQuiz = async () => {
+     const { isConnected, isInternetReachable } =
+          await Network.getNetworkStateAsync();
+        const airplane = await Network.isAirplaneModeEnabledAsync();
+        if (airplane) {
+          Toast.show({
+            text: `Offline mode`,
+            buttonText: 'CLOSE',
+            type: 'danger'
+          });
+        } else if (!isConnected && !isInternetReachable){
+          Toast.show({
+            text: `Network error, please check your connection.`,
+            buttonText: 'CLOSE',
+            type: 'danger'
+          });
+        }
     dispatch(callStartGame(redirect));
   };
 
@@ -157,7 +173,7 @@ const QuizScreen = ({ navigation }) => {
           ) : (
             <>
               <Text style={style.subText}>
-                Sorry, you do not have points to proceed!
+                Sorry, you do not have enough cilver for the quiz, please subscribe.
               </Text>
               <TouchableHighlight onPress={subscribe}>
                 <View style={style.but}>
