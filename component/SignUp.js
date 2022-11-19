@@ -112,6 +112,7 @@ const SignUp = ({ navigation, route }) => {
         if (validator.allValid()) {
             if (name.trim().split(' ').length > 1) {
                 if (passwordStr && passwordStr !== 'Too weak') {
+
                     handleSignUp()
                     // console.log(name, phone, email, password)
                     // navigation.navigate('Username', {

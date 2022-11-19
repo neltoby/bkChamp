@@ -3,7 +3,6 @@ import { Alert } from 'react-native'
 import { Header, Button, Left, Body, Right, Icon as NativeIcon, Title, } from 'native-base'
 
 export default function QuizHeader({ navigation }) {
-    null
     return (
         <Header transparent>
             <Left>

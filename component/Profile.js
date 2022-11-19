@@ -1,6 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useMemo, useEffect, useState } from 'react';
+
 import {
   Dimensions, Image as RNImage, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';

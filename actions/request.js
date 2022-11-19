@@ -49,7 +49,6 @@ export const failedRequest = (payload) => {
 const successLogin = (payload) => {
   return function (dispatch, getState) {
     storeKey(loginValue, payload.token);
-    null
     const newObj = JSON.parse(JSON.stringify(payload));
     dispatch(loginDetails(newObj));
     dispatch(successfulRequest());
@@ -509,7 +508,6 @@ export const signUp = (payload, onSuccess, onFail) => {
     })();
   };
 };
-
 export const editUserProfile = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {

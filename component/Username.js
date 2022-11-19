@@ -64,6 +64,7 @@ const Username = ({ navigation, route }) => {
     }
   const updateUsername = async () => {
     if (username.trim().length > 1) {
+
       if (username.trim().split(" ").length === 1) {
         dispatch(editUserProfile({username }, onSuccess, onFail))
       } else {
@@ -91,7 +92,6 @@ const Username = ({ navigation, route }) => {
   //       handleBack();
   //       return true;
   //     };
-
   //     BackHandler.addEventListener('hardwareBackPress', backAction);
   //     return () => {
   //       BackHandler.removeEventListener('hardwareBackPress', backAction);
@@ -168,6 +168,7 @@ const Username = ({ navigation, route }) => {
             />
             <Text style={style.skipText} onPress={skip}>{"Skip>>"}</Text>
           </View>
+          <Text style={{ color: "white", fontSize: 10 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={async () => await Linking.openURL('http://bookchamp.herokuapp.com/privacy')}>Privacy Policy</Text></Text>
         </Content>
       </Container>
       

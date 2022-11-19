@@ -13,6 +13,7 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { createdb, loadQuiz } from '../actions/quiz';
 import { callStartGame } from '../actions/request';
+import { updateUserinfo } from '../actions/user';
 import deviceSize from '../processes/deviceSize';
 import isJson from '../processes/isJson';
 import FocusAwareStatusBar from './FocusAwareStatusBar';

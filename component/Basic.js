@@ -49,7 +49,6 @@ const Basic = (props) => {
     });
   };
   const makePayment = () => {
-    //null
     const payment_data = {
       game_plan: `${itemSelect.amt} plan`,
       reference_code: `${reference_code}`,

@@ -53,7 +53,6 @@ const RankingScreen = () => {
     await dispatch(getLiveRanks()).unwrap();
   }; 
 
-
   const liveRanks = async () => {
     await onSuccess();
   };
@@ -75,7 +74,6 @@ const RankingScreen = () => {
       return () => clearInterval(intervalId);
     }, [])
   );
-  null
   const renderUsers = (user, index) => {
     const rankBgColor = index % 2 === 0 ? '#CCCCFF' : '#fff';
     const user_color = user.user_id === current_user.username ? "#00ff00" : "#000"

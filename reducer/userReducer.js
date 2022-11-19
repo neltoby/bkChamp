@@ -20,7 +20,6 @@ export default function(state = initialState, action){
     switch(action.type) {
         case USER_PROFILE: {
             return produce(state, draft => {
-            null
                 draft.user = action.payload
             })
         }

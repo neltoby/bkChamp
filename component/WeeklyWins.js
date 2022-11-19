@@ -71,7 +71,6 @@ const WeeklyWinners = () => {
     animatedLoader()
     loadWeeklyWins();
   }, []);
-  // null
 
 
   useFocusEffect(

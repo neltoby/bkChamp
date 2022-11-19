@@ -32,8 +32,6 @@ export default function Resend() {
         setDisabled(true)
         // dispatch(vNumber(23456))
       dispatch(requestVerification({email: "danielchibuezeolah@gmail.com"}, onSuccess, onFail))
-
-        
         setTimeout(() => {
             setDisabled(false)
         }, 1000 * 10);

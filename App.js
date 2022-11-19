@@ -36,6 +36,7 @@ const App = () => {
         ...MaterialIcons.font,
         ...MaterialCommunityIcons.font,
       });
+
       null
     }
     catch (e) {
@@ -55,8 +56,6 @@ const App = () => {
       ]);
       const val = await getKey(loginValue);
       const value = await getKey(confirm);
-
-      // null
 
       if (val !== undefined && val !== null) {
         store.dispatch(loginWithUser(true));

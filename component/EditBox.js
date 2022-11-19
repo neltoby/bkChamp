@@ -55,7 +55,6 @@ export default function EditBox(props) {
         fetch(`${domain}user/edit`, param)
             .then(res => res.json())
             .then(resp => {
-                null
                 const val = Object.entries(str)[0]
                 dispatch(updateUserinfo({ name: val[0], value: val[1] }))
                 setLoading(false)
@@ -68,7 +67,6 @@ export default function EditBox(props) {
                 })
             })
             .catch(err => {
-                null
                 setLoading(false)
                 setEdit(false)
                 setSuccess(false)
@@ -80,7 +78,6 @@ export default function EditBox(props) {
                 })
             })
             .then(res => {
-                null
                 setTimeout(() => {
                     setEdit(false)
                     setSuccess(false)

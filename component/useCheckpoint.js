@@ -21,11 +21,8 @@ export default function useCheckpoint(failed, success, payload) {
             )
             return failed(payload)
         } else if (!isConnected || !isInternetReachable) {
-            null
             return failed(payload)
         } else {
-            null
-            null
             return success(payload)
         }
     }
