@@ -25,7 +25,7 @@ export default function ListSeparator(props) {
                 // Animated.spring(springVal, {
                 //     duration: 1000,
                 //     toValue: -windowHeight,
-                // }).start(({finished}) => console.log(springVal))
+                // }).start(({finished}) => null
             }
         }, [edit])
     )

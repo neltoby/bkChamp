@@ -228,7 +228,7 @@ export const loginWithUser = (payload) => {
               if (payload === true) {
                 dispatch(login());
               } else {
-                dispatch(verification());
+                dispatch(verification(true));
               }
             },
             (err) => console.log(err, 'failed getting details')

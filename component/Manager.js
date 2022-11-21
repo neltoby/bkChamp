@@ -20,7 +20,7 @@ const Stack = createStackNavigator();
 
 const Manager = () => {
   const store = isJson(useSelector((state) => state));
-  // console.log(process.env.DB_HOST, 'that was a db value')
+  // null
   return (
     <>
       <SafeAreaProvider>

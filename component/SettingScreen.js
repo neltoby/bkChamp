@@ -42,7 +42,7 @@ import {
 import { deleteUser } from '../actions/request';
 import { storeKey, getKey, deleteKey } from '../processes/keyStore';
 import { loginValue, confirm } from '../processes/lock';
-import { logOutUser } from '../actions/login';
+import { logOutUser, notLogin } from '../actions/login';
 
 const {
   Value,
@@ -77,6 +77,8 @@ const SettingScreen = ({ navigation }) => {
   const [cloudImg, setCloudImg] = useState(null);
   const [loading, setLoading] = useState(false);
   const store = isJson(useSelector((state) => state));
+    null
+
   const user = [];
   var deleteTimer;
   const storePreview = isJson(useSelector((state) => state.learn)).preview;
@@ -221,7 +223,7 @@ const SettingScreen = ({ navigation }) => {
   );
 
   const pickImage = async () => {
-    console.log('pickImage has been called');
+    null
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -252,7 +254,7 @@ const SettingScreen = ({ navigation }) => {
       })
         .then(async (res) => {
           let data = await res.json();
-          console.log(data);
+          null
           return data.secure_url;
         })
         .then((url) => {
@@ -309,8 +311,7 @@ const SettingScreen = ({ navigation }) => {
     const domain = 'https://bookchamp.herokuapp.com/api/v1/';
 
     // get token from securestore
-    const user_pk = store.user.user.id;
-    console.log(user_pk);
+    const user_pk = store.user.user.user_pk;
     // get token from securestore
     const val = await getKey(loginValue);
     // set headers and other params
@@ -320,20 +321,20 @@ const SettingScreen = ({ navigation }) => {
         Authorization: `Token ${val}`,
       },
     };
-    console.log(val);
+    null
     if (val !== undefined && val !== null) {
       fetch(`${domain}user/${user_pk}/delete`, param)
         .then((res) => res.json())
         .then((res) => {
-          console.log(res, '<===response from user_delete');
+          null
           if (res.status === 'Success') {
             dispatch(logOutUser());
             setLoader(false);
-            navigation.navigate('Login');
+            dispatch(notLogin())
           }
         })
         .catch((err) => {
-          console.log(err, 'err from user_delete');
+          null
         });
     }
   };
@@ -432,7 +433,7 @@ const SettingScreen = ({ navigation }) => {
 
   // useCode(() => {
   //     return call([borderRadius], (borderRadius) => {
-  //         console.log(borderRadius, 'borderRadius')
+  //         null
   //     })
   // }, [borderRadius])
   return (

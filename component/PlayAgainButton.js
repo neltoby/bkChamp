@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from 'react-native'
 import { Button } from 'native-base'
 
 export default function PlayAgainButton(props) {
-    console.log('play again was called')
+    null
     return (
         <View style={{alignItems: 'center', width: '100%'}}>
             <View style={[style.startBut, {width: '80%'}]}>

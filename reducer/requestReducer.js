@@ -1,14 +1,20 @@
 import producer, { produce } from 'immer'
-import {AWAITING_REQUEST, SUCCESSFUL_REQUEST, FAILED_REQUEST} 
+import {AWAITING_REQUEST, SUCCESSFUL_REQUEST, FAILED_REQUEST, IDLE_REQUEST} 
 from '../actions/request'
 
 const initialState = {
-    status: 'awaiting',
+    status: 'idle',
     err: ''
 }
 
 export default function (state = initialState, action) {
     switch (action.type) {
+        case IDLE_REQUEST:{
+            return produce(state, draft => {
+                draft.status = 'idle',
+                draft.err = ''
+            })
+        }
         case AWAITING_REQUEST:{
             return produce(state, draft => {
                 draft.status = 'awaiting',

@@ -1,11 +1,13 @@
 import { useFocusEffect } from '@react-navigation/native';
-import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Network from 'expo-network';
 import { Container, Content, Toast } from 'native-base';
 import React, { useEffect } from 'react';
+import EStyleSheet from 'react-native-extended-stylesheet';
+
 import {
   ActivityIndicator,
-  Dimensions, Image, StatusBar, StyleSheet, Text, View
+  Dimensions, Image, ScrollView, StatusBar, Text, View
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,11 +18,18 @@ import deviceSize from '../processes/deviceSize';
 import isJson from '../processes/isJson';
 import FocusAwareStatusBar from './FocusAwareStatusBar';
 
-const ContainerView = ({ width, height, styleProp, children }) => {
+const ContainerView = ({ width, height, style, children }) => {
   if (width > height) {
-    return <Content style={styleProp}>{children}</Content>;
+    return<Content>{children}</Content>;
   }
-  return <Container style={styleProp}>{children}</Container>;
+  return <Container style={style}>{children}</Container>;
+};
+
+const AdaptiveContent = ({ width, height, style, children }) => {
+  if (width > height) {
+    return<View style={style}>{children}</View>;
+  }
+  return <ScrollView style={{...style, maxHeight: '50%'}}>{children}</ScrollView>;
 };
 const data = [
   { no: 1, text: 'Every correct answer attracts 3 marks' },
@@ -30,20 +39,51 @@ const data = [
   { no: 5, text: 'Quiz Duration: 6 minutes 30 secs' },
 ];
 
+const guidelines = () => (
+  <>
+          <Text style={style.head}>QUIZ GUIDELINES</Text>
+          {data.map((item, i) => {
+            return (
+              <Text style={style.textContainer} key={`${item}${i}`}>
+                <Text style={style.thick}>{item.no}.</Text>
+                <Text style={style.info}>{item.text}</Text>
+              </Text>
+            );
+          })}
+  </>
+    
+    )
 const deviceHeight = Dimensions.get("window").height;
 
 const QuizScreen = ({ navigation }) => {
+  // const {width, height} = useWindowDimensions()
   const dispatch = useDispatch();
   const windowWidth = deviceSize().deviceWidth;
   const windowHeight = deviceSize().deviceHeight;
+
   const points = isJson(useSelector((state) => state.user.user)).points;
   const loading = isJson(useSelector((state) => state.quiz)).loadingQuiz;
   const errStateGame = isJson(useSelector((state) => state.quiz)).startGameErr;
 
   const redirect = () => navigation.navigate('PlayQuiz');
 
-  const playQuiz = () => {
-    dispatch(updateUserinfo({ name: "points", value: "-1" }))
+  const playQuiz = async () => {
+     const { isConnected, isInternetReachable } =
+          await Network.getNetworkStateAsync();
+        const airplane = await Network.isAirplaneModeEnabledAsync();
+        if (airplane) {
+          Toast.show({
+            text: `Offline mode`,
+            buttonText: 'CLOSE',
+            type: 'danger'
+          });
+        } else if (!isConnected && !isInternetReachable){
+          Toast.show({
+            text: `Network error, please check your connection.`,
+            buttonText: 'CLOSE',
+            type: 'danger'
+          });
+        }
     dispatch(callStartGame(redirect));
   };
 
@@ -68,6 +108,7 @@ const QuizScreen = ({ navigation }) => {
     React.useCallback(() => {
       if (errStateGame !== null) {
         Toast.show({
+          type: "danger",
           text: errStateGame,
           buttonText: 'CLOSE',
           textStyle: { fontSize: 14 },
@@ -99,12 +140,13 @@ const QuizScreen = ({ navigation }) => {
         }}>
         <LinearGradient
           colors={['transparent', '#e1efef']}
-          style={{ ...style.gradient, height: windowHeight }}
+          start={{ x: 0.1, y: 0.2 }}
+          style={{ ...style.gradient, height: "100%" }}
         />
-        <View style={{ ...style.viewImg, marginTop: Constants.statusBarHeight }}>
-          {/*    <Image source={require('../img/book-champ.png')} style={style.img} />*/}
-        </View>
-        <View style={style.guide}>
+        {/* <View style={{ ...style.viewImg, marginTop: Constants.statusBarHeight }}>
+             <Image source={require('../img/book-champ.png')} style={style.img} />
+        </View> */}
+        <AdaptiveContent width={windowWidth} height={ windowHeight} style={style.guide}>
           <Text style={style.head}>QUIZ GUIDELINES</Text>
           {data.map((item, i) => {
             return (
@@ -114,8 +156,9 @@ const QuizScreen = ({ navigation }) => {
               </Text>
             );
           })}
-        </View>
-        <View style={{ flex: 0.3, alignItems: 'center', width: '100%' }}>
+        </AdaptiveContent>
+
+          <View style={{ flex: 0.3, alignItems: 'center', width: '100%' }}>
           {points > 0 ? (
             <TouchableHighlight onPress={loading ? disable : playQuiz}>
               <View style={style.but}>
@@ -131,7 +174,7 @@ const QuizScreen = ({ navigation }) => {
           ) : (
             <>
               <Text style={style.subText}>
-                Sorry, you do not have points to proceed!
+                Sorry, you do not have enough cilver for the quiz, please subscribe.
               </Text>
               <TouchableHighlight onPress={subscribe}>
                 <View style={style.but}>
@@ -148,7 +191,7 @@ const QuizScreen = ({ navigation }) => {
   );
 };
 
-const style = StyleSheet.create({
+const style = EStyleSheet.create({
   container: {
     flex: 1,
   },
@@ -167,7 +210,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    marginTop: Constants.statusBarHeight,
+    // marginTop: Constants.statusBarHeight,
   },
   foreImg: {
     width: 150,
@@ -190,6 +233,7 @@ const style = StyleSheet.create({
     width: '80%',
     paddingHorizontal: 10,
     paddingVertical: 20,
+    marginTop: "4rem"  ,
     marginBottom: 25,
   },
   head: {

@@ -1,6 +1,6 @@
 import { db } from '../processes/db';
 import isJson from '../processes/isJson';
-import { getKey, storeKey } from '../processes/keyStore';
+import { deleteKey, getKey, storeKey } from '../processes/keyStore';
 import { confirm, loginValue } from '../processes/lock';
 import { createUserLoading, createUserStop, login, loginDetails, loginStatus, logOutUser, signUpErr, verificationPoint, vNumber } from './login';
 import {
@@ -11,15 +11,22 @@ import {
   addSearchToDb,
   ADD_SEARCH_ITEM, LOAD_SEARCH, SEARCH_ITEM_ARRAY, SORT_SEARCH
 } from './search';
+import { updateUserinfo } from './user';
 import {
   onDailyWinnersSuccess, onWeeklyWinnersSuccess, winnersErrDis
 } from './winners';
 export const AWAITING_REQUEST = 'AWAITING_REQUEST';
 export const SUCCESSFUL_REQUEST = 'SUCCESSFUL_REQUEST';
 export const FAILED_REQUEST = 'FAILED_REQUEST';
+export const IDLE_REQUEST = 'IDLE_REQUEST';
 
 const domain = 'https://bookchamp.herokuapp.com/api/v1/';
 
+export const idleRequest = () => {
+  return {
+    type: IDLE_REQUEST
+  }
+}
 export const awaitingRequest = () => {
   return {
     type: AWAITING_REQUEST,
@@ -42,7 +49,6 @@ export const failedRequest = (payload) => {
 const successLogin = (payload) => {
   return function (dispatch, getState) {
     storeKey(loginValue, payload.token);
-    console.log(payload.token);
     const newObj = JSON.parse(JSON.stringify(payload));
     dispatch(loginDetails(newObj));
     dispatch(successfulRequest());
@@ -77,7 +83,7 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
     : fetch(`${domain}${endpoint}`);
   fet
     .then((res) => {
-      // console.log(res)
+      // null
       if (res.status === 200) {
         return res.json();
       } else if (endpoint === 'login') {
@@ -90,7 +96,6 @@ export const request = (endpoint, param, callback, errCallback, dispatch) => {
       dispatch(callback(res));
     })
     .catch((error) => {
-      // console.log(error.message)
       // const err = error.message === 'A user with this username and password was not found' ?
       // 'A user with this username and password was not found' : 'Failed request' ;
       dispatch(errCallback(error.message));
@@ -120,10 +125,10 @@ export const loginRequest = (body) => {
 export const deleteUser = (payload) => {
   return function (dispatch, getState) {
     async () => {
-      console.log('delete user was called');
+      null
       // let pk = getState().user.user.id
       let pk = payload;
-      console.log('requests log==>', pk);
+      null
       const val = getKey(loginValue);
       const param = {
         method: 'POST',
@@ -135,9 +140,9 @@ export const deleteUser = (payload) => {
       if (val !== undefined && val !== null) {
         await fetch(`${domain}/user/${pk}/delete`)
           .then((resp) => resp.json)
-          .then((response) => console.log(response))
+          .then((response) => null)
           .then(dispatch(logOutUser()))
-          .catch((err) => console.log(err));
+          .catch((err) => null)
       }
     };
   };
@@ -159,7 +164,7 @@ export const fetchArchived = () => {
         await fetch(`${domain}articles/archive`, param)
           .then((res) => res.json())
           .then((resp) => dispatch(resolveArchive(resp)))
-          .catch((err) => console.log(err))
+          .catch((err) => null)
           .then((res) => {
             return setTimeout(() => {
               dispatch(getArchived());
@@ -173,7 +178,7 @@ export const fetchArchived = () => {
 export const getArticles = (payload) => {
   return function (dispatch, getState) {
     (async () => {
-      console.log('getArticles was called');
+      null
       // set article array to empty
       dispatch(setArticle([]));
 
@@ -203,7 +208,7 @@ export const getArticles = (payload) => {
 export const getLiveRanks = () => {
   return function (dispatch, getState) {
     (async () => {
-      console.log('getWinners was called');
+      null
       //get the auth token from the store
       const val = await getKey(loginValue);
       //set headers and pother params
@@ -227,7 +232,7 @@ export const getLiveRanks = () => {
 export const getWeeklyWinners = () => {
   return function (dispatch, getState) {
     (async () => {
-      console.log('getWinners was called');
+      null
       // dispatch(setDailyWinners([]));
       //get the auth token from the store
       const val = await getKey(loginValue);
@@ -270,7 +275,7 @@ export const likeFxn = (payload) => {
             return dispatch(likeDisperse({ id: json.id, state: 1 }));
           })
           .catch((err) => {
-            console.log(err);
+            null
             return dispatch(onFailedLike({ id: payload, state: 1 }));
             // return showTaoster({text:'Poor network', type: 'danger', })
           });
@@ -300,7 +305,7 @@ export const unlikeFxn = (payload) => {
             dispatch(likeDisperse({ id: json.id, state: 0 }));
           })
           .catch((err) => {
-            console.log(err);
+            null
             return dispatch(onFailedLike({ id: payload, state: 0 }));
             // return showTaoster({text:'Poor network', type: 'danger', })
           });
@@ -394,7 +399,7 @@ export const buyPoints = (payload) => {
   return function (dispatch, getState) {
     (async () => {
       const val = await getKey(loginValue);
-      console.log(payload)
+      null
       const param = {
         method: 'POST',
         headers: {
@@ -407,9 +412,9 @@ export const buyPoints = (payload) => {
         await fetch(`${domain}purchase_game_points`, param)
           .then((res) => res.json())
           .then((response) => {
-            console.log(response)
+            null
           })
-          .catch(err => console.log(err));
+          .catch(err => null)
       }
     })()
   };
@@ -418,7 +423,7 @@ export const endGame = (payloads) => {
   return function (dispatch, getState) {
     (async () => {
       const id = getState().quiz.game_id;
-      console.log(id, '<====endGame id');
+      null
       // get token from securestore
       const val = await getKey(loginValue);
       const { payload } = payloads;
@@ -439,14 +444,14 @@ export const endGame = (payloads) => {
         fetch(`${domain}end_game`, param)
           .then((res) => res.json())
           .then((res) => {
-            console.log(res, '<===response from end_game');
+            null
             if (fxn !== null) {
               dispatch(startGameFxn(fxn));
               removeQuestions(payload);
             }
           })
           .catch((err) => {
-            console.log(err, 'err from end game');
+            null
             registerQuestion(payload);
             if (fxn !== null) {
               dispatch(loadQuiz(false));
@@ -457,7 +462,7 @@ export const endGame = (payloads) => {
   };
 };
 
-export const signUp = (payload, navigateFxn) => {
+export const signUp = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
       // dispatch creating user loading
@@ -473,42 +478,76 @@ export const signUp = (payload, navigateFxn) => {
       await fetch(`${domain}signup`, param)
         .then((res) => res.json())
         .then((json) => {
+          console.log(json)
           // dispatch stop creating user loading
           dispatch(createUserStop());
-          console.log(json, 'line 296');
           const obj = isJson(json);
           if (obj.constructor === Object && obj.token) {
             const objs = JSON.parse(JSON.stringify(obj));
-            console.log("tagged-1", objs)
+            storeKey(confirm, obj.token)
+            console.log(objs)
             dispatch(verificationPoint(objs));
             // dispatch(vNumber(23456));
             return obj;
           } else {
             const val = Object.entries(obj);
-            console.log(val);
             throw new Error(`${val[0][0]}: ${val[0][1][0]}`);
           }
         })
         .then((obj) => storeKey(confirm, obj.token))
-        .then((response) => navigateFxn())
+        .then((response) => onSuccess())
         .catch((err) => {
-          console.log(err, err.message);
+          console.log(err.message)
           dispatch(signUpErr(err.message));
+          onFail({message: getState().login.signUpErr})
           dispatch(createUserStop());
           setTimeout(() => {
             dispatch(signUpErr(null));
           }, 3000);
-          console.log(err.message, 'fro request.js eror reporting 322');
         });
     })();
   };
 };
-
-export const requestVerification = (payload) => {
+export const editUserProfile = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
       const val = await getKey(loginValue);
- 
+      const param = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+          Authorization: `Token ${val}`,
+      },
+      body: JSON.stringify(payload),
+      };
+      dispatch(awaitingRequest())
+      await fetch(`${domain}user/edit`, param)
+        .then(res => res.json())
+        .then((data) => {
+          console.log(data)
+          if (data.status === "success") {
+            dispatch(successfulRequest())
+            onSuccess()
+          } else {
+             const val = Object.entries(data);
+            throw new Error(`${val[0][0]}: ${val[0][1][0]}`);
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          dispatch(failedRequest())
+          dispatch(signUpErr(error.message));
+          onFail({message: getState().login.signUpErr})
+      })
+    })()
+  }
+}
+export const requestVerification = (payload, onSuccess, onFail) => {
+  return (dispatch, getState) => {
+    (async () => {
+      const val = await getKey(confirm);
+      console.log(payload, val)
+      null
       const param = {
       method: 'POST',
       headers: {
@@ -519,22 +558,26 @@ export const requestVerification = (payload) => {
       };
       dispatch(awaitingRequest())
       await fetch(`${domain}verify_email_request`, param)
-        .then(res => res.json)
+        .then(res => console.log(res))
         .then((data) => {
+          console.log(data, "<====verify request")
+          onSuccess()
           dispatch(successfulRequest())
         })
         .catch((error) => {
+          console.log(error)
+          onFail()
         dispatch(failedRequest())
       })
     })()
   }
 }
 
-export const verifyEmail = (payload) => {
+export const verifyEmail = (payload, onSuccess, onFail) => {
   return (dispatch, getState) => {
     (async () => {
-      const val = await getKey(loginValue);
- 
+      const val = await getKey(confirm);
+      console.log(payload)
       const param = {
       method: 'POST',
       headers: {
@@ -545,13 +588,23 @@ export const verifyEmail = (payload) => {
       };
      dispatch(awaitingRequest())
       await fetch(`${domain}verify_email`, param)
-        .then(res => res.json)
+        .then(res => res.json())
         .then((data) => {
-          dispatch(successfulRequest())
+          if (data.message === "success") {
+            console.log(data, "<=========")
+            storeKey(loginValue, data.token)
+            deleteKey(confirm)
+            dispatch(successfulRequest())
+            onSuccess()
+          } else {
+            console.log(data)
+            dispatch(failedRequest())
+            onFail()
+          }
         })
         .catch((error) => {
-        dispatch(failedRequest())
-      })
+            dispatch(failedRequest())
+        })
     })()
   }
 }
@@ -588,11 +641,10 @@ export const callStartGame = (fxn = null) => {
                 }
               }
             },
-            (err) => console.log(err)
+            (err) => null
           );
         },
-        (err) => console.log(err),
-        () => console.log('susx')
+        (err) => null
       );
     })();
   };
@@ -601,7 +653,7 @@ export const callStartGame = (fxn = null) => {
 export const startGameFxn = (fxn = null) => {
   return (dispatch) => {
     (async () => {
-      console.log('startGame was called');
+      null
       // get token from securestore
       const val = await getKey(loginValue);
       // set headers and other params
@@ -611,12 +663,12 @@ export const startGameFxn = (fxn = null) => {
           Authorization: `Token ${val}`,
         },
       };
-      console.log(val);
+      null
       if (val !== undefined && val !== null) {
         fetch(`${domain}start_game`, param)
           .then((res) => res.json())
           .then((resp) => {
-            console.log(resp);
+            null
             const response = isJson(resp);
             if (response.questions !== undefined) {
               return quizDispatcher(resp);
@@ -626,10 +678,11 @@ export const startGameFxn = (fxn = null) => {
           })
           .then((json) => {
             dispatch(loadQuestion(json));
+    dispatch(updateUserinfo({ name: "points", value: "-1" }))
             if (fxn !== null) fxn();
           })
           .catch((err) => {
-            console.log(err, 'from start game');
+            null
             dispatch(startGameErr(err.message));
             setTimeout(() => {
               dispatch(startGameErr(null));
@@ -663,7 +716,7 @@ export const getSearchArray = ({ subject, search }) => {
           .then((resp) => {
             dispatch(actionCreator(SEARCH_ITEM_ARRAY, resp));
           })
-          .catch((e) => console.log(e))
+          .catch((e) => null)
           .then((res) => {
             dispatch(actionCreator(LOAD_SEARCH, false));
           });

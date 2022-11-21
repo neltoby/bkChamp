@@ -136,14 +136,14 @@ const ReviewQuestion = ({ navigation }) => {
                             </View>
                             <View style={style.next}>
                                 {no !== 0 ?
-                                    <Text onPress={() => { prevQuestion() }}>Prev</Text>
+                                    <Text style={{fontSize: 20, fontWeight: "bold"}} onPress={() => { prevQuestion() }}>{"<<Prev"}</Text>
                                     :
-                                    null
+                                    <></>
                                 }
                                 {no < played.length - 1 ?
-                                    <Text onPress={() => nextQuestion()}>Next</Text>
+                                    <Text style={{fontSize: 20, fontWeight: "bold"}} onPress={() => nextQuestion()}>{"Next>>"}</Text>
                                     :
-                                    null
+                                    <></>
                                 }
                             </View>
                             <MemoizedPlayAgainButton setStartAgain={setAgain} />
@@ -305,6 +305,7 @@ const style = StyleSheet.create({
         fontWeight: 'bold',
     },
     next: {
+        marginTop: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingRight: 15,

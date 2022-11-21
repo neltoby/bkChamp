@@ -1,21 +1,32 @@
-import React, { useState, useEffect } from 'react'
-import logo from '../processes/image'
-import SimpleReactValidator from 'simple-react-validator';
-import Container from './Container'
-import { Content, Toast, Button as NButton } from 'native-base';
-import { View, Text, StyleSheet, StatusBar, Image } from 'react-native'
-import { Input, Icon } from 'react-native-elements';
+import { useFocusEffect } from '@react-navigation/native';
 import { passwordStrength } from 'check-password-strength';
+import { Button as NButton, Content, Toast } from 'native-base';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, StatusBar, StyleSheet, Text, View, Linking } from 'react-native';
+import { Icon, Input } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
+import SimpleReactValidator from 'simple-react-validator';
+import { createUserLoading, verification } from '../actions/login';
+import { idleRequest, signUp } from '../actions/request';
+import deviceSize from '../processes/deviceSize';
+import logo from '../processes/image';
+import { deleteKey, getKey, storeKey } from '../processes/keyStore';
+import { confirm, loginValue } from '../processes/lock';
+import Container from './Container';
+import Overlay from './Overlay';
 
 const checkPasswordStrength = (value) => {
     if (value) {
-        console.log(passwordStrength(value));
+        null
         return passwordStrength(value);
     }
     return '';
 }
 
 const SignUp = ({ navigation, route }) => {
+      const deviceWidth = deviceSize().deviceWidth;
+  const deviceHeight = deviceSize().deviceHeight;
+    const dispatch = useDispatch();
     const [notVisible, setNotVisible] = useState(true)
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -24,23 +35,101 @@ const SignUp = ({ navigation, route }) => {
     const [passwordStrengthContent, setPasswordStrengthContent] = useState({})
     const [passwordStr, setPasswordStr] = useState('');
     const validator = new SimpleReactValidator();
-    const handleSignUp = () => {
+     const loading = useSelector((state) => state.login).createUser;
+    const errSignUp = useSelector((state) => state.login).signUpErr;
+    
+//     useFocusEffect(
+//         React.useCallback(() => {
+//         if (errSignUp !== null) {
+//             null
+//             Toast.show({
+//             type: "danger",
+//             text: errSignUp.split(":")[1],
+//             buttonText: 'CLOSE',
+//             duration: 5000,
+
+//             });
+//         }
+//         return () => { };
+//         }, [errSignUp])
+//   );
+
+    const onSuccess = () => {
+         dispatch(idleRequest())
+         Toast.show({
+            type: "success",
+            text: "You've successfully registered!",
+            buttonText: 'CLOSE',
+            duration: 5000,
+
+            });
+    navigation.navigate('ConfirmNumber');
+    // setVisible(false)
+    };
+    
+    const onFail = ({message = null}) => {
+        if (message !== null) {
+            null
+            Toast.show({
+            type: "danger",
+            text: message.split(":")[1],
+            buttonText: 'CLOSE',
+            duration: 5000,
+
+            });
+        }
+    }
+
+    const handleSignUp = async () => {
+        let phone_number =
+          phone.length === 10 ? `0${phone}` : phone;
+        const payload = {
+            fullname: name,
+            email,
+            phone_number,
+            password,
+            username: name.trim().split(" ").join("")
+        }
+        console.log(payload)
+      dispatch(createUserLoading());
+      // To be restored to VerificationBody once email verification is online
+      const val = await getKey(confirm);
+      if (val !== undefined && val !== null) {
+            await storeKey(loginValue, val);
+            await deleteKey(confirm);
+            // verification state set to false indicates that user is verified and confirm token removed
+            dispatch(verification(false));
+            // navigation.navigate('Welcome');
+      } else {
+          dispatch(verification(true))
+      }
+        dispatch(signUp(payload, onSuccess, onFail))
+        
+    //   setUserName('');
+    }
+
+    const validate = () => {
         if (validator.allValid()) {
             if (name.trim().split(' ').length > 1) {
                 if (passwordStr && passwordStr !== 'Too weak') {
-                    navigation.navigate('Username', {
-                        name, email, phone, password
-                    })
+
+                    handleSignUp()
+                    // console.log(name, phone, email, password)
+                    // navigation.navigate('Username', {
+                    //     name, email, phone, password
+                    // })
                 } else {
                     if (!passwordStr) {
                         Toast.show({
                             text: "Password is missing!",
                             buttonText: "CLOSE",
-                            duration: 3000
+                            duration: 3000,
+                            type: "danger"
                         })
                     }
                     if (passwordStr === 'Too weak') {
                         Toast.show({
+                            type: "danger",
                             text: "Password is too weak!",
                             buttonText: "CLOSE",
                             duration: 3000
@@ -49,6 +138,7 @@ const SignUp = ({ navigation, route }) => {
                 }
             } else {
                 Toast.show({
+                    type: "danger",
                     text: "Other name is missing!",
                     buttonText: "CLOSE",
                     duration: 3000
@@ -58,24 +148,28 @@ const SignUp = ({ navigation, route }) => {
             let nErr = { ...validator.getErrorMessages() }
             if (nErr.Fullname) {
                 Toast.show({
+                    type: "danger",
                     text: nErr.Fullname,
                     buttonText: "CLOSE",
                     duration: 3000
                 })
             } else if (nErr.Email) {
                 Toast.show({
+                    type: "danger",
                     text: nErr.Email,
                     buttonText: "CLOSE",
                     duration: 3000
                 })
             } else if (nErr.Phone) {
                 Toast.show({
+                    type: "danger",
                     text: nErr.Phone,
                     buttonText: "CLOSE",
                     duration: 3000
                 })
             } else if (nErr.Password) {
                 Toast.show({
+                    type: "danger",
                     text: nErr.Password,
                     buttonText: "CLOSE",
                     duration: 3000
@@ -217,13 +311,12 @@ const SignUp = ({ navigation, route }) => {
                                 />
                             }
                             rightIcon={
-                                <Icon
-                                    type='font-awesome'
-                                    name={notVisible ? 'eye' : 'eye-slash'}
-                                    size={24}
-                                    color='#fff'
-                                    onPress={() => setNotVisible(!notVisible)}
-                                />
+                                <Text
+                                onPress={() => setNotVisible(!notVisible)}
+                                style={{ color: "#fff" }}
+                                >
+                                {notVisible ? "Show" : "Hide"}
+                                </Text>
                             }
                             onChangeText={value => checkPassword(value)}
                         />
@@ -257,11 +350,11 @@ const SignUp = ({ navigation, route }) => {
 
                     <View style={{ ...style.viewImg, marginTop: 20, width: '100%', paddingHorizontal: 7 }}>
                         <NButton
-                            onPress={() => handleSignUp()}
+                            onPress={validate}
                             style={{ backgroundColor: '#1258ba', width: '100%', borderRadius: 50 }}
                             full
                         >
-                            <Text style={{ color: '#fff' }}>CONTINUE</Text>
+                            <Text style={{ color: '#fff' }}>Sign Up</Text>
                             <Icon
                                 type='font-awesome'
                                 name="chevron-circle-right"
@@ -270,8 +363,27 @@ const SignUp = ({ navigation, route }) => {
                                 containerStyle={{ marginLeft: 8 }}
                             />
                         </NButton>
+          <Text style={{ color: "white", fontSize: 10, padding: 37 }}>By Signing up you agree to our <Text style={{ color: 'blue' }} onPress={async () => await Linking.openURL('http://thebookchamp.com/privacy')}>Privacy Policy</Text></Text>
+
                     </View>
                 </View>
+                 {loading && (
+        <Overlay
+          isVisible={true}
+          deviceHeight={deviceHeight}
+          deviceWidth={deviceWidth}>
+          <View style={style.createUser}>
+            <View style={style.activity}>
+              <ActivityIndicator color="#054078" size={24} />
+            </View>
+            <View style={style.cUserContainer}>
+              <Text numberOfLines={1} style={style.cUserText}>
+                signing you up ...
+              </Text>
+            </View>
+          </View>
+        </Overlay>
+      ) }
             </Content>
         </Container>
 
@@ -371,6 +483,26 @@ const style = StyleSheet.create({
     },
     label: {
         color: '#fff'
-    }
+    },
+        activity: {
+    flex: 0.3,
+  },
+  cUserContainer: {
+    flex: 0.7,
+  },
+  cUserText: {
+    fontSize: 16,
+    color: '#054078',
+  },
+  createUser: {
+    height: 50,
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 3,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
 })
 export default SignUp

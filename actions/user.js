@@ -40,14 +40,13 @@ export const updateUserinfo = (payload) => {
             sql,
             [newValue],
             (txObj, { rowsAffected }) => {
-              console.log(rowsAffected, 'row affected');
+              null
               dispatch(updateUser({ name, value: newValue }));
             },
-            (err) => console.log(err, 'err in updating')
+            (err) => null
           );
         },
-        (err) => console.log(err, 'err in transaction'),
-        () => console.log('transaction successful')
+        (err) => null
       );
     })();
   };

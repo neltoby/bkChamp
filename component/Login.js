@@ -66,7 +66,7 @@ const Login = ({ navigation, route }) => {
         });
       }
     } catch (error) {
-      console.log(error.message);
+      null
       Toast.show({
         text: `Network request failed`,
         buttonText: 'CLOSE',
@@ -95,7 +95,7 @@ const Login = ({ navigation, route }) => {
     }, [store.login.login])
   );
 
-    store.request.status === 'failed'
+    (store.request.status === 'failed' && store.request.err)
       ? Toast.show({
         text: store.request.err,
         buttonText: 'CLOSE',

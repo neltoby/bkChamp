@@ -50,12 +50,11 @@ export default function EditBox(props) {
             },
             body: JSON.stringify(str)
         }
-        console.log(str)
+        null
         setLoading(true)
         fetch(`${domain}user/edit`, param)
             .then(res => res.json())
             .then(resp => {
-                console.log(resp)
                 const val = Object.entries(str)[0]
                 dispatch(updateUserinfo({ name: val[0], value: val[1] }))
                 setLoading(false)
@@ -68,7 +67,6 @@ export default function EditBox(props) {
                 })
             })
             .catch(err => {
-                console.log(err)
                 setLoading(false)
                 setEdit(false)
                 setSuccess(false)
@@ -80,7 +78,6 @@ export default function EditBox(props) {
                 })
             })
             .then(res => {
-                console.log(res)
                 setTimeout(() => {
                     setEdit(false)
                     setSuccess(false)
@@ -139,7 +136,7 @@ export default function EditBox(props) {
     })
 
     const setBack = () => {
-        console.log('setback called')
+        null
         setEdit(false)
     }
 

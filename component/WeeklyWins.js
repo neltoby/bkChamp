@@ -71,7 +71,6 @@ const WeeklyWinners = () => {
     animatedLoader()
     loadWeeklyWins();
   }, []);
-  // console.log(store.weekly_winners, "<===rendered winners")
 
 
   useFocusEffect(

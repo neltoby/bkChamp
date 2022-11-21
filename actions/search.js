@@ -29,10 +29,8 @@ export const addSearchToDb = payload => {
                             dispatch(actionCreator(ADD_SEARCH_ITEM, payload))
                             console.log('inserted successful')
                         }                      
-                    }, err => console.log('failed insert'))
-                }, 
-                err => console.log(err), 
-                () => console.log('successful transxtion'))
+                    })
+                })
             }
         )()
     }
@@ -48,8 +46,7 @@ export const getSearchItem = () => {
                     console.log(_array, 'from getSearchItem')
                     dispatch(actionCreator(SEARCH_ITEM_ARRAY, _array))
                 }, err => console.log('failed searched'))
-            }, err => console.log(err, 'nothing'),
-            () => console.log('successful transaction'))
+            })
         })()
     }
 }

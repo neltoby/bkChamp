@@ -9,14 +9,14 @@ export const storeKey = async (key, value) => {
             if(Platform.Version < 23){
                 res = await _storeData(key, val)
             }else{
-                console.log(`key value is ${key}`, value, 'is value')
+                null
                 res = await SecureStore.setItemAsync(key, value)
             }
         }else{
             res = await SecureStore.setItemAsync(key, value)
         }  
     } catch(e) {
-        console.log(e)
+        null
     }
 }
 
@@ -34,7 +34,7 @@ export const getKey = async (key) => {
         }
         return read
     }catch(e){
-        console.log(e)
+        null
     }
 }
 
@@ -52,6 +52,6 @@ export const deleteKey = async (key) => {
         }
         return res
     }catch(e){
-        console.log(e)
+        null
     }
 }

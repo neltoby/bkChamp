@@ -25,7 +25,7 @@ export default function DailyWins() {
   const refContainer = useRef(null);
 
   const onSuccess = () => {
-    console.log('onsuccess was called');
+    null
     dispatch(getDailyWinners());
   };
 
